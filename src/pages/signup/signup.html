@@ -36,13 +36,13 @@
     </div>
 
     <ion-item>
-      <ion-label>Signup as</ion-label>
+      <ion-label floating>What are you?</ion-label>
       <ion-select [(ngModel)]="data.type" required type="type" #type="ngModel">
         <ion-option value="recruiter">Recruiter</ion-option>
         <ion-option value="candidate">Candidate</ion-option>
       </ion-select>
     </ion-item>
-
+    
     <ion-item class="animated pulse">
       <ion-label>Password</ion-label>
       <ion-input [(ngModel)]="data.password" required password="password" #password="ngModel"

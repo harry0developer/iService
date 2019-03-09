@@ -7,6 +7,7 @@ import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { LoginPage } from '../login/login';
 import { DashboardPage } from '../dashboard/dashboard';
 import { EMAIL_EXISTS } from '../../config';
+import { DateProvider } from '../../providers/date/date';
 
 
 @IonicPage()
@@ -31,17 +32,19 @@ export class SignupPage {
     public navParams: NavParams,
     public dataProvider: DataProvider,
     public authProvider: AuthProvider,
+    public dateProvider: DateProvider,
     public feedbackProvider: FeedbackProvider) { }
 
   ionViewDidLoad() { }
 
   signupWithEmailAndPassword() {
-    console.log(this.data);
 
-    this.authProvider.signUpWithEmailAndPassword(this.data.email, this.data.password).then(() => {
-      this.authProvider.updateUser(this.data).then(() => {
-        this.navCtrl.setRoot(DashboardPage);
-      });
+    const data = {
+      ...this.data,
+      createdAt: this.dateProvider.getDate()
+    }
+    this.authProvider.signUpWithEmailAndPassword(data).then(() => {
+      this.navCtrl.setRoot(DashboardPage);
     }).catch(err => {
       if (err.code === EMAIL_EXISTS) {
         this.feedbackProvider.presentErrorAlert('Signup failed', 'Email already exists, please signin');

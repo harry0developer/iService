@@ -5,8 +5,13 @@ import { DashboardPage } from '../dashboard/dashboard';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { SignupPage } from '../signup/signup';
 import { ForgotPasswordPage } from '../forgot-password/forgot-password';
-import { USER_NOT_FOUND } from '../../config';
+import { USER_NOT_FOUND, INVALID_PASSWORD } from '../../config';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
+import { User } from '../../models/user';
+import { DataProvider } from '../../providers/data/data';
+import { CandidatesPage } from '../candidates/candidates';
+import { JobsPage } from '../jobs/jobs';
+import { DateProvider } from '../../providers/date/date';
 
 @Component({
   selector: 'page-login',
@@ -24,21 +29,41 @@ export class LoginPage {
     public afAuth: AngularFireAuth,
     public navCtrl: NavController,
     public navParams: NavParams,
+    public dataProvider: DataProvider,
+    public dateProvider: DateProvider,
     public feedbackProvider: FeedbackProvider,
     private authProvider: AuthProvider) {
   }
 
   ionViewDidLoad() {
-    // if (this.authProvider.isLoggedIn()) {
-    //   this.navCtrl.setRoot(DashboardPage);
-    // }
+    if (this.authProvider.isLoggedIn()) {
+      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, this.authProvider.getStoredUser().uid).subscribe(u => {
+        const user: any = u;
+        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
+      });
+    }
+  }
+
+  addUser() {
+    const user: User = {
+      firstname: 'Thabo',
+      lastname: 'Papo',
+      type: 'candidate',
+      email: 'thabo@papo.com',
+      password: '123456',
+      createdAt: this.dateProvider.getDate()
+    }
+    this.authProvider.signUpWithEmailAndPassword(user).then(s => console.log).catch(err => console.log);
   }
 
   signinWithEmailAndPassword() {
-    this.authProvider.signInWithEmailAndPassword(this.data.email, this.data.password).then(() => {
-      this.navCtrl.setRoot(DashboardPage);
+    this.authProvider.signInWithEmailAndPassword(this.data.email, this.data.password).then((res) => {
+      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, res.user.uid).subscribe(u => {
+        const user: any = u;
+        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
+      });
     }).catch(err => {
-      if (err.code === USER_NOT_FOUND) {
+      if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
         this.feedbackProvider.presentErrorAlert('Login failed', 'Username an password do not match');
       }
       console.log(err);

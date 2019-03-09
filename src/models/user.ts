@@ -5,4 +5,12 @@ export interface User {
     firstname: string;
     lastname: string;
     email: string;
+    phone: number;
+    createdAt: number;
+    location: Location;
+}
+
+interface Location {
+    latitude: string;
+    longitude: string;
 }

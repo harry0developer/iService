@@ -9,3 +9,4 @@ export const firebaseConfig = {
 
 export const EMAIL_EXISTS = 'auth/email-already-in-use';
 export const USER_NOT_FOUND = 'auth/user-not-found';
+export const INVALID_PASSWORD = 'auth/wrong-password';

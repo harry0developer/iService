@@ -3,4 +3,5 @@ export interface Job {
     title: string;
     description: string;
     uid: string;
+    createdAt: number;
 }

@@ -11,11 +11,28 @@ export class DataProvider {
   dataCollection: AngularFirestoreCollection<Job | User>;
   data$: Observable<any[]>;
 
+  KM: number = 1.60934;
+
   readonly USERS_COLLECTION = 'users';
   readonly JOBS_COLLECTION = 'jobs';
 
+  readonly CANDIDATE_TYPE = 'candidate';
+  readonly RECRUITER_TYPE = 'recruiter';
+
   constructor(public afStore: AngularFirestore) { }
 
+
+  getAllFromCollection(collectionName: string) {
+    return this.afStore.collection<Job>(collectionName).snapshotChanges().pipe(
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        });
+      })
+    );
+  }
 
   getCollection(collectionName: string, uid?: string) {
     return this.afStore.collection<Job>(collectionName, !!uid ? ref => ref.where('uid', '==', uid) : null).snapshotChanges().pipe(
@@ -34,10 +51,6 @@ export class DataProvider {
   }
 
   updateItem(collectionName: string, data: User | Job, id: string) {
-    console.log(collectionName);
-    console.log(data);
-    console.log(id);
-
     return this.afStore.collection(collectionName).doc<Job | User>(id).update(data);
   }
 
@@ -48,4 +61,56 @@ export class DataProvider {
   removeItem(collectionName: string, id: string) {
     return this.afStore.collection(collectionName).doc<Job | User>(id).delete();
   }
+
+  applyHaversine(jobs, lat, lng) {
+    if (jobs && lat && lng) {
+      let usersLocation = {
+        lat: lat,
+        lng: lng
+      };
+      jobs.map((job) => {
+        let placeLocation = {
+          lat: job.location.latitude,
+          lng: job.location.longitude
+        };
+        job.distance = this.getDistanceBetweenPoints(
+          usersLocation,
+          placeLocation,
+          'miles'
+        ).toFixed(0);
+      });
+      return jobs;
+    } else {
+      return jobs;
+    }
+  }
+
+  getDistanceBetweenPoints(start, end, units) {
+    let earthRadius = {
+      miles: 3958.8,
+      km: 6371
+    };
+
+    let R = earthRadius[units || 'miles'];
+    let lat1 = start.lat;
+    let lon1 = start.lng;
+    let lat2 = end.lat;
+    let lon2 = end.lng;
+
+    let dLat = this.toRad((lat2 - lat1));
+    let dLon = this.toRad((lon2 - lon1));
+    let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    let d = R * c;
+
+    return d * this.KM; //convert miles to km
+  }
+
+  toRad(x) {
+    return x * Math.PI / 180;
+  }
+
 }

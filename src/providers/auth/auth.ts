@@ -3,6 +3,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase';
 import { User } from '../../models/user';
+import { DateProvider } from '../date/date';
 
 @Injectable()
 export class AuthProvider {
@@ -11,7 +12,8 @@ export class AuthProvider {
   constructor(
     public afs: AngularFirestore,
     public afAuth: AngularFireAuth,
-    public afStore: AngularFirestore
+    public afStore: AngularFirestore,
+    public dateProvider: DateProvider
   ) {
     this.afAuth.authState.subscribe(user => {
       if (user) {
@@ -32,13 +34,6 @@ export class AuthProvider {
   forgotPassword(passwordResetEmail) {
     return this.afAuth.auth.sendPasswordResetEmail(passwordResetEmail);
   }
-
-  // Returns true when user is looged in and email is verified
-  // get isLoggedIn(): boolean {
-  //   const user = JSON.parse(localStorage.getItem('user'));
-  //   return (user !== null && user.emailVerified !== false) ? true : false;
-  // }
-
 
   logout() {
     return this.afAuth.auth.signOut();
@@ -61,21 +56,11 @@ export class AuthProvider {
     return this.afAuth.auth.signInWithEmailAndPassword(email, password);
   }
 
-  signUpWithEmailAndPassword(email: string, password: string) {
-    return this.afAuth.auth.createUserWithEmailAndPassword(email, password);
+  signUpWithEmailAndPassword(user: User) {
+    return this.afAuth.auth.createUserWithEmailAndPassword(user.email, user.password).then(res => {
+      this.updateUser(user);
+    });
   }
-
-  // setUserData(user: User) {
-  //   const userRef: AngularFirestoreDocument<any> = this.afs.doc(`users/${user.uid}`);
-  //   const userData: User = {
-  //     uid: user.uid,
-  //     name: user.name,
-  //     email: user.email,
-  //   };
-  //   return userRef.set(userData, {
-  //     merge: true
-  //   });
-  // }
 
   updateUser(data: User) {
     const user = this.afAuth.auth.currentUser;
@@ -84,6 +69,7 @@ export class AuthProvider {
       email: user.email,
       firstname: data.firstname,
       lastname: data.lastname,
+      createdAt: this.dateProvider.getDate(),
       type: data.type
     };
     this.storeUser(user);
