@@ -7,8 +7,8 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content *ngIf="user">
-  <div class="top">
+<ion-content>
+  <div class="top" *ngIf="profile">
     <div class="profile">
       <img src="{{profilePicture()}}" alt="profile" [src]="profilePicture()" class="animated zoomIn" (error)="img.src = defaultImg"
         #img>
@@ -16,24 +16,24 @@
     <div class="animated slideInRight">
       <!-- <rating [float]="true" [(ngModel)]="ratingsData.rating" [readonly]="true"></rating> -->
     </div>
-    <h2 class="animated slideInLeft">{{user.firstname}} {{user.lastname}} </h2>
-    <p class="animated slideInRight">{{user.title || user.type}}</p>
+    <h2 class="animated slideInLeft">{{profile.firstname}} {{profile.lastname}} </h2>
+    <p class="animated slideInRight">{{profile.title || profile.type}}</p>
     <button ion-button round small class="primary animated zoomIn" (click)="editProfile()" color="primary">Edit Profile</button>
   </div>
-  <ion-grid class="contact-info">
+  <ion-grid class="contact-info"  *ngIf="profile">
     <ion-row>
       <ion-col col-6 class="animated slideInLeft">
         <i class="fa fa-phone" item-start></i>
-        {{ user.phone}}
+        {{ profile.phone}}
       </ion-col>
       <ion-col col-6 class="animated slideInRight">
         <i class="fa fa-envelope" item-start></i>
-        {{ user.email}}
+        {{ profile.email}}
       </ion-col>
     </ion-row>
   </ion-grid>
 
-  <ion-grid>
+  <ion-grid  *ngIf="profile">
     <ion-row *ngIf="isRecruiter()">
       <ion-col col-6 class="animated zoomIn">
         <ion-card class="summary" (tap)="viewPostedJobs()">

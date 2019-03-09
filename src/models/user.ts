@@ -5,7 +5,7 @@ export interface User {
     firstname: string;
     lastname: string;
     email: string;
-    phone: number;
+    phone: string;
     createdAt: number;
     location: Location;
 }

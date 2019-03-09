@@ -24,18 +24,22 @@ import { JobsPage } from '../pages/jobs/jobs';
 import { CandidatesPage } from '../pages/candidates/candidates';
 import { DateProvider } from '../providers/date/date';
 import { JobDetailsPage } from '../pages/job-details/job-details';
+import { ProfilePage } from '../pages/profile/profile';
+import { AppointmentsPage } from '../pages/appointments/appointments';
 
 @NgModule({
   declarations: [
     MyApp,
-    LoginPage,
-    SignupPage,
-    OtpPage,
+    AppointmentsPage,
+    CandidatesPage,
     DashboardPage,
     ForgotPasswordPage,
+    JobDetailsPage,
     JobsPage,
-    CandidatesPage,
-    JobDetailsPage
+    LoginPage,
+    OtpPage,
+    ProfilePage,
+    SignupPage,
   ],
   imports: [
     BrowserModule,
@@ -47,14 +51,16 @@ import { JobDetailsPage } from '../pages/job-details/job-details';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    LoginPage,
-    SignupPage,
-    OtpPage,
+    AppointmentsPage,
+    CandidatesPage,
     DashboardPage,
     ForgotPasswordPage,
+    JobDetailsPage,
     JobsPage,
-    CandidatesPage,
-    JobDetailsPage
+    LoginPage,
+    OtpPage,
+    ProfilePage,
+    SignupPage,
   ],
   providers: [
     StatusBar,

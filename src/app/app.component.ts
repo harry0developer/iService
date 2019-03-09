@@ -10,6 +10,8 @@ import { DataProvider } from '../providers/data/data';
 import { MyJobsPage } from '../pages/my-jobs/my-jobs';
 import { FeedbackProvider } from '../providers/feedback/feedback';
 import { DashboardPage } from '../pages/dashboard/dashboard';
+import { AuthProvider } from '../providers/auth/auth';
+import { ProfilePage } from '../pages/profile/profile';
 // import { LocationProvider } from '../providers/location/location';
 // import { ConnectionProvider } from '../providers/connection/connection';
 // import { ConnectionPage } from '../pages/connection/connection';
@@ -21,22 +23,25 @@ import { DashboardPage } from '../pages/dashboard/dashboard';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
   profile: any;
-  rootPage: any = LoginPage;
+  rootPage: any = DashboardPage;
   defaultImg: string = '';
-  pages2: any = {};
+  pages: any = {};
 
   constructor(
     public platform: Platform,
     public statusBar: StatusBar,
     public splashScreen: SplashScreen,
     public events: Events,
-    // public dataProvider: DataProvider,
-    // public locationProvider: LocationProvider,
-    // private connectionProvider: ConnectionProvider,
+    public dataProvider: DataProvider,
+    public authProvider: AuthProvider,
     private feedbackProvider: FeedbackProvider,
   ) {
 
     this.initializeApp();
+    this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid).subscribe(user => {
+      this.profile = user.data();
+    });
+    console.log(this.profile);
 
     // this.connectionProvider.getConnection();
 
@@ -69,14 +74,13 @@ export class MyApp {
     //   this.getLocation();
     // });
 
-    this.pages2 = {
+    this.pages = {
       dashboardPage: DashboardPage,
-      // recruitersPage: JobsPage,
-      // candidatesPage: CandidatesPage,
-      // myJobsPage: MyJobsPage,
-      // profilePage: ProfilePage,
-      // appointmentPage: AppointmentsPage,
-      loginPage: LoginPage
+      jobsPage: JobsPage,
+      candidatesPage: CandidatesPage,
+      myJobsPage: MyJobsPage,
+      profilePage: ProfilePage,
+      appointmentPage: AppointmentsPage,
     }
   }
 
@@ -97,7 +101,7 @@ export class MyApp {
   }
 
   profilePicture(): string {
-    return ''; // this.dataProvider.getMediaUrl() + this.profile.picture;
+    return `../../assets/imgs/users/${this.profile.gender}.svg`;
   }
 
   logout() {

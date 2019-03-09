@@ -62,6 +62,7 @@ export class DataProvider {
     return this.afStore.collection(collectionName).doc<Job | User>(id).delete();
   }
 
+
   applyHaversine(jobs, lat, lng) {
     if (jobs && lat && lng) {
       let usersLocation = {

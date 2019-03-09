@@ -1,24 +1,27 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-
-/**
- * Generated class for the MyJobsPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import { User } from '../../models/user';
+import { DataProvider } from '../../providers/data/data';
+import { AuthProvider } from '../../providers/auth/auth';
 
 @Component({
   selector: 'page-my-jobs',
   templateUrl: 'my-jobs.html',
 })
 export class MyJobsPage {
-
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  profile: User;
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public dataProvider: DataProvider,
+    public authProvider: AuthProvider,
+  ) {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad MyJobsPage');
+    this.profile = this.authProvider.getFirebaseUserData(this.authProvider.afAuth.auth.currentUser.uid);
+    console.log(this.profile);
+
   }
 
 }

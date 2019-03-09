@@ -13,7 +13,7 @@ import { User } from '../../models/user';
 })
 export class JobDetailsPage {
   job: any;
-  postedBy: any;
+  postedBy: User;
   profile: any;
   countApplied: number;
   countViews: number;

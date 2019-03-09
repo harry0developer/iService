@@ -70,13 +70,15 @@ export class AuthProvider {
       firstname: data.firstname,
       lastname: data.lastname,
       createdAt: this.dateProvider.getDate(),
-      type: data.type
+      type: data.type,
+      location: data.location,
+      phone: data.phone
     };
     this.storeUser(user);
     return this.afs.collection('users').doc(user.uid).set(userData);
   }
 
-  getFirebaseUserData(uid) {
+  getFirebaseUserData(uid): any {
     return this.afs.collection('users').doc(uid).get();
   }
 

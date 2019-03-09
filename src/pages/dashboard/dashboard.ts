@@ -21,7 +21,7 @@ import { LoginPage } from '../login/login';
   templateUrl: 'dashboard.html',
 })
 export class DashboardPage {
-  user: any;
+  profile: any;
   jobs: any;
   constructor(
     public navCtrl: NavController,
@@ -35,39 +35,27 @@ export class DashboardPage {
   }
 
   ionViewDidLoad() {
-    this.afAuth.authState.subscribe(state => {
-      if (state && state.uid) {
-        this.user = {
-          uid: state.uid,
-          email: state.email
-        };
-        this.setJobs(state.uid);
-        this.setUser(state.uid);
-      } else {
-        this.logout();
-      }
+    this.setUser();
+    this.setJobs();
+
+  }
+
+  setUser() {
+    this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, this.authProvider.getStoredUser().uid).subscribe(user => {
+      this.profile = user;
     });
   }
 
-  setUser(uid: string) {
-    this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, uid).subscribe(user => {
-      this.user = user;
-    });
-  }
-
-  setJobs(uid: string) {
-    this.jobs = this.dataProvider.getCollection(this.dataProvider.JOBS_COLLECTION, uid);
-  }
-
-  logout() {
-    this.authProvider.logout().then(() => {
-      this.navCtrl.setRoot(LoginPage);
-    });
+  setJobs() {
+    this.jobs = this.dataProvider.getCollection(this.dataProvider.JOBS_COLLECTION, this.authProvider.getStoredUser().uid);
   }
 
   profilePicture(): string {
-    return '';
-    // return this.dataProvider.getMediaUrl() + this.profile.picture;
+    return `../../assets/imgs/users/${this.profile.gender}.svg`;
+  }
+
+  isRecruiter(): boolean {
+    return this.profile.type === 'recruiter';
   }
 
   editProfile() {

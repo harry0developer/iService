@@ -1,18 +1,76 @@
-<!--
-  Generated template for the AppointmentsPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
-
-  <ion-navbar>
-    <ion-title>appointments</ion-title>
-  </ion-navbar>
-
-</ion-header>
-
-
-<ion-content padding>
-
-</ion-content>
+    <ion-navbar color="dark">
+      <button ion-button menuToggle>
+        <ion-icon name="menu"></ion-icon>
+      </button>
+      <ion-title>Appointments</ion-title>
+    </ion-navbar>
+  
+    <ion-toolbar color="light">
+      <ion-segment color="dark" [(ngModel)]="appointment_type">
+        <ion-segment-button value="inProgress">
+          In Progress
+        </ion-segment-button>
+        <ion-segment-button value="completed">
+          Completed
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+    
+  </ion-header>
+  
+  <ion-content>
+    <div [ngSwitch]="appointment_type">
+      <ion-list *ngSwitchCase="'inProgress'">
+        <div [@listAnimation]="inProgressAppointments.length">
+          <ion-list *ngFor="let user of inProgressAppointments">
+            <ion-card>
+              <ion-item (click)="viewUserDetails(user)">
+                <ion-avatar class="border-dark" item-start>
+                  <img [src]="profilePicture(user)" (error)="img.src = getDefaultProfilePic(user)"
+                  #img alt="profile" class="profile-picture">
+                </ion-avatar>
+                <h2>{{user.firstname}} {{user.lastname}}</h2>
+                <p>
+                  <i class="fa fa-calendar" item-start></i>
+                  <b>Scheduled </b> {{getDateScheduled(user)}}
+                </p>
+                <i class="fa fa-chevron-right" item-end></i>
+              </ion-item>
+            </ion-card>
+          </ion-list>
+        </div>
+        <ion-card padding text-wrap class="not-found" *ngIf="!inProgressAppointments || (inProgressAppointments && inProgressAppointments.length < 1)">
+          <i class="fa fa-4x fa-calendar"></i>
+          <p>You do not have appointments in progress</p>
+        </ion-card>
+      </ion-list>
+  
+      <ion-list *ngSwitchCase="'completed'">
+        <div [@listAnimation]="completedAppointments.length">
+          <ion-list *ngFor="let user of completedAppointments">
+            <ion-card >
+              <ion-item (click)="viewUserDetails(user)">
+                <ion-avatar class="border-dark" item-start>
+                  <img [src]="profilePicture(user)" (error)="img.src = getDefaultProfilePic(user)"
+                  #img alt="profile" class="profile-picture">
+                </ion-avatar>
+                <h2>{{user.firstname}} {{user.lastname}}</h2>
+                <p>
+                  <i class="fa fa-calendar" item-start></i>
+                  <b>Completed </b> {{getDateAppointed(user)}}
+                </p>
+                <i class="fa fa-chevron-right" item-end></i>
+              </ion-item>
+            </ion-card>
+          </ion-list>
+        </div>
+        <ion-card padding text-wrap class="not-found" *ngIf="!completedAppointments || (completedAppointments && completedAppointments.length < 1)">
+          <i class="fa fa-4x fa-calendar"></i>
+          <p>You do not have completed appointments yet</p>
+        </ion-card>
+      </ion-list>
+    </div>
+  
+  </ion-content>
+  

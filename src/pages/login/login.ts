@@ -51,7 +51,13 @@ export class LoginPage {
       type: 'candidate',
       email: 'thabo@papo.com',
       password: '123456',
-      createdAt: this.dateProvider.getDate()
+      createdAt: this.dateProvider.getDate(),
+      phone: '0798829922',
+      location: {
+        latitude: '18.999',
+        longitude: '-29.9999'
+      }
+
     }
     this.authProvider.signUpWithEmailAndPassword(user).then(s => console.log).catch(err => console.log);
   }
