@@ -15,6 +15,7 @@ export class DataProvider {
 
   readonly USERS_COLLECTION = 'users';
   readonly JOBS_COLLECTION = 'jobs';
+  readonly RATINGS_COLLECTION = 'ratings';
 
   readonly CANDIDATE_TYPE = 'candidate';
   readonly RECRUITER_TYPE = 'recruiter';

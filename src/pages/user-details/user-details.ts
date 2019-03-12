@@ -36,6 +36,8 @@ export class UserDetailsPage {
   countViews: number;
   appointmentDate: string;
 
+  candidateRating: string;
+
 
   candidate: User;
   constructor(
@@ -59,6 +61,24 @@ export class UserDetailsPage {
 
   ionViewDidLoad() {
     this.candidate = this.navParams.get('user');
+    this.getMyRating(this.candidate);
+    console.log(this.candidateRating);
+
+  }
+
+  getMyRating(candidate: User): number {
+    let total = 0;
+    let rate = 0;
+    this.dataProvider.getCollectionByKeyValuePair(this.dataProvider.RATINGS_COLLECTION, 'uid', candidate.uid).subscribe(ratings => {
+      if (ratings.length > 0) {
+        ratings.forEach(rateObject => {
+          total += rateObject.rating;
+        });
+        rate = total / ratings.length;
+        this.candidateRating = rate.toFixed(1);
+      };
+    });
+    return rate;
   }
 
   profilePicture(user): string {

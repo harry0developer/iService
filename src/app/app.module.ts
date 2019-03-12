@@ -7,6 +7,8 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 
+import { RatingModule } from "ngx-rating";
+
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -49,6 +51,7 @@ import { UserDetailsPage } from '../pages/user-details/user-details';
     BrowserAnimationsModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
+    RatingModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [

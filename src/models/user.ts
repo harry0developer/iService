@@ -1,5 +1,6 @@
 export interface User {
     uid?: string;
+    rating?: number;
     password?: string;
     type: string;
     firstname: string;

@@ -55,7 +55,6 @@ export class AuthProvider {
     return this.afAuth.auth.signInWithPopup(provider);
   }
 
-
   signInWithEmailAndPassword(email: string, password: string) {
     return this.afAuth.auth.signInWithEmailAndPassword(email, password);
   }

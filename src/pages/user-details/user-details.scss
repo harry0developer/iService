@@ -32,8 +32,9 @@ page-user-details {
     .top{
         text-align: center;
         background-color: $primary !important;
-        padding-bottom: 10px;
         color: $white;
+        margin-bottom: 30px;
+        border-bottom: 2px solid $white;
         p{
             padding: 0 !important;
             margin: 5px 0 !important;
@@ -41,6 +42,17 @@ page-user-details {
         h2{
             margin: 10px 0 2px 0;
             font-size: 1.4em;
+        }
+        .row.summary {
+            font-size: .9em;
+            margin-top: 10px;
+            width: 95%;
+            position: relative;
+            top: 30px;
+            margin: 0 auto;
+            background-color: $white;
+            color: $primary;
+            border-radius: 4px;
         }
         .profile-image {
             .imagex {
@@ -62,7 +74,7 @@ page-user-details {
                     left: 76px;
                     width: 40px;
                     height: 40px;
-                    padding: 3px 0 0 3px;
+                    padding: 2px 0 0 5px;
                     text-align: center;
                     font-weight: .9em;
                     line-height: 1;
@@ -71,6 +83,7 @@ page-user-details {
                     background-color: $primary;
                     border: 2px solid $white;
                     color: $white;
+                    display: inline-block;
                     .fa.fa-star {
                         font-size: .8em;
                     }
@@ -112,11 +125,6 @@ page-user-details {
                 color: $light-grey !important;
             }
         }
-
-        .row.summary {
-            margin-top: 10px;
-        }
-
     }
 
     .item.item-block {
@@ -126,6 +134,7 @@ page-user-details {
 
     .info {
         // background-color: $light-grey;
+        font-size: .9em;
         color: $primary;
         .row  {
             text-align: center;
@@ -135,14 +144,14 @@ page-user-details {
                 margin: .5%;
                 border-radius: 10px;
             }
-            i {
-                font-size: 1em;
-                color: $primary;
-            }
+            // i {
+            //     font-size: 1em;
+            //     color: $primary;
+            // }
 
-            i.enlarge {
-                font-size: 1.2em;
-            }
+            // i.enlarge {
+            //     font-size: 1.2em;
+            // }
             p {
                 font-weight: 500;
             }

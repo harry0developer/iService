@@ -27,7 +27,9 @@
         <div class="imagex">
           <img class="image animated slideInLeft" [src]="profilePicture(candidate)" (error)="img.src = getDefaultProfilePic(candidate)" #img alt="profile">
           <span class="ratings animated slideInRight">
-           <i class="fa fa-star"></i> {{ updateUserRate }}
+           <i class="fa fa-star"></i> 
+           <br>
+           {{ candidateRating }}
           </span>
         </div>
       </div>

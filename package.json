@@ -32,6 +32,7 @@
     "ionic-angular": "3.9.2",
     "ionicons": "3.0.0",
     "moment": "^2.24.0",
+    "ngx-rating": "0.0.9",
     "rxjs": "^6.0.0",
     "rxjs-compat": "^6.4.0",
     "sw-toolbox": "3.6.0",
