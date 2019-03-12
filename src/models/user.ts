@@ -5,9 +5,9 @@ export interface User {
     firstname: string;
     lastname: string;
     email: string;
-    phone: string;
+    phone?: string;
+    location?: Location;
     createdAt: number;
-    location: Location;
 }
 
 interface Location {

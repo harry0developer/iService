@@ -26,6 +26,7 @@ import { DateProvider } from '../providers/date/date';
 import { JobDetailsPage } from '../pages/job-details/job-details';
 import { ProfilePage } from '../pages/profile/profile';
 import { AppointmentsPage } from '../pages/appointments/appointments';
+import { UserDetailsPage } from '../pages/user-details/user-details';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { AppointmentsPage } from '../pages/appointments/appointments';
     OtpPage,
     ProfilePage,
     SignupPage,
+    UserDetailsPage
   ],
   imports: [
     BrowserModule,
@@ -61,6 +63,7 @@ import { AppointmentsPage } from '../pages/appointments/appointments';
     OtpPage,
     ProfilePage,
     SignupPage,
+    UserDetailsPage
   ],
   providers: [
     StatusBar,

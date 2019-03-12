@@ -75,8 +75,8 @@ export class ProfilePage {
 
   }
 
-  isRecruiter() {
-    return this.profile.type.toLowerCase() === 'recruiter' ? true : false;
+  isRecruiter(): boolean {
+    return this.profile.type === 'recruiter';
   }
 
 

@@ -35,9 +35,12 @@ export class DashboardPage {
   }
 
   ionViewDidLoad() {
-    this.setUser();
-    this.setJobs();
-
+    if (this.authProvider.isLoggedIn()) {
+      this.setUser();
+      this.setJobs();
+    } else {
+      this.navCtrl.setRoot(LoginPage);
+    }
   }
 
   setUser() {
@@ -47,7 +50,7 @@ export class DashboardPage {
   }
 
   setJobs() {
-    this.jobs = this.dataProvider.getCollection(this.dataProvider.JOBS_COLLECTION, this.authProvider.getStoredUser().uid);
+    this.jobs = this.dataProvider.getMyCollection(this.dataProvider.JOBS_COLLECTION, this.authProvider.getStoredUser().uid);
   }
 
   profilePicture(): string {

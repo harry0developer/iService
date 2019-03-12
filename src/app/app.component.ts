@@ -23,7 +23,7 @@ import { ProfilePage } from '../pages/profile/profile';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
   profile: any;
-  rootPage: any = DashboardPage;
+  rootPage: any = LoginPage;
   defaultImg: string = '';
   pages: any = {};
 
@@ -38,10 +38,6 @@ export class MyApp {
   ) {
 
     this.initializeApp();
-    this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid).subscribe(user => {
-      this.profile = user.data();
-    });
-    console.log(this.profile);
 
     // this.connectionProvider.getConnection();
 
@@ -88,6 +84,11 @@ export class MyApp {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      if (this.authProvider.isLoggedIn()) {
+        this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid).subscribe(user => {
+          this.profile = user.data();
+        });
+      }
     });
   }
 

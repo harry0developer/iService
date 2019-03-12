@@ -43,7 +43,11 @@ export class AuthProvider {
     return this.authLogin(new auth.GoogleAuthProvider());
   }
 
-  facebookAuth() {
+  signInWithTwitter() {
+    return this.authLogin(new auth.TwitterAuthProvider());
+  }
+
+  signInWithFacebook() {
     return this.authLogin(new auth.FacebookAuthProvider());
   }
 
@@ -63,7 +67,7 @@ export class AuthProvider {
   }
 
   updateUser(data: User) {
-    const user = this.afAuth.auth.currentUser;
+    const user = this.getStoredUser().uid;
     const userData: User = {
       uid: user.uid,
       email: user.email,

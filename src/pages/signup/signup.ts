@@ -8,6 +8,7 @@ import { LoginPage } from '../login/login';
 import { DashboardPage } from '../dashboard/dashboard';
 import { EMAIL_EXISTS } from '../../config';
 import { DateProvider } from '../../providers/date/date';
+import { User } from '../../models/user';
 
 
 @IonicPage()
@@ -39,7 +40,7 @@ export class SignupPage {
 
   signupWithEmailAndPassword() {
 
-    const data = {
+    const data: User = {
       ...this.data,
       createdAt: this.dateProvider.getDate()
     }

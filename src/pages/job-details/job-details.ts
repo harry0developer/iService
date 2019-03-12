@@ -29,7 +29,7 @@ export class JobDetailsPage {
     private dateProvider: DateProvider,
     private authProvider: AuthProvider,
     private feedbackProvider: FeedbackProvider) {
-    this.profile = this.authProvider.getFirebaseUserData(this.authProvider.afAuth.auth.currentUser.uid);
+    this.profile = this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid);
     this.didView = false;
   }
 

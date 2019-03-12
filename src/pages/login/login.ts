@@ -36,7 +36,7 @@ export class LoginPage {
   }
 
   ionViewDidLoad() {
-    if (this.authProvider.isLoggedIn()) {
+    if (this.authProvider.getStoredUser()) {
       this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, this.authProvider.getStoredUser().uid).subscribe(u => {
         const user: any = u;
         user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
@@ -64,6 +64,34 @@ export class LoginPage {
 
   signinWithEmailAndPassword() {
     this.authProvider.signInWithEmailAndPassword(this.data.email, this.data.password).then((res) => {
+      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, res.user.uid).subscribe(u => {
+        const user: any = u;
+        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
+      });
+    }).catch(err => {
+      if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
+        this.feedbackProvider.presentErrorAlert('Login failed', 'Username an password do not match');
+      }
+      console.log(err);
+    });
+  }
+
+  signInWithFacebook() {
+    this.authProvider.signInWithFacebook().then((res) => {
+      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, res.user.uid).subscribe(u => {
+        const user: any = u;
+        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
+      });
+    }).catch(err => {
+      if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
+        this.feedbackProvider.presentErrorAlert('Login failed', 'Username an password do not match');
+      }
+      console.log(err);
+    });
+  }
+
+  signInWithTwitter() {
+    this.authProvider.signInWithFacebook().then((res) => {
       this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, res.user.uid).subscribe(u => {
         const user: any = u;
         user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);

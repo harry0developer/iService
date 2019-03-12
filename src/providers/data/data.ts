@@ -34,8 +34,20 @@ export class DataProvider {
     );
   }
 
-  getCollection(collectionName: string, uid?: string) {
+  getMyCollection(collectionName: string, uid: string) {
     return this.afStore.collection<Job>(collectionName, !!uid ? ref => ref.where('uid', '==', uid) : null).snapshotChanges().pipe(
+      map(actions => {
+        return actions.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return { id, ...data };
+        });
+      })
+    );
+  }
+
+  getCollectionByKeyValuePair(collectionName: string, key: string, value: string) {
+    return this.afStore.collection<Job>(collectionName, ref => ref.where(key, '==', value)).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();

@@ -25,7 +25,7 @@
     </div>
 
     <ion-item class="animated pulse">
-      <ion-label>Email Address</ion-label>
+      <ion-label>Email</ion-label>
       <ion-input [(ngModel)]="data.email" required email="email" #email="ngModel"
         pattern="^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$" type="email">
       </ion-input>
@@ -35,8 +35,8 @@
       <p class="animated tada" [hidden]="!email.hasError('pattern')">Invalid email address</p>
     </div>
 
-    <ion-item>
-      <ion-label floating>What are you?</ion-label>
+    <ion-item class="animated pulse">
+      <ion-label>What are you?</ion-label>
       <ion-select [(ngModel)]="data.type" required type="type" #type="ngModel">
         <ion-option value="recruiter">Recruiter</ion-option>
         <ion-option value="candidate">Candidate</ion-option>
