@@ -25,7 +25,7 @@ import { User } from '../../models/user';
 })
 export class DashboardPage {
   profile: any;
-  jobs: any;
+  postedJobs: any;
   appointments: Appointment[];
   constructor(
     public navCtrl: NavController,
@@ -39,42 +39,32 @@ export class DashboardPage {
   }
 
   ionViewDidLoad() {
-    this.profile = this.authProvider.getStoredUser();
-    if (this.authProvider.isLoggedIn()) {
-      this.setUser();
-      this.setJobs();
-      this.setMyAppointments();
-    } else {
+    if (!this.authProvider.isLoggedIn()) {
+      localStorage.clear();
       this.navCtrl.setRoot(LoginPage);
+    } else {
+      this.profile = this.authProvider.profile;
     }
-
+    this.initialize();
   }
 
-  isRecruiter(): boolean {
-    return this.authProvider.isRecruiter();
-  }
-
-  setUser() {
-    this.dataProvider.getItemById(COLLECTION.users, this.profile.uid).subscribe(user => {
-      this.profile = user;
-    });
-  }
-
-  setJobs() {
-    this.dataProvider.getMyCollection(COLLECTION.jobs, this.profile.uid).subscribe(jobs => {
-      this.jobs = jobs;
-    });
-  }
-
-  setMyAppointments() {
-    const id = this.authProvider.isRecruiter() ? 'rid' : 'uid';
-    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(app => {
-      this.appointments = app;
+  initialize() {
+    let id = this.isRecruiter() ? 'rid' : 'uid';
+    if (this.isRecruiter()) {
+      this.postedJobs = this.dataProvider.getMyJobs();
+    }
+    this.appointments = this.dataProvider.getMyAppointments();
+    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
+      Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
     });
   }
 
   profilePicture(): string {
     return `../../assets/imgs/users/${this.profile.gender}.svg`;
+  }
+
+  isRecruiter(): boolean {
+    return this.authProvider.isRecruiter();
   }
 
   viewAppointments() {

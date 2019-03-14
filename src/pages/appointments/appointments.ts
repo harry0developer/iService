@@ -52,9 +52,6 @@ export class AppointmentsPage {
   }
 
   getUserWithAppointmets(users: User[], appointments: Appointment[]) {
-    console.log(users);
-    console.log(appointments);
-
     const userz = [];
 
     users.map(user => {

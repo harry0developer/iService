@@ -53,12 +53,12 @@ export class ProfilePage {
       this.navCtrl.setRoot(LoginPage);
     } else {
       this.profile = this.authProvider.profile;
-
     }
+    this.initialize();
+  }
 
-
+  initialize() {
     let id = this.isRecruiter() ? 'rid' : 'uid';
-
     if (this.isRecruiter()) {
       console.log(this.profile);
 
@@ -69,9 +69,6 @@ export class ProfilePage {
     this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
       Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
     });
-
-
-
   }
 
   profilePicture(): string {

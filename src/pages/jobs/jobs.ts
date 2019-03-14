@@ -82,7 +82,6 @@ export class JobsPage {
       const lat = 28.909;
       const lng = -18.909;
       this.jobs = this.dataProvider.applyHaversine(jobs, lat, lng);
-      console.log(this.jobs);
     });
   }
 

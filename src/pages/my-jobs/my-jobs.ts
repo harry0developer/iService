@@ -20,8 +20,6 @@ export class MyJobsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid);
-    console.log(this.profile);
-
   }
 
 }

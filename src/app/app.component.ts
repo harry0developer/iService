@@ -38,16 +38,12 @@ export class MyApp {
 
     this.authProvider.afAuth.authState.subscribe(user => {
       this.profile = this.authProvider.getStoredUser();
-      console.log(this.profile);
-
     });
 
     this.ionEvents.subscribe(EVENTS.loggedIn, data => {
       if (data) {
         this.profile = data.user;
-        console.log(data);
       }
-
     });
 
     this.pages = {
