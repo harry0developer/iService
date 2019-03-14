@@ -22,7 +22,8 @@ export class SignupPage {
     lastname: '',
     email: '',
     password: '',
-    type: ''
+    type: '',
+    gender: ''
   }
 
   type = 'password';

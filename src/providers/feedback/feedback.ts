@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { LoadingController, ToastController, AlertController, Events, ActionSheetController } from 'ionic-angular';
+import { LoadingController, ToastController, AlertController, Events, ActionSheetController, ModalController } from 'ionic-angular';
 
 @Injectable()
 export class FeedbackProvider {
@@ -10,6 +10,7 @@ export class FeedbackProvider {
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,
     private actionSheetCtrl: ActionSheetController,
+    private modalCtrl: ModalController,
     private events: Events,
   ) {
   }
@@ -51,6 +52,13 @@ export class FeedbackProvider {
 
   dismissLoading() {
     this.loadSpinner.dismiss();
+  }
+
+
+
+  presentModal(page, data) {
+    const modal = this.modalCtrl.create(page, { data });
+    modal.present();
   }
 
 

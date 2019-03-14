@@ -7,6 +7,7 @@ import { bounceIn } from '../../utils/animations';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
 import { UserDetailsPage } from '../user-details/user-details';
+import { COLLECTION, USER_TYPE } from '../../utils/const';
 // import { PostJobPage } from '../post-job/post-job';
 // import { bounceIn } from '../../util/animations';
 // import 'rxjs/add/operator/debounceTime.js';
@@ -51,13 +52,12 @@ export class CandidatesPage {
       this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid).subscribe(user => {
         this.profile = user.data();
       });
-      this.dataProvider.getCollectionByKeyValuePair(this.dataProvider.USERS_COLLECTION, 'type', this.dataProvider.CANDIDATE_TYPE).subscribe(users => {
+      this.dataProvider.getCollectionByKeyValuePair(COLLECTION.users, 'type', USER_TYPE.candidate).subscribe(users => {
         const loc = {
           lat: 19.999,
           lng: -19.000
         }
         this.candidates = this.dataProvider.applyHaversine(users, loc.lat, loc.lng);;
-        console.log(this.candidates);
       });
     } else {
       this.authProvider.logout();

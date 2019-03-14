@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, Events, ModalController, ActionSheetController, Platform } from 'ionic-angular';
+import { IonicPage, NavController } from 'ionic-angular';
 import { DataProvider } from '../../providers/data/data';
 import { slideIn, listSlideUp } from '../../utils/animations';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { AuthProvider } from '../../providers/auth/auth';
-
+import { COLLECTION } from '../../utils/const';
+import { Appointment } from '../../models/appointment';
+import { LoginPage } from '../login/login';
 
 declare var cordova: any;
 
@@ -23,7 +25,7 @@ export class ProfilePage {
   appliedJobs: any = [];
   viewedJobs: any = [];
   postedJobs: any = [];
-  appointments: any = [];
+  appointments: Appointment[];
   settings: any = {
     hide_dob: false,
     hide_email: false,
@@ -32,24 +34,45 @@ export class ProfilePage {
   };
   lastImage: string;
   defaultImg: string = '';
-  // userRatings: Rate;
+
+  profileRating: string;
 
   constructor(
-    private events: Events,
     private feedbackProvider: FeedbackProvider,
-    private modalCtrl: ModalController,
-    private platform: Platform,
-    private authProvider: AuthProvider
+    private authProvider: AuthProvider,
+    private dataProvider: DataProvider,
+    private navCtrl: NavController,
   ) {
+
   }
 
 
   ionViewDidLoad() {
-    this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid).subscribe(user => {
-      this.profile = user.data();
-    });
-  }
+    if (!this.authProvider.isLoggedIn()) {
+      localStorage.clear();
+      this.navCtrl.setRoot(LoginPage);
+    } else {
+      this.profile = this.authProvider.profile;
 
+    }
+
+
+    let id = this.isRecruiter() ? 'rid' : 'uid';
+
+    if (this.isRecruiter()) {
+      console.log(this.profile);
+
+      this.postedJobs = this.dataProvider.getMyJobs();
+    }
+    this.appointments = this.dataProvider.getMyAppointments();
+
+    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
+      Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
+    });
+
+
+
+  }
 
   profilePicture(): string {
     return `../../assets/imgs/users/${this.profile.gender}.svg`;
@@ -76,7 +99,7 @@ export class ProfilePage {
   }
 
   isRecruiter(): boolean {
-    return this.profile.type === 'recruiter';
+    return this.authProvider.isRecruiter();
   }
 
 

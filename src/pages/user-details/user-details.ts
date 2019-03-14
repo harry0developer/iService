@@ -4,6 +4,8 @@ import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { DataProvider } from '../../providers/data/data';
 import { LoginPage } from '../login/login';
 import { User } from '../../models/user';
+import { AuthProvider } from '../../providers/auth/auth';
+import { COLLECTION } from '../../utils/const';
 // import { Rating, Rate } from '../../models/Ratings';
 // import { Error } from '../../models/error';
 // import { RatingsModalPage } from '../ratings-modal/ratings-modal';
@@ -44,6 +46,7 @@ export class UserDetailsPage {
     public navCtrl: NavController, public navParams: NavParams,
     private feedbackProvider: FeedbackProvider,
     private dataProvider: DataProvider,
+    private authProvider: AuthProvider,
     private events: Events,
     private actionSheetCtrl: ActionSheetController,
     private ionEvent: Events,
@@ -52,33 +55,21 @@ export class UserDetailsPage {
     this.didView = false;
   }
 
-  ionViewWillLeave() {
-    if (this.isRated) {
-      this.rateCandidate(this.rating);
-      console.log("User rated :)", this.rating);
-    }
-  }
 
   ionViewDidLoad() {
     this.candidate = this.navParams.get('user');
+    this.dataProvider.getItemById(COLLECTION.users, this.authProvider.getStoredUser().uid).subscribe(user => {
+      this.profile = user;
+    });
     this.getMyRating(this.candidate);
-    console.log(this.candidateRating);
-
   }
 
-  getMyRating(candidate: User): number {
+  getMyRating(candidate: User) {
     let total = 0;
     let rate = 0;
-    this.dataProvider.getCollectionByKeyValuePair(this.dataProvider.RATINGS_COLLECTION, 'uid', candidate.uid).subscribe(ratings => {
-      if (ratings.length > 0) {
-        ratings.forEach(rateObject => {
-          total += rateObject.rating;
-        });
-        rate = total / ratings.length;
-        this.candidateRating = rate.toFixed(1);
-      };
+    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, 'uid', candidate.uid).subscribe(ratings => {
+      this.candidateRating = this.dataProvider.mapRatings(ratings);
     });
-    return rate;
   }
 
   profilePicture(user): string {
@@ -203,10 +194,6 @@ export class UserDetailsPage {
 
   completeCandidateAppointment(user) {
 
-  }
-
-  isRecruiter() {
-    return this.profile && this.profile.type.toLowerCase() === 'recruiter' ? true : false;
   }
 
   completeAppointmentActionSheep(candidate) {

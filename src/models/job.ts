@@ -3,6 +3,6 @@ export interface Job {
     rating?: number;
     title: string;
     description: string;
-    uid: string;
+    rid: string;
     createdAt: number;
 }

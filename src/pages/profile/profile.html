@@ -43,6 +43,7 @@
             <p class="animated slideInRight">{{profile.title || profile.type}}</p>
           </ion-col>
           <ion-col col-4 class="animated slideInRight" >
+            {{ profile.rating  || 0 }}
             <!-- <rating [float]="true" [(ngModel)]="userRatings.rating" [readonly]="true" ></rating> -->
           </ion-col>
         </ion-row>
@@ -63,7 +64,7 @@
             <i class="fa fa-transgender" item-start></i>
             <p>Gender <span class="details">{{profile.gender}}</span></p>
           </ion-item>
-          <ion-item text-wrap>
+          <ion-item text-wrap *ngIf="profile.nationality">
             <i class="fa fa-flag" item-start></i>
             <p>Nationality <span class="details">{{profile.nationality}}</span></p>
           </ion-item>
@@ -83,7 +84,7 @@
             <i class="fa fa-envelope" item-start></i>
             <p>Email address <span class="details">{{profile.email}}</span></p>
           </ion-item>
-          <ion-item text-wrap class="address">
+          <ion-item text-wrap *ngIf="profile.address" class="address">
             <i class="fa fa-map" item-start></i>
             <p>{{profile.address}}</p>
           </ion-item>

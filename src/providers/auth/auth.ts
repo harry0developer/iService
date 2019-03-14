@@ -4,10 +4,13 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { auth } from 'firebase';
 import { User } from '../../models/user';
 import { DateProvider } from '../date/date';
+import { USER_TYPE } from '../../utils/const';
 
 @Injectable()
 export class AuthProvider {
   userData: any;
+
+  profile: User;
 
   constructor(
     public afs: AngularFirestore,
@@ -15,16 +18,17 @@ export class AuthProvider {
     public afStore: AngularFirestore,
     public dateProvider: DateProvider
   ) {
-    this.afAuth.authState.subscribe(user => {
-      if (user) {
-        this.userData = user;
-        localStorage.setItem('user', JSON.stringify(this.userData));
-        JSON.parse(localStorage.getItem('user'));
-      } else {
-        localStorage.setItem('user', null);
-        JSON.parse(localStorage.getItem('user'));
-      }
-    });
+    this.profile = this.getStoredUser();
+    // this.afAuth.authState.subscribe(user => {
+    //   if (user) {
+    //     this.userData = user;
+    //     localStorage.setItem('user', JSON.stringify(this.userData));
+    //     JSON.parse(localStorage.getItem('user'));
+    //   } else {
+    //     localStorage.setItem('user', null);
+    //     JSON.parse(localStorage.getItem('user'));
+    //   }
+    // });
   }
 
   sendVerificationMail() {
@@ -66,10 +70,11 @@ export class AuthProvider {
   }
 
   updateUser(data: User) {
-    const user = this.getStoredUser().uid;
+    const user = this.getStoredUser();
     const userData: User = {
       uid: user.uid,
       email: user.email,
+      gender: user.gender,
       firstname: data.firstname,
       lastname: data.lastname,
       createdAt: this.dateProvider.getDate(),
@@ -77,7 +82,6 @@ export class AuthProvider {
       location: data.location,
       phone: data.phone
     };
-    this.storeUser(user);
     return this.afs.collection('users').doc(user.uid).set(userData);
   }
 
@@ -86,10 +90,10 @@ export class AuthProvider {
   }
 
   storeUser(user) {
-    localStorage.setItem('user', JSON.stringify(user.uid));
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
-  getStoredUser() {
+  getStoredUser(): User {
     return JSON.parse(localStorage.getItem('user'));
   }
 
@@ -100,6 +104,10 @@ export class AuthProvider {
   signOut() {
     localStorage.removeItem('user');
     return this.afAuth.auth.signOut();
+  }
+
+  isRecruiter(): boolean {
+    return this.profile.type === USER_TYPE.recruiter;
   }
 
 }

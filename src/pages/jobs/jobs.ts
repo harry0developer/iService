@@ -10,6 +10,7 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { DateProvider } from '../../providers/date/date';
 import { JobDetailsPage } from '../job-details/job-details';
+import { COLLECTION } from '../../utils/const';
 
 // import { JobDetailsPage } from '../job-details/job-details';
 // import { LocationProvider } from '../../providers/location/location';
@@ -71,13 +72,13 @@ export class JobsPage {
   }
 
   setUser(uid: string) {
-    this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, uid).subscribe(user => {
+    this.dataProvider.getItemById(COLLECTION.users, uid).subscribe(user => {
       this.user = user;
     });
   }
 
   setJobs() {
-    this.dataProvider.getAllFromCollection(this.dataProvider.JOBS_COLLECTION).subscribe(jobs => {
+    this.dataProvider.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => {
       const lat = 28.909;
       const lng = -18.909;
       this.jobs = this.dataProvider.applyHaversine(jobs, lat, lng);

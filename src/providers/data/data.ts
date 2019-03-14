@@ -4,6 +4,10 @@ import { map } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Job } from '../../models/job';
 import { User } from '../../models/user';
+import { Rating } from '../../models/rating';
+import { COLLECTION, USER_TYPE } from '../../utils/const';
+import { Appointment } from '../../models/appointment';
+import { AuthProvider } from '../auth/auth';
 
 @Injectable()
 export class DataProvider {
@@ -11,19 +15,25 @@ export class DataProvider {
   dataCollection: AngularFirestoreCollection<Job | User>;
   data$: Observable<any[]>;
 
+  jobs: Job[];
+  users: User[];
+  ratings: Rating[];
+  appointments: Appointment[];
+
   KM: number = 1.60934;
 
-  readonly USERS_COLLECTION = 'users';
-  readonly JOBS_COLLECTION = 'jobs';
-  readonly RATINGS_COLLECTION = 'ratings';
+  profile: User;
 
-  readonly CANDIDATE_TYPE = 'candidate';
-  readonly RECRUITER_TYPE = 'recruiter';
+  constructor(public afStore: AngularFirestore, private authProvider: AuthProvider) {
+    this.profile = this.authProvider.getStoredUser();
+    this.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => this.jobs = jobs);
+    this.getAllFromCollection(COLLECTION.users).subscribe(users => this.users = users);
+    this.getAllFromCollection(COLLECTION.ratings).subscribe(ratings => this.ratings = ratings);
+    this.getAllFromCollection(COLLECTION.appointments).subscribe(appointments => this.appointments = appointments);
+  }
 
-  constructor(public afStore: AngularFirestore) { }
 
-
-  getAllFromCollection(collectionName: string) {
+  getAllFromCollection(collectionName: string): Observable<any> {
     return this.afStore.collection<Job>(collectionName).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
@@ -35,8 +45,8 @@ export class DataProvider {
     );
   }
 
-  getMyCollection(collectionName: string, uid: string) {
-    return this.afStore.collection<Job>(collectionName, !!uid ? ref => ref.where('uid', '==', uid) : null).snapshotChanges().pipe(
+  getMyCollection(collectionName: string, uid: string): Observable<any> {
+    return this.afStore.collection<any>(collectionName, !!uid ? ref => ref.where('uid', '==', uid) : null).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();
@@ -47,8 +57,8 @@ export class DataProvider {
     );
   }
 
-  getCollectionByKeyValuePair(collectionName: string, key: string, value: string) {
-    return this.afStore.collection<Job>(collectionName, ref => ref.where(key, '==', value)).snapshotChanges().pipe(
+  getCollectionByKeyValuePair(collectionName: string, key: string, value: string): Observable<any> {
+    return this.afStore.collection<any>(collectionName, ref => ref.where(key, '==', value)).snapshotChanges().pipe(
       map(actions => {
         return actions.map(a => {
           const data = a.payload.doc.data();
@@ -60,19 +70,73 @@ export class DataProvider {
   }
 
   getItemById(collectionName: string, id: string) {
-    return this.afStore.collection(collectionName).doc<Job | User>(id).valueChanges();
+    return this.afStore.collection(collectionName).doc<any>(id).valueChanges();
   }
 
   updateItem(collectionName: string, data: User | Job, id: string) {
-    return this.afStore.collection(collectionName).doc<Job | User>(id).update(data);
+    return this.afStore.collection(collectionName).doc<any>(id).update(data);
   }
 
   addItem(collectionName: string, data: User | Job, id: string) {
-    return this.afStore.collection(collectionName).doc<Job | User>(id).set(data);
+    return this.afStore.collection(collectionName).doc<any>(id).set(data);
   }
 
   removeItem(collectionName: string, id: string) {
-    return this.afStore.collection(collectionName).doc<Job | User>(id).delete();
+    return this.afStore.collection(collectionName).doc<any>(id).delete();
+  }
+
+  // getMyRatings(user) {
+  //   let rating;
+  //   const id = user.type === USER_TYPE.recruiter ? 'rid' : 'uid';
+  //   this.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
+  //     rating = this.mapRatings(rating)
+  //   });
+  // }
+  mapRatings(ratings: Rating[]): string {
+    let total = 0;
+    let rate = 0;
+    ratings.forEach(rateObject => {
+      total += rateObject.rating;
+    });
+    rate = total / ratings.length;
+    return rate.toFixed(1);
+  }
+
+  getMyJobs(): Job[] {
+    const jobs: Job[] = this.jobs.filter(job => job.rid === this.profile.uid);
+    return jobs;
+  }
+
+  getMyAppointments(): Appointment[] {
+    let appointments: Appointment[] = [];
+    if (this.authProvider.isRecruiter()) {
+      appointments = this.appointments.filter(appointment => appointment.rid === this.profile.uid);
+    } else {
+      appointments = this.appointments.filter(appointment => appointment.uid === this.profile.uid);
+    }
+    return appointments;
+  }
+
+  mapJobs(myJobs: Job[]): Job[] {
+    let mappedJobs: Job[] = [];
+    myJobs.forEach(myJob => {
+      this.jobs.forEach(job => {
+        if (myJob.jid === job.jid) {
+          mappedJobs.push(job);
+        }
+      });
+    });
+    return mappedJobs;
+  }
+
+
+  getUserProfile() {
+    const user: User = JSON.parse(localStorage.getItem('user'));
+    this.getItemById(COLLECTION.users, user.uid).subscribe(u => {
+      this.profile = u;
+      console.log(u);
+
+    });
   }
 
 

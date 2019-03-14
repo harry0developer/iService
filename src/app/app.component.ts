@@ -12,17 +12,15 @@ import { FeedbackProvider } from '../providers/feedback/feedback';
 import { DashboardPage } from '../pages/dashboard/dashboard';
 import { AuthProvider } from '../providers/auth/auth';
 import { ProfilePage } from '../pages/profile/profile';
-// import { LocationProvider } from '../providers/location/location';
-// import { ConnectionProvider } from '../providers/connection/connection';
-// import { ConnectionPage } from '../pages/connection/connection';
-// import { Profile } from '../models/Profile';
+import { User } from '../models/user';
+import { EVENTS } from '../utils/const';
 
 @Component({
   templateUrl: 'app.html'
 })
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
-  profile: any;
+  profile: User;
   rootPage: any = LoginPage;
   defaultImg: string = '';
   pages: any = {};
@@ -31,52 +29,33 @@ export class MyApp {
     public platform: Platform,
     public statusBar: StatusBar,
     public splashScreen: SplashScreen,
-    public events: Events,
+    public ionEvents: Events,
     public dataProvider: DataProvider,
     public authProvider: AuthProvider,
     private feedbackProvider: FeedbackProvider,
   ) {
-
     this.initializeApp();
 
-    // this.connectionProvider.getConnection();
+    this.authProvider.afAuth.authState.subscribe(user => {
+      this.profile = this.authProvider.getStoredUser();
+      console.log(this.profile);
 
+    });
 
-    // this.defaultImg = `${this.dataProvider.getMediaUrl()}Male.svg`;
+    this.ionEvents.subscribe(EVENTS.loggedIn, data => {
+      if (data) {
+        this.profile = data.user;
+        console.log(data);
+      }
 
-    // this.events.subscribe(this.dataProvider.LOCATION_SET, (location) => {
-    //   this.dataProvider.saveUserLocation(location);
-    // });
-
-    // this.events.subscribe(this.dataProvider.NETWORK_CONNECTED, () => {
-    //   this.feedbackProvider.presentToast("You are now connected");
-    //   this.nav.pop();
-    // });
-
-    // this.events.subscribe(this.dataProvider.NETWORK_DISCONNECTED, () => {
-    //   this.feedbackProvider.presentToast("You have lost internet connection");
-    //   this.nav.push(ConnectionPage);
-    // });
-
-    // this.events.subscribe(this.dataProvider.USER_LOGGED_IN, (user) => {
-    //   console.log(`${user.firstname} has logged in`);
-    //   this.getLocation();
-    // });
-
-    // this.events.subscribe(this.dataProvider.USER_LOGGED_IN, (profile) => {
-    //   this.profile = profile;
-    //   this.dataProvider.initializeData();
-    //   this.defaultImg = `${this.dataProvider.getMediaUrl()}${this.profile.gender}.svg`;
-    //   this.getLocation();
-    // });
+    });
 
     this.pages = {
       dashboardPage: DashboardPage,
       jobsPage: JobsPage,
       candidatesPage: CandidatesPage,
       myJobsPage: MyJobsPage,
-      profilePage: ProfilePage,
-      appointmentPage: AppointmentsPage,
+      profilePage: ProfilePage
     }
   }
 
@@ -84,11 +63,6 @@ export class MyApp {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      if (this.authProvider.isLoggedIn()) {
-        this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid).subscribe(user => {
-          this.profile = user.data();
-        });
-      }
     });
   }
 
@@ -97,7 +71,11 @@ export class MyApp {
   }
 
   isRecruiter() {
-    return this.profile && this.profile.type.toLowerCase() === 'recruiter' ? true : false;
+    if (this.authProvider.isLoggedIn()) {
+      return this.authProvider.isRecruiter();
+    } else {
+      this.logout();
+    }
   }
 
   profilePicture(): string {

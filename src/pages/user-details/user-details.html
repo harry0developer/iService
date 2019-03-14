@@ -18,11 +18,12 @@
       <!-- <div class="animated slideInLeft status" [hidden]="!hired">
         <i class="fa fa-calendar" item-start></i>
         Offered Job
-      </div> -->
+      </div>
       <div class="animated slideInRight distance" [hidden]="!candidate.distance">
         <ion-icon name="pin" item-start></ion-icon>
         {{candidate.distance}} KM
       </div>
+    -->
       <div class="profile-image">
         <div class="imagex">
           <img class="image animated slideInLeft" [src]="profilePicture(candidate)" (error)="img.src = getDefaultProfilePic(candidate)" #img alt="profile">
@@ -41,7 +42,7 @@
         <rating *ngIf="canRateUser" [float]="true" [(ngModel)]="ratings" (click)="rateUser(ratings)"></rating>
       </span> -->
       
-      <div class="row summary" *ngIf="!isRecruiter()">
+      <div class="row summary" *ngIf="candidate.type === 'recruiter'">
         <div class="col animated slideInDown col-6">
           <h2>{{postedJobs?.length}}</h2>
           <p *ngIf="postedJobs?.length != 1">Jobs Posted</p>
@@ -57,7 +58,7 @@
         </div>
       </div>
   
-      <div class="row summary" *ngIf="isRecruiter()">
+      <div class="row summary" *ngIf="candidate.type === 'candidate'">
         <div class="col animated slideInDown col-4">
           <h2>{{appliedJobs?.length || 0}}</h2>
           <p *ngIf="appliedJobs?.length != 1">Jobs Applied</p>
@@ -126,7 +127,7 @@
       </ion-grid>
     </div>
   
-    <div *ngIf="isRecruiter()">
+    <div *ngIf="candidate && candidate.type === 'recruiter'">
       <div padding [hidden]="hired">
         <button ion-button color="light" class="dark" block (click)="offerUserEmployment(candidate)">Offer Employment</button>
       </div>

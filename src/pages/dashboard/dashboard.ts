@@ -11,6 +11,9 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { LoginPage } from '../login/login';
+import { COLLECTION, USER_TYPE } from '../../utils/const';
+import { Appointment } from '../../models/appointment';
+import { User } from '../../models/user';
 // import { Rate } from '../../models/Ratings';
 // import { RatingsPage } from '../ratings/ratings';
 
@@ -23,6 +26,7 @@ import { LoginPage } from '../login/login';
 export class DashboardPage {
   profile: any;
   jobs: any;
+  appointments: Appointment[];
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -35,30 +39,47 @@ export class DashboardPage {
   }
 
   ionViewDidLoad() {
+    this.profile = this.authProvider.getStoredUser();
     if (this.authProvider.isLoggedIn()) {
       this.setUser();
       this.setJobs();
+      this.setMyAppointments();
     } else {
       this.navCtrl.setRoot(LoginPage);
     }
+
+  }
+
+  isRecruiter(): boolean {
+    return this.authProvider.isRecruiter();
   }
 
   setUser() {
-    this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, this.authProvider.getStoredUser().uid).subscribe(user => {
+    this.dataProvider.getItemById(COLLECTION.users, this.profile.uid).subscribe(user => {
       this.profile = user;
     });
   }
 
   setJobs() {
-    this.jobs = this.dataProvider.getMyCollection(this.dataProvider.JOBS_COLLECTION, this.authProvider.getStoredUser().uid);
+    this.dataProvider.getMyCollection(COLLECTION.jobs, this.profile.uid).subscribe(jobs => {
+      this.jobs = jobs;
+    });
+  }
+
+  setMyAppointments() {
+    const id = this.authProvider.isRecruiter() ? 'rid' : 'uid';
+    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(app => {
+      this.appointments = app;
+    });
   }
 
   profilePicture(): string {
     return `../../assets/imgs/users/${this.profile.gender}.svg`;
   }
 
-  isRecruiter(): boolean {
-    return this.profile.type === 'recruiter';
+  viewAppointments() {
+    this.feedbackProvider.presentModal(AppointmentsPage, { appointments: this.appointments });
+    // this.navCtrl.push(AppointmentsPage, { appointments: this.appointments });
   }
 
   editProfile() {

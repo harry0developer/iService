@@ -1,9 +1,11 @@
 <ion-header>
     <ion-navbar color="dark">
-      <button ion-button menuToggle>
-        <ion-icon name="menu"></ion-icon>
-      </button>
       <ion-title>Appointments</ion-title>
+      <ion-buttons end>
+        <button ion-button (click)="dismissModal()">
+          Cancel
+        </button>
+      </ion-buttons>
     </ion-navbar>
   
     <ion-toolbar color="light">
@@ -22,7 +24,7 @@
   <ion-content>
     <div [ngSwitch]="appointment_type">
       <ion-list *ngSwitchCase="'inProgress'">
-        <div [@listAnimation]="inProgressAppointments.length">
+        <div *ngIf="inProgressAppointments && inProgressAppointments.length > 0" [@listAnimation]="inProgressAppointments.length">
           <ion-list *ngFor="let user of inProgressAppointments">
             <ion-card>
               <ion-item (click)="viewUserDetails(user)">
@@ -58,7 +60,7 @@
                 <h2>{{user.firstname}} {{user.lastname}}</h2>
                 <p>
                   <i class="fa fa-calendar" item-start></i>
-                  <b>Completed </b> {{getDateAppointed(user)}}
+                  <b>Completed </b> {{getDateCompleted(user)}}
                 </p>
                 <i class="fa fa-chevron-right" item-end></i>
               </ion-item>

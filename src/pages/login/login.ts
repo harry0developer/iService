@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, Events } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { DashboardPage } from '../dashboard/dashboard';
 import { AngularFireAuth } from '@angular/fire/auth';
@@ -12,6 +12,7 @@ import { DataProvider } from '../../providers/data/data';
 import { CandidatesPage } from '../candidates/candidates';
 import { JobsPage } from '../jobs/jobs';
 import { DateProvider } from '../../providers/date/date';
+import { COLLECTION, USER_TYPE, EVENTS } from '../../utils/const';
 
 @Component({
   selector: 'page-login',
@@ -32,24 +33,23 @@ export class LoginPage {
     public dataProvider: DataProvider,
     public dateProvider: DateProvider,
     public feedbackProvider: FeedbackProvider,
-    private authProvider: AuthProvider) {
+    private authProvider: AuthProvider,
+    private ionEvents: Events) {
   }
 
   ionViewDidLoad() {
-    if (this.authProvider.getStoredUser()) {
-      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, this.authProvider.getStoredUser().uid).subscribe(u => {
-        const user: any = u;
-        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
-      });
+    if (this.authProvider.isLoggedIn()) {
+      this.navigate(this.authProvider.getStoredUser());
     }
   }
 
   addUser() {
     const user: User = {
-      firstname: 'Thabo',
-      lastname: 'Papo',
+      firstname: 'Lesang',
+      lastname: 'Chini',
       type: 'candidate',
-      email: 'thabo@papo.com',
+      gender: 'female',
+      email: 'lesang@chini.com',
       password: '123456',
       createdAt: this.dateProvider.getDate(),
       phone: '0798829922',
@@ -64,9 +64,8 @@ export class LoginPage {
 
   signinWithEmailAndPassword() {
     this.authProvider.signInWithEmailAndPassword(this.data.email, this.data.password).then((res) => {
-      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, res.user.uid).subscribe(u => {
-        const user: any = u;
-        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
+      this.dataProvider.getItemById(COLLECTION.users, res.user.uid).subscribe(u => {
+        this.navigate(u);
       });
     }).catch(err => {
       if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
@@ -78,9 +77,8 @@ export class LoginPage {
 
   signInWithFacebook() {
     this.authProvider.signInWithFacebook().then((res) => {
-      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, res.user.uid).subscribe(u => {
-        const user: any = u;
-        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
+      this.dataProvider.getItemById(COLLECTION.users, res.user.uid).subscribe(u => {
+        this.navigate(u);
       });
     }).catch(err => {
       if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
@@ -92,9 +90,8 @@ export class LoginPage {
 
   signInWithTwitter() {
     this.authProvider.signInWithFacebook().then((res) => {
-      this.dataProvider.getItemById(this.dataProvider.USERS_COLLECTION, res.user.uid).subscribe(u => {
-        const user: any = u;
-        user.type == this.dataProvider.CANDIDATE_TYPE ? this.navCtrl.setRoot(JobsPage) : this.navCtrl.setRoot(CandidatesPage);
+      this.dataProvider.getItemById(COLLECTION.users, res.user.uid).subscribe(u => {
+        this.navigate(u);
       });
     }).catch(err => {
       if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
@@ -102,6 +99,13 @@ export class LoginPage {
       }
       console.log(err);
     });
+  }
+
+  navigate(user) {
+    this.ionEvents.publish(EVENTS.loggedIn, { user });
+    this.authProvider.storeUser(user);
+    user.type == USER_TYPE.recruiter ? this.navCtrl.setRoot(CandidatesPage) : this.navCtrl.setRoot(JobsPage);
+
   }
 
   goToSignup() {
