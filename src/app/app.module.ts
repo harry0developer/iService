@@ -31,6 +31,7 @@ import { AppointmentsPage } from '../pages/appointments/appointments';
 import { UserDetailsPage } from '../pages/user-details/user-details';
 import { MyJobsPage } from '../pages/my-jobs/my-jobs';
 import { ViewedJobsPage } from '../pages/viewed-jobs/viewed-jobs';
+import { ViewUsersPage } from '../pages/view-users/view-users';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { ViewedJobsPage } from '../pages/viewed-jobs/viewed-jobs';
     SignupPage,
     UserDetailsPage,
     MyJobsPage,
-    ViewedJobsPage
+    ViewedJobsPage,
+    ViewUsersPage,
   ],
   imports: [
     BrowserModule,
@@ -72,7 +74,8 @@ import { ViewedJobsPage } from '../pages/viewed-jobs/viewed-jobs';
     SignupPage,
     UserDetailsPage,
     MyJobsPage,
-    ViewedJobsPage
+    ViewedJobsPage,
+    ViewUsersPage,
   ],
   providers: [
     StatusBar,

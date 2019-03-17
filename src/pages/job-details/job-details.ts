@@ -6,6 +6,8 @@ import { DateProvider } from '../../providers/date/date';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
 import { Job } from '../../models/job';
+import { CandidatesPage } from '../candidates/candidates';
+import { ViewUsersPage } from '../view-users/view-users';
 
 @IonicPage()
 @Component({
@@ -64,6 +66,16 @@ export class JobDetailsPage {
       }
     });
 
+  }
+
+  viewAppliedUsers() {
+    this.navCtrl.push(ViewUsersPage, { users: this.applied });
+  }
+  viewViewedUsers() {
+    this.navCtrl.push(ViewUsersPage, { users: this.viewed });
+  }
+  viewSharedUsers() {
+    this.navCtrl.push(ViewUsersPage, { users: this.shared });
   }
 
   getSkills(skills) {

@@ -25,15 +25,15 @@
     <p class="animated slideInRight">Posted {{getDateTime(job.dateCreated)}}</p>
     <ion-grid class="info">
       <ion-row>
-        <ion-col col-4 class="animated slideInDown">
+        <ion-col col-4 class="animated slideInDown" (tap)="viewViewedUsers()">
           <h2>{{viewed?.length || 0}}</h2>
           <p>Viewed</p>
         </ion-col>
-        <ion-col col-4 class="animated slideInDown">
+        <ion-col col-4 class="animated slideInDown" (tap)="viewAppliedUsers()">
           <h2>{{applied?.length || 0}}</h2>
           <p>Applied</p>
         </ion-col>
-        <ion-col col-4 class="animated slideInDown">
+        <ion-col col-4 class="animated slideInDown" (tap)="viewSharedUsers()">
           <h2>{{shared?.length || 0}}</h2>
           <p>Shared</p>
         </ion-col>

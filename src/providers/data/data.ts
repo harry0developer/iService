@@ -100,6 +100,18 @@ export class DataProvider {
     return this.afStore.collection(collectionName).doc<any>(id).delete();
   }
 
+  mapUsers(users) {
+    let userz = [];
+    users.map(u => {
+      this.users.map(user => {
+        if (u.uid === user.id) {
+          userz.push(user);
+        }
+      });
+    });
+    return userz;
+  }
+
   mapRatings(ratings: Rating[]): string {
     let total = 0;
     let rate = 0;
