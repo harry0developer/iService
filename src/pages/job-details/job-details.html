@@ -26,16 +26,16 @@
     <ion-grid class="info">
       <ion-row>
         <ion-col col-4 class="animated slideInDown">
-          <h2>{{countShared}}</h2>
-          <p>Shared</p>
-        </ion-col>
-        <ion-col col-4 class="animated slideInDown">
-          <h2>{{countViews}}</h2>
+          <h2>{{viewed?.length || 0}}</h2>
           <p>Viewed</p>
         </ion-col>
         <ion-col col-4 class="animated slideInDown">
-          <h2>{{countApplied}}</h2>
+          <h2>{{applied?.length || 0}}</h2>
           <p>Applied</p>
+        </ion-col>
+        <ion-col col-4 class="animated slideInDown">
+          <h2>{{shared?.length || 0}}</h2>
+          <p>Shared</p>
         </ion-col>
       </ion-row>
     </ion-grid>

@@ -5,6 +5,7 @@ import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { DateProvider } from '../../providers/date/date';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
+import { Job } from '../../models/job';
 
 @IonicPage()
 @Component({
@@ -15,12 +16,10 @@ export class JobDetailsPage {
   job: any;
   postedBy: User;
   profile: any;
-  countApplied: number;
-  countViews: number;
-  countShared: number;
-  applied: boolean;
-  viewedJobs: any;
-  didView: boolean;
+
+  applied: any[] = [];
+  viewed: any[] = [];
+  shared: any[] = [];
 
   constructor(
     public navCtrl: NavController, public ionEvent: Events,
@@ -30,23 +29,41 @@ export class JobDetailsPage {
     private authProvider: AuthProvider,
     private feedbackProvider: FeedbackProvider) {
     this.profile = this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid);
-    this.didView = false;
   }
 
   ionViewDidLoad() {
     this.job = this.navParams.get('job');
-    console.log(this.job);
 
-    const user = this.job.id;
-    this.authProvider.getFirebaseUserData(user).subscribe(user => {
+    const jid = this.job.rid;
+    this.authProvider.getFirebaseUserData(jid).subscribe(user => {
       this.postedBy = user.data();
     });
 
-    this.applied = this.hasApplied();
-    // const shared = this.dataProvider.getSharedJobs();
-    // this.countAppliedUsers();
-    // this.hasViewedJob();
-    // this.countJobShares(shared);
+    // const jobs = this.dataProvider.jobs;
+    // const users = this.dataProvider.users;
+
+    const appliedJobs = this.dataProvider.appliedJobs;
+    const viewedJobs = this.dataProvider.viewedJobs;
+    const sharedJobs = this.dataProvider.sharedJobs;
+
+    appliedJobs.map(a => {
+      if (a.jid === this.job.id) {
+        this.applied.push(a);
+      }
+    });
+
+    viewedJobs.map(v => {
+      if (v.jid === this.job.id) {
+        this.viewed.push(v);
+      }
+    });
+
+    sharedJobs.map(s => {
+      if (s.jid === this.job.id) {
+        this.shared.push(s);
+      }
+    });
+
   }
 
   getSkills(skills) {
@@ -90,26 +107,6 @@ export class JobDetailsPage {
     // else {
     //   this.addToViewedHelper();
     // }
-  }
-
-  private countJobViews(viewed) {
-    let count = 0;
-    viewed.forEach(v => {
-      if (v.job_id_fk == this.job.job_id) {
-        count++;
-      }
-    });
-    this.countViews = count;
-  }
-
-  countJobShares(shared) {
-    let count = 0;
-    shared.forEach(v => {
-      if (v.job_id_fk == this.job.job_id) {
-        count++;
-      }
-    });
-    this.countShared = count;
   }
 
   addToViewedHelper() {
