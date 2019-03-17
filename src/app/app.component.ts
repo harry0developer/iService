@@ -75,7 +75,7 @@ export class MyApp {
   }
 
   profilePicture(): string {
-    return `../../assets/imgs/users/${this.profile.gender}.svg`;
+    return this.dataProvider.getProfilePicture();
   }
 
   logout() {

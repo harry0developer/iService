@@ -18,7 +18,7 @@ export class OtpPage {
     lastname: '',
     email: '',
     password: '',
-    date_created: '',
+    dateCreated: '',
     otp: 0
   }
   emailPattern: string = "^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$";

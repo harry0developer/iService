@@ -9,7 +9,7 @@ export interface User {
     email: string;
     phone?: string;
     location?: Location;
-    createdAt: number;
+    dateCreated: string;
 }
 
 interface Location {

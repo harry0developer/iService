@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { Job } from '../../models/job';
+import { Job, ViewedJob, SharedJob, AppliedJob } from '../../models/job';
 import { User } from '../../models/user';
 import { Rating } from '../../models/rating';
 import { COLLECTION, USER_TYPE } from '../../utils/const';
@@ -19,6 +19,9 @@ export class DataProvider {
   users: User[];
   ratings: Rating[];
   appointments: Appointment[];
+  appliedJobs: AppliedJob[];
+  viewedJobs: ViewedJob[];
+  sharedJobs: SharedJob[];
 
   KM: number = 1.60934;
 
@@ -26,10 +29,22 @@ export class DataProvider {
 
   constructor(public afStore: AngularFirestore, private authProvider: AuthProvider) {
     this.profile = this.authProvider.getStoredUser();
+    const id = this.authProvider.isRecruiter() ? 'rid' : 'uid';
+
     this.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => this.jobs = jobs);
     this.getAllFromCollection(COLLECTION.users).subscribe(users => this.users = users);
-    this.getAllFromCollection(COLLECTION.ratings).subscribe(ratings => this.ratings = ratings);
-    this.getAllFromCollection(COLLECTION.appointments).subscribe(appointments => this.appointments = appointments);
+
+    this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
+    this.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(ratings => this.ratings = ratings);
+
+    this.getCollectionByKeyValuePair(COLLECTION.appliedJobs, id, this.profile.uid).subscribe(appliedJobs => this.appliedJobs = appliedJobs);
+    this.getCollectionByKeyValuePair(COLLECTION.viewedJobs, id, this.profile.uid).subscribe(viewedJobs => this.viewedJobs = viewedJobs);
+    this.getCollectionByKeyValuePair(COLLECTION.sharedJobs, id, this.profile.uid).subscribe(sharedJobs => this.sharedJobs = sharedJobs);
+
+
+    // this.getAllFromCollection(COLLECTION.ratings).subscribe(ratings => this.ratings = ratings);
+    // this.getAllFromCollection(COLLECTION.appointments).subscribe(appointments => this.appointments = appointments);
+    // this.getAllFromCollection(COLLECTION.appliedJobs).subscribe(appliedJobs => this.appliedJobs = appliedJobs);
   }
 
 
@@ -85,13 +100,6 @@ export class DataProvider {
     return this.afStore.collection(collectionName).doc<any>(id).delete();
   }
 
-  // getMyRatings(user) {
-  //   let rating;
-  //   const id = user.type === USER_TYPE.recruiter ? 'rid' : 'uid';
-  //   this.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
-  //     rating = this.mapRatings(rating)
-  //   });
-  // }
   mapRatings(ratings: Rating[]): string {
     let total = 0;
     let rate = 0;
@@ -100,6 +108,18 @@ export class DataProvider {
     });
     rate = total / ratings.length;
     return rate.toFixed(1);
+  }
+
+  getMyAppliedJobs(): AppliedJob[] {
+    return this.appliedJobs;
+  }
+
+  getMyViewedJobs(): ViewedJob[] {
+    return this.viewedJobs;
+  }
+
+  getMySharedJobs(): SharedJob[] {
+    return this.sharedJobs;
   }
 
   getMyJobs(): Job[] {
@@ -117,15 +137,19 @@ export class DataProvider {
     return appointments;
   }
 
+
+
   mapJobs(myJobs: Job[]): Job[] {
     let mappedJobs: Job[] = [];
-    myJobs.forEach(myJob => {
-      this.jobs.forEach(job => {
-        if (myJob.jid === job.jid) {
-          mappedJobs.push(job);
-        }
+    if (myJobs && myJobs.length > 0) {
+      myJobs.forEach(myJob => {
+        this.jobs.forEach(job => {
+          if (myJob.jid === job.id) {
+            mappedJobs.push(job);
+          }
+        });
       });
-    });
+    }
     return mappedJobs;
   }
 
@@ -137,6 +161,10 @@ export class DataProvider {
       console.log(u);
 
     });
+  }
+
+  getProfilePicture(): string {
+    return `../../assets/imgs/users/${this.profile.gender}.svg`;
   }
 
 

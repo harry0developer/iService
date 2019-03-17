@@ -43,7 +43,7 @@ export class SignupPage {
 
     const data: User = {
       ...this.data,
-      createdAt: this.dateProvider.getDate()
+      dateCreated: this.dateProvider.getDate()
     }
     this.authProvider.signUpWithEmailAndPassword(data).then(() => {
       this.navCtrl.setRoot(DashboardPage);

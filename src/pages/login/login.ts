@@ -51,7 +51,7 @@ export class LoginPage {
       gender: 'female',
       email: 'lesang@chini.com',
       password: '123456',
-      createdAt: this.dateProvider.getDate(),
+      dateCreated: this.dateProvider.getDate(),
       phone: '0798829922',
       location: {
         latitude: '18.999',

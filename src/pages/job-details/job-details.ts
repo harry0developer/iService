@@ -35,7 +35,9 @@ export class JobDetailsPage {
 
   ionViewDidLoad() {
     this.job = this.navParams.get('job');
-    const user = this.job.uid;
+    console.log(this.job);
+
+    const user = this.job.id;
     this.authProvider.getFirebaseUserData(user).subscribe(user => {
       this.postedBy = user.data();
     });
@@ -226,7 +228,7 @@ export class JobDetailsPage {
 
   manageJob(job) {
     const actionSheet = this.actionSheetCtrl.create({
-      title: `Manage: ${job.name}`,
+      title: `Manage: ${job.title}`,
       buttons: [
         {
           text: 'Edit Job',

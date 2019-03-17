@@ -7,6 +7,7 @@ import { AuthProvider } from '../../providers/auth/auth';
 import { COLLECTION } from '../../utils/const';
 import { Appointment } from '../../models/appointment';
 import { LoginPage } from '../login/login';
+import { AppliedJob } from '../../models/job';
 
 declare var cordova: any;
 
@@ -22,10 +23,11 @@ export class ProfilePage {
   job: any;
   countViewed: number;
   appliedViewed: number;
-  appliedJobs: any = [];
   viewedJobs: any = [];
   postedJobs: any = [];
   appointments: Appointment[];
+  appliedJobs: AppliedJob[];
+
   settings: any = {
     hide_dob: false,
     hide_email: false,
@@ -42,10 +44,7 @@ export class ProfilePage {
     private authProvider: AuthProvider,
     private dataProvider: DataProvider,
     private navCtrl: NavController,
-  ) {
-
-  }
-
+  ) { }
 
   ionViewDidLoad() {
     if (!this.authProvider.isLoggedIn()) {
@@ -60,8 +59,6 @@ export class ProfilePage {
   initialize() {
     let id = this.isRecruiter() ? 'rid' : 'uid';
     if (this.isRecruiter()) {
-      console.log(this.profile);
-
       this.postedJobs = this.dataProvider.getMyJobs();
     }
     this.appointments = this.dataProvider.getMyAppointments();
@@ -72,7 +69,7 @@ export class ProfilePage {
   }
 
   profilePicture(): string {
-    return `../../assets/imgs/users/${this.profile.gender}.svg`;
+    return this.dataProvider.getProfilePicture();
   }
 
   getSettings(): any {

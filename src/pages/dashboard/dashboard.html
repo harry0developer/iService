@@ -33,9 +33,9 @@
     </ion-row>
   </ion-grid>
 
-  <ion-grid  *ngIf="profile">
-    <ion-row *ngIf="isRecruiter()">
-      <ion-col col-6 class="animated zoomIn">
+  <ion-grid *ngIf="profile">
+    <ion-row>
+      <ion-col *ngIf="isRecruiter()" col-6 class="animated zoomIn">
         <ion-card class="summary" (tap)="viewPostedJobs()">
           <ion-item>
             <div class="card-icon">
@@ -48,35 +48,19 @@
           </ion-item>
         </ion-card>
       </ion-col>
-      <ion-col col-6 class="animated zoomIn">
-        <ion-card class="summary" (tap)="viewViewedJobs()">
+      <ion-col *ngIf="!isRecruiter()" col-6 class="animated zoomIn">
+        <ion-card class="summary" (tap)="viewPopularity()">
           <ion-item>
             <div class="card-icon">
               <i class="fa fa-users"></i>
             </div>
             <div class="card-details" text-wrap>
-              <h2>{{viewedJobs?.length || 0}}</h2>
-              <p>Viewed Jobs</p>
+              <h2>20%</h2>
+              <p>Popularity</p>
             </div>
           </ion-item>
         </ion-card>
-      </ion-col>
-    </ion-row>
-
-    <ion-row *ngIf="!isRecruiter()">
-      <ion-col col-6 class="animated zoomIn">
-        <ion-card class="summary" (tap)="viewAppliedJobs()">
-          <ion-item>
-            <div class="card-icon">
-              <i class="fa fa-file"></i>
-            </div>
-            <div class="card-details" text-wrap>
-              <h2>{{appliedJobs?.length || 0}}</h2>
-              <p>Jobs Applied</p>
-            </div>
-          </ion-item>
-        </ion-card>
-      </ion-col>
+      </ion-col> 
       <ion-col col-6 class="animated zoomIn">
         <ion-card class="summary" (tap)="viewViewedJobs()">
           <ion-item>
@@ -91,20 +75,9 @@
         </ion-card>
       </ion-col>
     </ion-row>
- 
+
     <ion-row>
-      <ion-col col-6 class="animated zoomIn">
-        <!-- <ion-card class="summary" (tap)="viewRaters()">
-          <ion-item>
-            <div class="card-icon">
-              <i class="fa fa-star"></i>
-            </div>
-            <div class="card-details" text-wrap>
-              <h2>{{getMyRaters()}}</h2>
-              <p>Raters</p>
-            </div>
-          </ion-item>
-        </ion-card> -->
+      <ion-col col-6 class="animated zoomIn"> 
         <ion-card class="summary" *ngIf="appointments" (tap)="viewAppointments()">
           <ion-item>
             <div class="card-icon">
@@ -117,16 +90,15 @@
           </ion-item>
         </ion-card>
       </ion-col>
-      
       <ion-col col-6 class="animated zoomIn">
-        <ion-card class="summary" (tap)="viewSharedJobs()">
+        <ion-card class="summary" (tap)="viewRaters()">
           <ion-item>
             <div class="card-icon">
-              <i class="fa fa-share"></i>
+              <i class="fa fa-star"></i>
             </div>
             <div class="card-details" text-wrap>
-              <h2>{{sharedJobs?.length || 0}}</h2>
-              <p>Jobs Shared</p>
+              <h2>{{getMyRaters()}}</h2>
+              <p>Raters</p>
             </div>
           </ion-item>
         </ion-card>

@@ -14,6 +14,9 @@ import { LoginPage } from '../login/login';
 import { COLLECTION, USER_TYPE } from '../../utils/const';
 import { Appointment } from '../../models/appointment';
 import { User } from '../../models/user';
+import { JobDetailsPage } from '../job-details/job-details';
+import { AppliedJob, ViewedJob, SharedJob } from '../../models/job';
+import { ViewedJobsPage } from '../viewed-jobs/viewed-jobs';
 // import { Rate } from '../../models/Ratings';
 // import { RatingsPage } from '../ratings/ratings';
 
@@ -27,6 +30,12 @@ export class DashboardPage {
   profile: any;
   postedJobs: any;
   appointments: Appointment[];
+
+  appliedJobs: AppliedJob[];
+  viewedJobs: ViewedJob[];
+  sharedJobs: SharedJob[];
+  jobsSummary: any;
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -54,13 +63,25 @@ export class DashboardPage {
       this.postedJobs = this.dataProvider.getMyJobs();
     }
     this.appointments = this.dataProvider.getMyAppointments();
+
+    this.appliedJobs = this.dataProvider.getMyAppliedJobs();
+    this.viewedJobs = this.dataProvider.getMyViewedJobs();
+    this.sharedJobs = this.dataProvider.getMySharedJobs();
+
+    this.jobsSummary = {
+      applied: this.appliedJobs,
+      viewed: this.viewedJobs,
+      shared: this.sharedJobs,
+    }
+
+
     this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
       Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
     });
   }
 
   profilePicture(): string {
-    return `../../assets/imgs/users/${this.profile.gender}.svg`;
+    return this.dataProvider.getProfilePicture();
   }
 
   isRecruiter(): boolean {
@@ -72,6 +93,18 @@ export class DashboardPage {
     // this.navCtrl.push(AppointmentsPage, { appointments: this.appointments });
   }
 
+  viewPostedJobs() {
+    this.feedbackProvider.presentModal(MyJobsPage, { jobs: this.postedJobs });
+  }
+
+  getJobSummary(): number {
+    return this.jobsSummary.viewed.length + this.jobsSummary.applied.length + this.jobsSummary.shared.length;
+  }
+
+  viewViewedJobs() {
+    this.navCtrl.push(ViewedJobsPage, { category: 'viewed', data: this.jobsSummary });
+  }
+
   editProfile() {
     // this.navCtrl.push(SettingsPage);
   }
@@ -80,13 +113,7 @@ export class DashboardPage {
     // this.navCtrl.push(CardDetailsPage, { category: 'applied' });
   }
 
-  viewViewedJobs() {
-    // this.navCtrl.push(CardDetailsPage, { category: 'viewed' });
-  }
 
-  viewPostedJobs() {
-    // this.navCtrl.push(MyJobsPage);
-  }
 
   viewSharedJobs() {
     // this.navCtrl.push(CardDetailsPage, { category: 'shared' });

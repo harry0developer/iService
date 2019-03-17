@@ -29,6 +29,8 @@ import { JobDetailsPage } from '../pages/job-details/job-details';
 import { ProfilePage } from '../pages/profile/profile';
 import { AppointmentsPage } from '../pages/appointments/appointments';
 import { UserDetailsPage } from '../pages/user-details/user-details';
+import { MyJobsPage } from '../pages/my-jobs/my-jobs';
+import { ViewedJobsPage } from '../pages/viewed-jobs/viewed-jobs';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import { UserDetailsPage } from '../pages/user-details/user-details';
     OtpPage,
     ProfilePage,
     SignupPage,
-    UserDetailsPage
+    UserDetailsPage,
+    MyJobsPage,
+    ViewedJobsPage
   ],
   imports: [
     BrowserModule,
@@ -66,7 +70,9 @@ import { UserDetailsPage } from '../pages/user-details/user-details';
     OtpPage,
     ProfilePage,
     SignupPage,
-    UserDetailsPage
+    UserDetailsPage,
+    MyJobsPage,
+    ViewedJobsPage
   ],
   providers: [
     StatusBar,

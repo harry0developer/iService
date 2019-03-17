@@ -1,40 +1,40 @@
-<ion-header>
-    <ion-navbar color="dark">
-      <ion-title>{{ profile.type === 'recruiter' ? 'My Posted Jobs' : 'My Applied Jobs'}}</ion-title>
-      <ion-buttons end>
-        <button ion-button icon-only (click)="postJob()">
-          <ion-icon name="create"></ion-icon>
-        </button>
-      </ion-buttons>
-    </ion-navbar>
-  </ion-header>
-  
-  <ion-content>
-    <div [@listAnimation]="myJobs.length">
-      <ion-list no-lines class="job" *ngFor="let job of myJobs">
-        <ion-card>
-          <ion-item (click)="jobDetails(job)">
-            <ion-thumbnail item-start>
-              <img src="../../assets/imgs/category/{{job.category}}.svg">
-            </ion-thumbnail>
-            <h2>{{job.name}}</h2>
-            <p>{{job.description}}</p>
-          </ion-item>
-          <ion-item-divider color="light" class="grey">
-            <span item-start>
-              <i class="fa fa-calendar light" item-start></i>
-              {{isRecruiter() ? getJobMoment(job.date_posted) : getJobMoment(job.date_applied)}}
-            </span>
-            <span item-end>
-              <i class="fa fa-bookmark light" item-start></i>
-              {{countJobApplicants(job)}} applied
-            </span>
-          </ion-item-divider>
-        </ion-card>
-      </ion-list>
-    </div>
-    <ion-card padding text-wrap class="not-found" *ngIf="!myJobs || (myJobs && myJobs.length < 1)">
-      <i class="fa fa-4x fa-calendar"></i>
-      <p>{{isRecruiter() ? 'You have not posted a job yet' : 'You have not applied for any job yet'}}</p>
-    </ion-card>
-  </ion-content>
+<ion-header> 
+  <ion-navbar color="dark">
+    <ion-title>My Jobs</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="dismissModal()">
+        Cancel
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="jobs" [@listAnimation]="jobs.length">
+    <ion-list no-lines class="job" *ngFor="let job of jobs">
+      <ion-card>
+        <ion-item (click)="jobDetails(job)">
+          <ion-thumbnail item-start>
+            <img src="../../assets/imgs/category/{{job.category}}.svg">
+          </ion-thumbnail>
+          <h2>{{job.title}}</h2>
+          <p>{{job.description}}</p>
+        </ion-item>
+        <ion-item-divider color="light" class="grey">
+          <span item-start>
+            <i class="fa fa-calendar light" item-start></i>
+            {{ getDateCreated(job.dateCreated) }}
+          </span>
+          <span item-end>
+            <i class="fa fa-bookmark light" item-start></i>
+            <!-- {{ }} applied -->
+          </span>
+        </ion-item-divider>
+      </ion-card>
+    </ion-list>
+  </div>
+  <ion-card padding text-wrap class="not-found" *ngIf="!jobs || (jobs && jobs.length < 1)">
+    <i class="fa fa-4x fa-calendar"></i>
+    <p>{{isRecruiter() ? 'You have not posted a job yet' : 'You have not applied for any job yet'}}</p>
+  </ion-card>
+</ion-content>

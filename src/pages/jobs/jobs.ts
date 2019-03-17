@@ -106,7 +106,9 @@ export class JobsPage {
   }
 
   getDateTime(date) {
-    // return this.dataProvider.getDateTime(date);
+    console.log(date);
+
+    return this.dateProvider.getDateFromNow(date);
   }
 
   jobDetails(job) {

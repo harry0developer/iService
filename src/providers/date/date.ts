@@ -9,11 +9,11 @@ export class DateProvider {
   }
 
 
-  getDate(): number {
-    return moment.now();
+  getDate(): string {
+    return moment().format('YYYY-MM-DD');
   }
 
   getDateFromNow(date: string): string {
-    return moment(date).fromNow();
+    return moment(date, 'YYYY-MM-DD').fromNow();
   }
 }

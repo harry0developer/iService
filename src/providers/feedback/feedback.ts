@@ -57,7 +57,7 @@ export class FeedbackProvider {
 
 
   presentModal(page, data) {
-    const modal = this.modalCtrl.create(page, { data });
+    const modal = this.modalCtrl.create(page, data);
     modal.present();
   }
 

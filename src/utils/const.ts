@@ -11,7 +11,10 @@ export const COLLECTION = {
     appointments: 'appointments',
     users: 'users',
     jobs: 'jobs',
-    ratings: 'ratings'
+    ratings: 'ratings',
+    appliedJobs: 'applied-jobs',
+    viewedJobs: 'viewed-jobs',
+    sharedJobs: 'shared-jobs'
 }
 
 export const USER_TYPE = {

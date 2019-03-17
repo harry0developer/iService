@@ -77,7 +77,7 @@ export class AuthProvider {
       gender: user.gender,
       firstname: data.firstname,
       lastname: data.lastname,
-      createdAt: this.dateProvider.getDate(),
+      dateCreated: this.dateProvider.getDate(),
       type: data.type,
       location: data.location,
       phone: data.phone
