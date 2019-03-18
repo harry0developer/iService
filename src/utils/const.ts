@@ -1,5 +1,6 @@
 export const EVENTS = {
-    loggedIn: 'logged-in'
+    loggedIn: 'logged-in',
+    appointmentsUpdated: 'appointments-updated',
 };
 
 export const APPOINTMENT_STATUS = {

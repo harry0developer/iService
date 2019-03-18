@@ -5,9 +5,10 @@ import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/fire
 import { Job, ViewedJob, SharedJob, AppliedJob } from '../../models/job';
 import { User } from '../../models/user';
 import { Rating } from '../../models/rating';
-import { COLLECTION, USER_TYPE } from '../../utils/const';
+import { COLLECTION, USER_TYPE, EVENTS } from '../../utils/const';
 import { Appointment } from '../../models/appointment';
 import { AuthProvider } from '../auth/auth';
+import { Events } from 'ionic-angular';
 
 @Injectable()
 export class DataProvider {
@@ -28,12 +29,17 @@ export class DataProvider {
 
   profile: User;
 
-  constructor(public afStore: AngularFirestore, private authProvider: AuthProvider) {
+  constructor(public afStore: AngularFirestore, private authProvider: AuthProvider, private ionEvents: Events) {
     this.profile = this.authProvider.getStoredUser();
     const id = this.authProvider.isRecruiter() ? 'rid' : 'uid';
 
     this.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => this.jobs = jobs);
     this.getAllFromCollection(COLLECTION.users).subscribe(users => this.users = users);
+
+    this.ionEvents.subscribe(EVENTS.appointmentsUpdated, () => {
+      this.getAllAppointments(id);
+    })
+    this.getAllAppointments(id);
 
     this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
 
@@ -45,6 +51,9 @@ export class DataProvider {
     this.getCollectionByKeyValuePair(COLLECTION.sharedJobs, id, this.profile.uid).subscribe(sharedJobs => this.sharedJobs = sharedJobs);
   }
 
+  getAllAppointments(id) {
+    this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
+  }
 
   getAllFromCollection(collectionName: string): Observable<any> {
     return this.afStore.collection<Job>(collectionName).snapshotChanges().pipe(
@@ -86,16 +95,20 @@ export class DataProvider {
     return this.afStore.collection(collectionName).doc<any>(id).valueChanges();
   }
 
-  updateItem(collectionName: string, data: User | Job, id: string) {
+  updateItem(collectionName: string, data: User | Job | Appointment, id: string) {
     return this.afStore.collection(collectionName).doc<any>(id).update(data);
   }
 
-  addItem(collectionName: string, data: User | Job, id: string) {
-    return this.afStore.collection(collectionName).doc<any>(id).set(data);
+  addItem(collectionName: string, data: User | Job | Appointment, id: string) {
+    return this.afStore.collection(collectionName).doc<any>(id).set(data, { merge: true });
   }
 
   removeItem(collectionName: string, id: string) {
     return this.afStore.collection(collectionName).doc<any>(id).delete();
+  }
+
+  findItemById(id: string) {
+    return this.getItemById(COLLECTION.users, id);
   }
 
   mapUsers(users) {
@@ -189,7 +202,6 @@ export class DataProvider {
     }
     return mappedJobs;
   }
-
 
   getUserProfile() {
     const user: User = JSON.parse(localStorage.getItem('user'));

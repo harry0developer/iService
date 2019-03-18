@@ -127,12 +127,12 @@
       </ion-grid>
     </div>
   
-    <div *ngIf="candidate && candidate.type === 'recruiter'">
+    <div *ngIf="isRecruiter()">
       <div padding [hidden]="hired">
-        <button ion-button color="light" class="dark" block (click)="offerUserEmployment(candidate)">Offer Employment</button>
+        <button ion-button color="light" class="dark" block (click)="makeAppointment(candidate)">Make Appointment</button>
       </div>
       <div padding [hidden]="!hired">
-        <button ion-button color="light" class="dark" block (click)="completeAppointmentActionSheep(candidate)">Complete Appointment</button>
+        <button ion-button color="light" class="dark" block (click)="completeAppointment(candidate)">Complete Appointment</button>
       </div>
     </div>
   

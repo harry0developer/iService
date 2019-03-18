@@ -5,8 +5,10 @@ import { DataProvider } from '../../providers/data/data';
 import { LoginPage } from '../login/login';
 import { User } from '../../models/user';
 import { AuthProvider } from '../../providers/auth/auth';
-import { COLLECTION } from '../../utils/const';
+import { COLLECTION, EVENTS, APPOINTMENT_STATUS } from '../../utils/const';
 import { RatingData } from '../../models/rating';
+import { Appointment } from '../../models/appointment';
+import { DateProvider } from '../../providers/date/date';
 // import { Rating, Rate } from '../../models/Ratings';
 // import { Error } from '../../models/error';
 // import { RatingsModalPage } from '../ratings-modal/ratings-modal';
@@ -48,6 +50,7 @@ export class UserDetailsPage {
     private feedbackProvider: FeedbackProvider,
     private dataProvider: DataProvider,
     private authProvider: AuthProvider,
+    private dateProvider: DateProvider,
     private events: Events,
     private actionSheetCtrl: ActionSheetController,
     private ionEvent: Events,
@@ -59,10 +62,18 @@ export class UserDetailsPage {
 
   ionViewDidLoad() {
     this.candidate = this.navParams.get('user');
-    this.dataProvider.getItemById(COLLECTION.users, this.authProvider.getStoredUser().uid).subscribe(user => {
-      this.profile = user;
-    });
+    this.profile = this.authProvider.getStoredUser();
+    this.appointments = this.dataProvider.appointments;
+    this.isUserInAppointment(this.candidate);
     this.getMyRating(this.candidate);
+  }
+
+  isUserInAppointment(user) {
+    this.appointments.forEach(app => {
+      if (app.uid === user.id && app.status === APPOINTMENT_STATUS.inProgress) {
+        this.hired = true;
+      }
+    });
   }
 
   getMyRating(candidate: User) {
@@ -70,15 +81,80 @@ export class UserDetailsPage {
     let rate = 0;
     const ratings: RatingData = this.dataProvider.getMyRatings();
     this.candidateRating = this.dataProvider.mapRatings(ratings.ratedMe);
+  }
 
-    // this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, 'uid', candidate.uid).subscribe(ratings => {
-    //   this.candidateRating = this.dataProvider.mapRatings(ratings);
-    // });
+  isRecruiter(): boolean {
+    return this.authProvider.isRecruiter();
   }
 
   profilePicture(user): string {
     return `../../assets/imgs/users/${user.gender}.svg`;
   }
+
+  makeAppointment(user) {
+    this.feedbackProvider.presentLoading();
+    const appointment: Appointment = {
+      uid: user.id,
+      rid: this.profile.uid,
+      status: APPOINTMENT_STATUS.inProgress,
+      dateCreated: this.dateProvider.getDate(),
+      dateCompleted: '',
+    }
+    this.dataProvider.addItem(COLLECTION.appointments, appointment, user.id).then(() => {
+      this.ionEvent.publish(EVENTS.appointmentsUpdated);
+      this.hired = true;
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentToast('Appointment made successfully');
+    }).catch(err => {
+      console.log(err);
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentErrorAlert('Making appointment', 'Error while making an appointment');
+    });
+  }
+
+
+  completeAppointment(user) {
+    this.feedbackProvider.presentLoading();
+    const appointment: Appointment = {
+      uid: user.id,
+      rid: this.profile.uid,
+      status: APPOINTMENT_STATUS.completed,
+      dateCompleted: this.dateProvider.getDate()
+    }
+    this.dataProvider.addItem(COLLECTION.appointments, appointment, user.id).then(() => {
+      this.ionEvent.publish(EVENTS.appointmentsUpdated);
+      this.hired = false;
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentToast('Appointment completed successfully');
+    }).catch(err => {
+      console.log(err);
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentErrorAlert('Making appointment', 'Error while making an appointment');
+    });
+  }
+
+  completeAppointmentActionSheep(candidate) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: 'You are about to complete the appointment',
+      buttons: [
+        {
+          text: 'Complete appointment',
+          role: 'destructive',
+          handler: () => {
+            this.completeAppointment(candidate);
+          }
+        },
+        {
+          text: "Don't complete",
+          role: 'cancel',
+          handler: () => {
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
+
 
   loadMyAppliedJobs() {
   }
@@ -188,38 +264,9 @@ export class UserDetailsPage {
   }
 
 
-  offerUserEmployment(user) {
-
-  }
 
   hasBeenHired(user) {
 
-  }
-
-  completeCandidateAppointment(user) {
-
-  }
-
-  completeAppointmentActionSheep(candidate) {
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'You are about to complete the appointment',
-      buttons: [
-        {
-          text: 'Complete appointment',
-          role: 'destructive',
-          handler: () => {
-            this.completeCandidateAppointment(candidate);
-          }
-        },
-        {
-          text: "Don't complete",
-          role: 'cancel',
-          handler: () => {
-          }
-        }
-      ]
-    });
-    actionSheet.present();
   }
 
   getLastSeen(date): string {

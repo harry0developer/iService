@@ -54,8 +54,6 @@ export class FeedbackProvider {
     this.loadSpinner.dismiss();
   }
 
-
-
   presentModal(page, data) {
     const modal = this.modalCtrl.create(page, data);
     modal.present();
