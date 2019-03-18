@@ -45,8 +45,6 @@ export class MyJobsPage {
   }
 
   getDateCreated(date): string {
-    console.log(date);
-
     return this.dateProvider.getDateFromNow(date);
   }
 

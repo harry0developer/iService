@@ -41,35 +41,54 @@ export class ViewedJobsPage {
     this.appliedJobs = this.dataProvider.mapJobs(data.applied);
     this.viewedJobs = this.dataProvider.mapJobs(data.viewed);
     this.sharedJobs = this.dataProvider.mapJobs(data.shared);
-    console.log(this.viewedJobs);
 
     this.getCategoryInfo(this.category);
   }
 
-  getPageTitle(): string {
-    return this.pageTitle;
+
+
+  countApplied(job) {
+    let count = 0;
+    this.appliedJobs.map(aJob => {
+      if (job.id === aJob.id) {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  countViewed(job) {
+    let count = 0;
+    this.viewedJobs.map(aJob => {
+      if (job.id === aJob.id) {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  countShared(job) {
+    let count = 0;
+    this.sharedJobs.map(aJob => {
+      if (job.id === aJob.id) {
+        count++;
+      }
+    });
+    return count;
   }
 
   getViewedJobs(): Array<any> {
     this.category = 'viewed';
-    // this.viewedJobs = this.dataProvider.getMyViewedJobs(this.profile.user_id, this.profile.type);
     return this.viewedJobs;
   }
 
   getAppliedJobs(): Array<any> {
     this.category = 'applied';
-    // this.appliedJobs = this.dataProvider.getMyAppliedJobs(this.profile.user_id, this.profile.type);
     return this.appliedJobs;
   }
 
-  getDate(date: string): string {
-    return this.dateProvider.getDateFromNow(date);
-  }
-
-
   getSharedJobs(): Array<any> {
     this.category = 'shared';
-    // this.sharedJobs = this.dataProvider.getMySharedJobs(this.profile.user_id, this.profile.type);
     return this.sharedJobs;
   }
 
@@ -105,17 +124,6 @@ export class ViewedJobsPage {
     this.navCtrl.push(JobDetailsPage, { job: job, user: this.profile });
   }
 
-  countJobApplicants(appliedJob) {
-    // let counter = 0;
-    // const appliedJobs = this.dataProvider.getAppliedJobs() || [];
-    // appliedJobs.forEach(job => {
-    //   if (job.job_id_fk == appliedJob.job_id) {
-    //     counter++;
-    //   }
-    // });
-    // return counter;
-  }
-
   // Appointments stuff
   viewUserDetails(candidate) {
     // this.navCtrl.push(UserDetailsPage, { user: candidate, page: 'Appointments' });
@@ -129,16 +137,8 @@ export class ViewedJobsPage {
     // return `${this.dataProvider.getMediaUrl()}${profile.gender}.svg`;
   }
 
-  getDateAppointed(user) {
-    // let appointment_date = '';
-    // this.appointments.forEach(app => {
-    //   if (app.candidate_id_fk === user.user_id && app.recruiter_id_fk === this.profile.user_id) {
-    //     appointment_date = this.dataProvider.getDateTime(app.date_created);
-    //   } else if (app.recruiter_id_fk === user.user_id && app.candidate_id_fk === this.profile.user_id) {
-    //     appointment_date = this.dataProvider.getDateTime(app.date_created);
-    //   }
-    // });
-    // return appointment_date;
+  getDate(date: string): string {
+    return this.dateProvider.getDateFromNow(date);
   }
 
 }
