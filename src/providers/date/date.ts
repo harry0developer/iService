@@ -14,6 +14,6 @@ export class DateProvider {
   }
 
   getDateFromNow(date: string): string {
-    return moment(date, 'YYYY-MM-DD').fromNow();
+    return moment(date).fromNow();
   }
 }

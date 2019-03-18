@@ -6,6 +6,7 @@ import { LoginPage } from '../login/login';
 import { User } from '../../models/user';
 import { AuthProvider } from '../../providers/auth/auth';
 import { COLLECTION } from '../../utils/const';
+import { RatingData } from '../../models/rating';
 // import { Rating, Rate } from '../../models/Ratings';
 // import { Error } from '../../models/error';
 // import { RatingsModalPage } from '../ratings-modal/ratings-modal';
@@ -67,9 +68,12 @@ export class UserDetailsPage {
   getMyRating(candidate: User) {
     let total = 0;
     let rate = 0;
-    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, 'uid', candidate.uid).subscribe(ratings => {
-      this.candidateRating = this.dataProvider.mapRatings(ratings);
-    });
+    const ratings: RatingData = this.dataProvider.getMyRatings();
+    this.candidateRating = this.dataProvider.mapRatings(ratings.ratedMe);
+
+    // this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, 'uid', candidate.uid).subscribe(ratings => {
+    //   this.candidateRating = this.dataProvider.mapRatings(ratings);
+    // });
   }
 
   profilePicture(user): string {

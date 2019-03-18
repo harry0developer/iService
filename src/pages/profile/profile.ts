@@ -63,9 +63,12 @@ export class ProfilePage {
     }
     this.appointments = this.dataProvider.getMyAppointments();
 
-    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
-      Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
-    });
+    const ratings = this.dataProvider.getMyRatings();
+    Object.assign(this.profile, { rating: this.dataProvider.mapRatings(ratings.ratedMe) });
+
+    // this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
+    //   Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
+    // });
   }
 
   profilePicture(): string {

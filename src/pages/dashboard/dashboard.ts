@@ -17,6 +17,8 @@ import { User } from '../../models/user';
 import { JobDetailsPage } from '../job-details/job-details';
 import { AppliedJob, ViewedJob, SharedJob } from '../../models/job';
 import { ViewedJobsPage } from '../viewed-jobs/viewed-jobs';
+import { Rating, RatingData } from '../../models/rating';
+import { RatingsPage } from '../ratings/ratings';
 // import { Rate } from '../../models/Ratings';
 // import { RatingsPage } from '../ratings/ratings';
 
@@ -35,6 +37,7 @@ export class DashboardPage {
   viewedJobs: ViewedJob[];
   sharedJobs: SharedJob[];
   jobsSummary: any;
+  ratingsData: RatingData;
 
   constructor(
     public navCtrl: NavController,
@@ -67,6 +70,7 @@ export class DashboardPage {
     this.appliedJobs = this.dataProvider.getMyAppliedJobs();
     this.viewedJobs = this.dataProvider.getMyViewedJobs();
     this.sharedJobs = this.dataProvider.getMySharedJobs();
+    this.ratingsData = this.dataProvider.getMyRatings();
 
     this.jobsSummary = {
       applied: this.appliedJobs,
@@ -75,13 +79,20 @@ export class DashboardPage {
     }
 
 
-    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
-      Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
-    });
+    const ratings = this.dataProvider.getMyRatings();
+    Object.assign(this.profile, { rating: this.dataProvider.mapRatings(ratings.ratedMe) });
+
+    // this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
+    //   Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
+    // });
   }
 
   profilePicture(): string {
     return this.dataProvider.getProfilePicture();
+  }
+
+  countMyRaters(): number {
+    return this.ratingsData.ratedMe.length + this.ratingsData.iRated.length;
   }
 
   isRecruiter(): boolean {
@@ -89,12 +100,11 @@ export class DashboardPage {
   }
 
   viewAppointments() {
-    this.feedbackProvider.presentModal(AppointmentsPage, { appointments: this.appointments });
-    // this.navCtrl.push(AppointmentsPage, { appointments: this.appointments });
+    this.navCtrl.push(AppointmentsPage, { appointments: this.appointments });
   }
 
   viewPostedJobs() {
-    this.feedbackProvider.presentModal(MyJobsPage, { jobs: this.postedJobs });
+    this.navCtrl.push(MyJobsPage, { jobs: this.postedJobs });
   }
 
   getJobSummary(): number {
@@ -104,6 +114,11 @@ export class DashboardPage {
   viewViewedJobs() {
     this.navCtrl.push(ViewedJobsPage, { category: 'viewed', data: this.jobsSummary });
   }
+
+  viewRaters() {
+    this.navCtrl.push(RatingsPage, { ratingsData: this.ratingsData });
+  }
+
 
   editProfile() {
     // this.navCtrl.push(SettingsPage);
@@ -119,13 +134,7 @@ export class DashboardPage {
     // this.navCtrl.push(CardDetailsPage, { category: 'shared' });
   }
 
-  viewRaters() {
-    // this.navCtrl.push(RatingsPage, { ratingsData: this.ratingsData });
-  }
 
-  getMyRaters(): number {
-    return 0;
-    // return this.ratingsData.ratedMe.length + this.ratingsData.iRated.length;
-  }
+
 
 }

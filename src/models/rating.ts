@@ -3,3 +3,8 @@ export interface Rating {
     rid: string;
     rating: number;
 }
+
+export interface RatingData {
+    iRated: Rating[],
+    ratedMe: Rating[]
+}

@@ -17,7 +17,8 @@ export class DataProvider {
 
   jobs: Job[];
   users: User[];
-  ratings: Rating[];
+  iRated: Rating[];
+  ratedMe: Rating[];
   appointments: Appointment[];
   appliedJobs: AppliedJob[];
   viewedJobs: ViewedJob[];
@@ -35,16 +36,13 @@ export class DataProvider {
     this.getAllFromCollection(COLLECTION.users).subscribe(users => this.users = users);
 
     this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
-    this.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(ratings => this.ratings = ratings);
+
+    this.getCollectionByKeyValuePair(COLLECTION.ratings, 'rid', this.profile.uid).subscribe(ratings => this.iRated = ratings);
+    this.getCollectionByKeyValuePair(COLLECTION.ratings, 'uid', this.profile.uid).subscribe(ratings => this.ratedMe = ratings);
 
     this.getCollectionByKeyValuePair(COLLECTION.appliedJobs, id, this.profile.uid).subscribe(appliedJobs => this.appliedJobs = appliedJobs);
     this.getCollectionByKeyValuePair(COLLECTION.viewedJobs, id, this.profile.uid).subscribe(viewedJobs => this.viewedJobs = viewedJobs);
     this.getCollectionByKeyValuePair(COLLECTION.sharedJobs, id, this.profile.uid).subscribe(sharedJobs => this.sharedJobs = sharedJobs);
-
-
-    // this.getAllFromCollection(COLLECTION.ratings).subscribe(ratings => this.ratings = ratings);
-    // this.getAllFromCollection(COLLECTION.appointments).subscribe(appointments => this.appointments = appointments);
-    // this.getAllFromCollection(COLLECTION.appliedJobs).subscribe(appliedJobs => this.appliedJobs = appliedJobs);
   }
 
 
@@ -112,6 +110,29 @@ export class DataProvider {
     return userz;
   }
 
+  mapIRated(iRated: Rating[]) {
+    let raters = [];
+    iRated.map(r => {
+      this.users.map(user => {
+        if (r.uid === user.id) {
+          raters.push(user);
+        }
+      });
+    });
+    return raters;
+  }
+  mapRatedMe(ratedMe: Rating[]) {
+    let raters = [];
+    ratedMe.map(r => {
+      this.users.map(user => {
+        if (r.rid === user.id) {
+          raters.push(user);
+        }
+      });
+    });
+    return raters;
+  }
+
   mapRatings(ratings: Rating[]): string {
     let total = 0;
     let rate = 0;
@@ -149,6 +170,10 @@ export class DataProvider {
     return appointments;
   }
 
+  getMyRatings(): any {
+    return Object.assign({}, { iRated: this.iRated, ratedMe: this.ratedMe });
+  }
+
 
 
   mapJobs(myJobs: Job[]): Job[] {
@@ -170,15 +195,12 @@ export class DataProvider {
     const user: User = JSON.parse(localStorage.getItem('user'));
     this.getItemById(COLLECTION.users, user.uid).subscribe(u => {
       this.profile = u;
-      console.log(u);
-
     });
   }
 
   getProfilePicture(): string {
     return `../../assets/imgs/users/${this.profile.gender}.svg`;
   }
-
 
   applyHaversine(jobs, lat, lng) {
     if (jobs && lat && lng) {
