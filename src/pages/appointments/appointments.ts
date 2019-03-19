@@ -5,7 +5,7 @@ import { bounceIn } from '../../utils/animations';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
 import { Appointment } from '../../models/appointment';
-import { APPOINTMENT_STATUS, COLLECTION } from '../../utils/const';
+import { STATUS, COLLECTION } from '../../utils/const';
 import { filter, take } from 'rxjs/operators';
 import { app } from 'firebase';
 import { forkJoin } from 'rxjs';
@@ -46,8 +46,8 @@ export class AppointmentsPage {
       this.dataProvider.getAllFromCollection(COLLECTION.users).pipe(take(1))
     ).subscribe(([appointments, users]) => {
       const usersWithAppointments = this.getUserWithAppointmets(users, appointments);
-      this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === APPOINTMENT_STATUS.completed);
-      this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === APPOINTMENT_STATUS.inProgress);
+      this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
+      this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
     });
   }
 

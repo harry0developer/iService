@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LoadingController, ToastController, AlertController, Events, ActionSheetController, ModalController } from 'ionic-angular';
+import { EVENTS } from '../../utils/const';
 
 @Injectable()
 export class FeedbackProvider {
@@ -68,21 +69,21 @@ export class FeedbackProvider {
           text: 'Facebook',
           icon: 'logo-facebook',
           handler: () => {
-            this.events.publish('action:facebook');
+            this.events.publish(EVENTS.facebookShare);
           }
         },
         {
           text: 'Twitter',
           icon: 'logo-twitter',
           handler: () => {
-            this.events.publish('action:twitter');
+            this.events.publish(EVENTS.twitterShare);
           }
         },
         {
           text: 'Instagram',
           icon: 'logo-instagram',
           handler: () => {
-            this.events.publish('action:instagram');
+            this.events.publish(EVENTS.instagramShare);
           }
         },
         {

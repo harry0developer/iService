@@ -1,5 +1,4 @@
 page-job-details{
-
     ion-badge.badge{
         background-color: $primary;
         font-weight: 1em;
@@ -11,7 +10,7 @@ page-job-details{
         text-align: center;
         background-color: $primary;
         padding: 10px 0;
-        .top_img{
+        .top_img {
             width: 100px;
             height: 100px;
             border: 2px solid $secondary;
@@ -30,14 +29,25 @@ page-job-details{
         }
         .info {
             // border-top: 1px solid $secondary;
-            margin-top: 20px;
+            box-shadow: 0px 1px 5px 1px rgba(0, 0, 0, 0.2);
+            width: 96%;
+            border-radius: 4px;
+            background: $white;
+            position: relative;
+            z-index: 100;
+            top: 30px;
+            border: 2px solid $primary;
             p {
                 font-size: 1em;
                 margin: 0;
             }
+            p, h2 {
+                color: $primary;
+            }
         }
 
     }
+
     .scroll-content {
         background: $light-grey;
     }
@@ -45,7 +55,7 @@ page-job-details{
     .center {
         margin: auto;
         padding: 10px;
-      }
+    }
 
     .card {
         min-height: 90px;
@@ -61,35 +71,13 @@ page-job-details{
             p {
                 font-size: .9em;
             }
-        }
-        // .item-block .item-inner{
-        //     border-bottom: 0.55px solid $white;
-        // }
-        // .item {
-        //     border-radius: 4px;
-        //     margin: 10px auto; 
-        // }
-        // i {
-        //     color: $primary;
-        //     font-size: 2em;
-        //     padding: 0 10px;
-        // } 
-        // i.icon {
-        //     font-size: 1.2em;
-        // }
-        // .label {
-        //     p {
-        //         font-size: 1.1em;
-        //         padding: 5px 0;
-        //         color: $dark !important;
-        //     }
-        //     h2 {
-        //         font-weight: bold;
-        //     }
-            
-        //     h2, p {
-        //         color: $primary
-        //     }
-        // }
+        } 
+    }
+
+    ion-list {
+        margin-top: 30px !important;
+    }
+    ion-grid {
+        padding: 0 0 5px 0 !important;
     }
 }

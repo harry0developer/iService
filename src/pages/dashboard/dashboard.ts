@@ -19,6 +19,7 @@ import { AppliedJob, ViewedJob, SharedJob } from '../../models/job';
 import { ViewedJobsPage } from '../viewed-jobs/viewed-jobs';
 import { Rating, RatingData } from '../../models/rating';
 import { RatingsPage } from '../ratings/ratings';
+import { SettingsPage } from '../settings/settings';
 // import { Rate } from '../../models/Ratings';
 // import { RatingsPage } from '../ratings/ratings';
 
@@ -121,7 +122,7 @@ export class DashboardPage {
 
 
   editProfile() {
-    // this.navCtrl.push(SettingsPage);
+    this.navCtrl.push(SettingsPage);
   }
 
   viewAppliedJobs() {

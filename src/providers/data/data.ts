@@ -14,7 +14,7 @@ import { Events } from 'ionic-angular';
 export class DataProvider {
   collectionName: any;
   dataCollection: AngularFirestoreCollection<Job | User>;
-  data$: Observable<any[]>;
+  data$: Observable<Job[] | User[] | Appointment[] | AppliedJob[]>;
 
   jobs: Job[];
   users: User[];
@@ -96,11 +96,11 @@ export class DataProvider {
     return this.afStore.collection(collectionName).doc<any>(id).valueChanges();
   }
 
-  updateItem(collectionName: string, data: User | Job | Appointment | AppliedJob, id: string) {
+  updateItem(collectionName: string, data: User | Job | Appointment | AppliedJob | SharedJob, id: string) {
     return this.afStore.collection(collectionName).doc<any>(id).set(data, { merge: true });
   }
 
-  addNewItem(collectionName: string, data: User | Job | Appointment | AppliedJob) {
+  addNewItem(collectionName: string, data: User | Job | Appointment | AppliedJob | SharedJob) {
     return this.afStore.collection(collectionName).add(data);
   }
 
@@ -213,6 +213,10 @@ export class DataProvider {
 
   getProfilePicture(): string {
     return `../../assets/imgs/users/${this.profile.gender}.svg`;
+  }
+
+  getSettings() {
+    return {};
   }
 
   applyHaversine(jobs, lat, lng) {

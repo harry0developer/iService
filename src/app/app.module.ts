@@ -33,6 +33,12 @@ import { MyJobsPage } from '../pages/my-jobs/my-jobs';
 import { ViewedJobsPage } from '../pages/viewed-jobs/viewed-jobs';
 import { ViewUsersPage } from '../pages/view-users/view-users';
 import { RatingsPage } from '../pages/ratings/ratings';
+import { SocialSharing } from '@ionic-native/social-sharing';
+import { EditProfilePage } from '../pages/edit-profile/edit-profile';
+import { PlacesPage } from '../pages/places/places';
+import { ChangePasswordPage } from '../pages/change-password/change-password';
+import { SettingsPage } from '../pages/settings/settings';
+
 
 @NgModule({
   declarations: [
@@ -51,7 +57,11 @@ import { RatingsPage } from '../pages/ratings/ratings';
     MyJobsPage,
     ViewedJobsPage,
     ViewUsersPage,
-    RatingsPage
+    RatingsPage,
+    EditProfilePage,
+    PlacesPage,
+    ChangePasswordPage,
+    SettingsPage
   ],
   imports: [
     BrowserModule,
@@ -78,13 +88,18 @@ import { RatingsPage } from '../pages/ratings/ratings';
     MyJobsPage,
     ViewedJobsPage,
     ViewUsersPage,
-    RatingsPage
+    RatingsPage,
+    EditProfilePage,
+    PlacesPage,
+    ChangePasswordPage,
+    SettingsPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
     AngularFireAuth,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
+    SocialSharing,
     DataProvider,
     AuthProvider,
     FeedbackProvider,

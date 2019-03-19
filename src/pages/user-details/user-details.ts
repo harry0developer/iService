@@ -5,10 +5,11 @@ import { DataProvider } from '../../providers/data/data';
 import { LoginPage } from '../login/login';
 import { User } from '../../models/user';
 import { AuthProvider } from '../../providers/auth/auth';
-import { COLLECTION, EVENTS, APPOINTMENT_STATUS } from '../../utils/const';
+import { COLLECTION, EVENTS, STATUS } from '../../utils/const';
 import { RatingData } from '../../models/rating';
 import { Appointment } from '../../models/appointment';
 import { DateProvider } from '../../providers/date/date';
+import { ViewedJob, Job, AppliedJob } from '../../models/job';
 // import { Rating, Rate } from '../../models/Ratings';
 // import { Error } from '../../models/error';
 // import { RatingsModalPage } from '../ratings-modal/ratings-modal';
@@ -24,11 +25,13 @@ export class UserDetailsPage {
   hired: boolean = false;
   settings: any;
   defaultImg: string = '';
-  postedJobs: any = [];
-  appliedJobs: any = [];
   viewedCandidates: any = [];
-  appointments: any = [];
   appliedUsers: any = [];
+
+  postedJobs: Job[] = [];
+  appliedJobs: AppliedJob[] = [];
+  viewedJobs: ViewedJob[] = [];
+  appointments: Appointment[] = [];
 
 
 
@@ -66,11 +69,19 @@ export class UserDetailsPage {
     this.appointments = this.dataProvider.appointments;
     this.isUserInAppointment(this.candidate);
     this.getMyRating(this.candidate);
+
+    if (this.isRecruiter()) {
+      this.postedJobs = this.dataProvider.getMyJobs();
+    } else {
+      this.appliedJobs = this.dataProvider.getMyAppliedJobs();
+    }
+    this.viewedJobs = this.dataProvider.getMyViewedJobs();
+    this.appointments = this.dataProvider.getMyAppointments();
   }
 
   isUserInAppointment(user) {
     this.appointments.forEach(app => {
-      if (app.uid === user.id && app.status === APPOINTMENT_STATUS.inProgress) {
+      if (app.uid === user.id && app.status === STATUS.inProgress) {
         this.hired = true;
       }
     });
@@ -96,7 +107,7 @@ export class UserDetailsPage {
     const appointment: Appointment = {
       uid: user.id,
       rid: this.profile.uid,
-      status: APPOINTMENT_STATUS.inProgress,
+      status: STATUS.inProgress,
       dateCreated: this.dateProvider.getDate(),
       dateCompleted: '',
     }
@@ -118,7 +129,7 @@ export class UserDetailsPage {
     const appointment: Appointment = {
       uid: user.id,
       rid: this.profile.uid,
-      status: APPOINTMENT_STATUS.completed,
+      status: STATUS.completed,
       dateCompleted: this.dateProvider.getDate()
     }
     this.dataProvider.addNewItem(COLLECTION.appointments, appointment).then(() => {

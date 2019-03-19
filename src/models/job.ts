@@ -31,4 +31,5 @@ export interface SharedJob {
     jid: string;
     rid: string;
     dateShared: string;
+    platform: string;
 }

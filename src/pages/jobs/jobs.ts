@@ -6,22 +6,11 @@ import { bounceIn } from '../../utils/animations';
 import { AuthProvider } from '../../providers/auth/auth';
 import { LoginPage } from '../login/login';
 import { User } from '../../models/user';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { AngularFireAuth } from '@angular/fire/auth';
 import { DateProvider } from '../../providers/date/date';
 import { JobDetailsPage } from '../job-details/job-details';
 import { COLLECTION } from '../../utils/const';
 import { Job } from '../../models/job';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
-
-// import { JobDetailsPage } from '../job-details/job-details';
-// import { LocationProvider } from '../../providers/location/location';
-// import { FilterPage } from '../filter/filter';
-// import { FeedbackProvider } from '../../providers/feedback/feedback';
-// import { locateHostElement } from '@angular/core/src/render3/instructions';
-// import { ConnectionProvider } from '../../providers/connection/connection';
-// import { Profile } from '../../models/Profile';
-// import { Location } from '../../models/location';
 
 @IonicPage()
 @Component({
@@ -59,7 +48,11 @@ export class JobsPage {
     if (this.authProvider.isLoggedIn()) {
       this.profile = this.authProvider.getStoredUser();
       this.dataProvider.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => {
-        this.jobs = jobs;
+        const loc = {
+          lat: 19.999,
+          lng: -29.000
+        }
+        this.jobs = this.dataProvider.applyHaversine(jobs, loc.lat, loc.lng);
         this.feedbackProvider.dismissLoading();
       });
     } else {

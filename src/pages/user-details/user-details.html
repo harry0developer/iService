@@ -42,24 +42,29 @@
         <rating *ngIf="canRateUser" [float]="true" [(ngModel)]="ratings" (click)="rateUser(ratings)"></rating>
       </span> -->
       
-      <div class="row summary" *ngIf="candidate.type === 'recruiter'">
-        <div class="col animated slideInDown col-6">
+      <!-- <div class="row summary" *ngIf="isRecruiter()">
+        <div class="col animated slideInDown col-4">
           <h2>{{postedJobs?.length}}</h2>
           <p *ngIf="postedJobs?.length != 1">Jobs Posted</p>
           <p *ngIf="postedJobs?.length == 1">Job Posted</p>
         </div>
-        <div class="col animated slideInDown col-6">
+        <div class="col animated slideInDown col-4">
           <h2>{{appliedJobs?.length || 0}}</h2>
           <p>Applied Jobs</p>
         </div>
-        <div class="col animated slideInDown col-6">
-          <h2>{{appliedUsers?.length || 0}}</h2>
-          <p>Applied users</p>
-        </div>
-      </div>
-  
-      <div class="row summary" *ngIf="candidate.type === 'candidate'">
         <div class="col animated slideInDown col-4">
+          <h2>{{appointments?.length || 0}}</h2>
+          <p>Appointments</p>
+        </div>
+      </div> -->
+  
+      <div class="row summary">
+        <div class="col animated slideInDown col-4" *ngIf="isRecruiter()">
+          <h2>{{postedJobs?.length || 0}}</h2>
+          <p *ngIf="appliedJobs?.length != 1">Jobs Applied</p>
+          <p *ngIf="appliedJobs?.length == 1">Job Applied</p>
+        </div>
+        <div class="col animated slideInDown col-4" *ngIf="!isRecruiter()">
           <h2>{{appliedJobs?.length || 0}}</h2>
           <p *ngIf="appliedJobs?.length != 1">Jobs Applied</p>
           <p *ngIf="appliedJobs?.length == 1">Job Applied</p>
@@ -75,7 +80,6 @@
           <p *ngIf="appointments?.length == 1">Appointment</p>
         </div>
       </div>
-  
     </div>
   
     <div *ngIf="candidate" class="info">
