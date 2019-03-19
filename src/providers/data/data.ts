@@ -24,6 +24,7 @@ export class DataProvider {
   appliedJobs: AppliedJob[];
   viewedJobs: ViewedJob[];
   sharedJobs: SharedJob[];
+  candidates: User[];
 
   KM: number = 1.60934;
 
@@ -38,7 +39,7 @@ export class DataProvider {
 
     this.ionEvents.subscribe(EVENTS.appointmentsUpdated, () => {
       this.getAllAppointments(id);
-    })
+    });
     this.getAllAppointments(id);
 
     this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
@@ -95,12 +96,12 @@ export class DataProvider {
     return this.afStore.collection(collectionName).doc<any>(id).valueChanges();
   }
 
-  updateItem(collectionName: string, data: User | Job | Appointment, id: string) {
-    return this.afStore.collection(collectionName).doc<any>(id).update(data);
+  updateItem(collectionName: string, data: User | Job | Appointment | AppliedJob, id: string) {
+    return this.afStore.collection(collectionName).doc<any>(id).set(data, { merge: true });
   }
 
-  addItem(collectionName: string, data: User | Job | Appointment, id: string) {
-    return this.afStore.collection(collectionName).doc<any>(id).set(data, { merge: true });
+  addNewItem(collectionName: string, data: User | Job | Appointment | AppliedJob) {
+    return this.afStore.collection(collectionName).add(data);
   }
 
   removeItem(collectionName: string, id: string) {

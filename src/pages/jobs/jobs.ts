@@ -11,6 +11,8 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { DateProvider } from '../../providers/date/date';
 import { JobDetailsPage } from '../job-details/job-details';
 import { COLLECTION } from '../../utils/const';
+import { Job } from '../../models/job';
+import { FeedbackProvider } from '../../providers/feedback/feedback';
 
 // import { JobDetailsPage } from '../job-details/job-details';
 // import { LocationProvider } from '../../providers/location/location';
@@ -32,13 +34,12 @@ export class JobsPage {
   searchTerm: string = '';
   searchControl: FormControl;
   searching: any = false;
-  jobs: any = [];
+  jobs: Job[] = [];
   tempJobs: any = [];
-  profile: any;
   location: Location;
+  profile: User;
   items = ['item 1', 'item 2', 'item 3', 'item 4', 'item 5'];
 
-  user: any;
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -46,6 +47,7 @@ export class JobsPage {
     private dataProvider: DataProvider,
     private authProvider: AuthProvider,
     private dateProvider: DateProvider,
+    private feedbackProvider: FeedbackProvider,
     private modalCtrl: ModalController,
   ) {
     this.searchControl = new FormControl();
@@ -53,37 +55,24 @@ export class JobsPage {
   }
 
   ionViewDidLoad() {
-    this.authProvider.afAuth.authState.subscribe(state => {
-      if (state && state.uid) {
-        this.user = {
-          uid: state.uid,
-          email: state.email
-        };
-        this.setJobs();
-        this.setUser(state.uid);
-      } else {
-        this.logout();
-      }
-    });
+    this.feedbackProvider.presentLoading();
+    if (this.authProvider.isLoggedIn()) {
+      this.profile = this.authProvider.getStoredUser();
+      this.dataProvider.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => {
+        this.jobs = jobs;
+        this.feedbackProvider.dismissLoading();
+      });
+    } else {
+      this.feedbackProvider.dismissLoading();
+      this.authProvider.logout();
+      this.navCtrl.setRoot(LoginPage);
+    }
   }
 
   getDateFromNow(date: string): string {
     return this.dateProvider.getDateFromNow(date);
   }
 
-  setUser(uid: string) {
-    this.dataProvider.getItemById(COLLECTION.users, uid).subscribe(user => {
-      this.user = user;
-    });
-  }
-
-  setJobs() {
-    this.dataProvider.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => {
-      const lat = 28.909;
-      const lng = -18.909;
-      this.jobs = this.dataProvider.applyHaversine(jobs, lat, lng);
-    });
-  }
 
   logout() {
     this.authProvider.logout().then(() => {

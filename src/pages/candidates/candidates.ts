@@ -8,6 +8,7 @@ import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
 import { UserDetailsPage } from '../user-details/user-details';
 import { COLLECTION, USER_TYPE } from '../../utils/const';
+import { LoginPage } from '../login/login';
 // import { PostJobPage } from '../post-job/post-job';
 // import { bounceIn } from '../../util/animations';
 // import 'rxjs/add/operator/debounceTime.js';
@@ -28,7 +29,7 @@ export class CandidatesPage {
   activeCategory: string = 'All';
   categories: any = [];
   profile: any;
-  candidates: any[];
+  candidates: User[] = [];
   // location: Location;
   // ratings: Rate;
 
@@ -47,20 +48,22 @@ export class CandidatesPage {
   }
 
 
-  ionViewWillEnter() {
+  ionViewDidLoad() {
+    this.feedbackProvider.presentLoading();
     if (this.authProvider.isLoggedIn()) {
-      this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid).subscribe(user => {
-        this.profile = user.data();
-      });
+      this.profile = this.authProvider.getStoredUser();
       this.dataProvider.getCollectionByKeyValuePair(COLLECTION.users, 'type', USER_TYPE.candidate).subscribe(users => {
         const loc = {
           lat: 19.999,
           lng: -19.000
         }
-        this.candidates = this.dataProvider.applyHaversine(users, loc.lat, loc.lng);;
+        this.candidates = this.dataProvider.applyHaversine(users, loc.lat, loc.lng);
+        this.feedbackProvider.dismissLoading();
       });
     } else {
+      this.feedbackProvider.dismissLoading();
       this.authProvider.logout();
+      this.navCtrl.setRoot(LoginPage);
     }
   }
 

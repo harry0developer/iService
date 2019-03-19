@@ -5,9 +5,9 @@ import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { DateProvider } from '../../providers/date/date';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
-import { Job } from '../../models/job';
-import { CandidatesPage } from '../candidates/candidates';
+import { Job, AppliedJob } from '../../models/job';
 import { ViewUsersPage } from '../view-users/view-users';
+import { COLLECTION, EVENTS } from '../../utils/const';
 
 @IonicPage()
 @Component({
@@ -18,6 +18,8 @@ export class JobDetailsPage {
   job: any;
   postedBy: User;
   profile: any;
+
+  hasApplied: boolean = false;
 
   applied: any[] = [];
   viewed: any[] = [];
@@ -30,19 +32,16 @@ export class JobDetailsPage {
     private dateProvider: DateProvider,
     private authProvider: AuthProvider,
     private feedbackProvider: FeedbackProvider) {
-    this.profile = this.authProvider.getFirebaseUserData(this.authProvider.getStoredUser().uid);
   }
 
   ionViewDidLoad() {
+    this.profile = this.authProvider.getStoredUser();
     this.job = this.navParams.get('job');
 
     const jid = this.job.rid;
     this.authProvider.getFirebaseUserData(jid).subscribe(user => {
       this.postedBy = user.data();
     });
-
-    // const jobs = this.dataProvider.jobs;
-    // const users = this.dataProvider.users;
 
     const appliedJobs = this.dataProvider.appliedJobs;
     const viewedJobs = this.dataProvider.viewedJobs;
@@ -68,6 +67,80 @@ export class JobDetailsPage {
 
   }
 
+  isRecruiter(): boolean {
+    return this.authProvider.isRecruiter();
+  }
+
+  hasUserApplied(user) {
+    this.applied.map(appliedJob => {
+      if (appliedJob.uid === user.id) {
+        this.hasApplied = true;
+      }
+    })
+  }
+
+  applyNow(job) {
+    this.feedbackProvider.presentLoading();
+    const appliedJob: AppliedJob = {
+      uid: this.profile.uid,
+      jid: job.id,
+      rid: this.postedBy.uid,
+      dateApplied: this.dateProvider.getDate()
+    }
+    this.dataProvider.addNewItem(COLLECTION.appliedJobs, appliedJob).then(() => {
+      this.ionEvent.publish(EVENTS.jobsUpdated);
+      this.hasApplied = true;
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentToast('Job applied successfully');
+    }).catch(err => {
+      console.log(err);
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentErrorAlert('Job application', 'Error while applying for a job');
+    });
+  }
+
+
+  confirmCancelApplication(job) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: 'You are about to cancel job application',
+      buttons: [
+        {
+          text: 'Cancel Application',
+          role: 'destructive',
+          handler: () => {
+            this.withdrawApplication(job);
+          }
+        },
+        {
+          text: "Don't Cancel",
+          role: 'cancel',
+          handler: () => {
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
+
+  withdrawApplication(job) {
+    this.feedbackProvider.presentLoading();
+    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.appliedJobs, 'jid', job.id).subscribe((doc) => {
+      const deleteJob = doc.filter(dJob => dJob.jid === job.id);
+      if (deleteJob[0]) {
+        this.dataProvider.removeItem(COLLECTION.appliedJobs, deleteJob[0].id).then(() => {
+          this.ionEvent.publish(EVENTS.jobsUpdated);
+          this.hasApplied = false;
+          this.feedbackProvider.dismissLoading();
+          this.feedbackProvider.presentToast('Job application cancelled successfully');
+        }).catch(err => {
+          this.feedbackProvider.dismissLoading();
+          this.feedbackProvider.presentErrorAlert('Cancel Application', 'An error occured while cancelling job application');
+        });
+      }
+
+    });
+  }
+
   viewAppliedUsers() {
     this.navCtrl.push(ViewUsersPage, { users: this.applied });
   }
@@ -82,22 +155,7 @@ export class JobDetailsPage {
     return []; //  skills.split(',');
   }
 
-  applyNow(job) {
 
-  }
-
-
-  confirmWithdrawApplication(job) {
-    this.presentActionSheet(job);
-  }
-
-  withdrawApplication(job) {
-
-  }
-
-  hasApplied(): boolean {
-    return false;
-  }
 
   countAppliedUsers() {
 
@@ -129,35 +187,11 @@ export class JobDetailsPage {
     return this.dateProvider.getDateFromNow(date);
   }
 
-  isCandidate() {
-    return false;
-  }
-
   editJob(job) {
     // this.navCtrl.push(PostJobPage, { job: job, action: 'edit' });
   }
 
-  presentActionSheet(job) {
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'You are about to cancel the application',
-      buttons: [
-        {
-          text: 'Cancel Application',
-          role: 'destructive',
-          handler: () => {
-            this.withdrawApplication(job);
-          }
-        },
-        {
-          text: "Don't Cancel",
-          role: 'cancel',
-          handler: () => {
-          }
-        }
-      ]
-    });
-    actionSheet.present();
-  }
+
 
 
   shareJobWithFacebook(job) {

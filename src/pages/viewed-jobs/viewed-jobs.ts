@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Events, ViewController } from 'ionic-angular';
 import { JobDetailsPage } from '../job-details/job-details';
 import { DataProvider } from '../../providers/data/data';
 import { AuthProvider } from '../../providers/auth/auth';
@@ -29,6 +29,7 @@ export class ViewedJobsPage {
     public dataProvider: DataProvider,
     public authProvider: AuthProvider,
     public dateProvider: DateProvider,
+    public viewCtrl: ViewController,
     public ionEvents: Events,
   ) {
   }
@@ -119,6 +120,11 @@ export class ViewedJobsPage {
   isRecruiter() {
     return this.profile && this.profile.type === 'recruiter';
   }
+
+  dismissModal() {
+    this.viewCtrl.dismiss();
+  }
+
 
   jobDetails(job) {
     this.navCtrl.push(JobDetailsPage, { job: job, user: this.profile });

@@ -1,19 +1,24 @@
 <ion-header>
-    <ion-navbar color="dark">
-      <ion-title> My Ratings </ion-title>
-    </ion-navbar>
+  <ion-navbar color="dark">
+    <ion-title>Ratings</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="dismissModal()">
+        Cancel
+      </button>
+    </ion-buttons>
+  </ion-navbar>
   
-    <ion-toolbar color="light">
-      <ion-segment color="dark" [(ngModel)]="ratings">
-        <ion-segment-button value="ratedMe">
-          Rated me
-        </ion-segment-button>
-        <ion-segment-button value="iRated">
-          I rated
-        </ion-segment-button>
-      </ion-segment>
-    </ion-toolbar>
-  </ion-header>
+  <ion-toolbar color="light">
+    <ion-segment color="dark" [(ngModel)]="ratings">
+      <ion-segment-button value="ratedMe">
+        Rated me
+      </ion-segment-button>
+      <ion-segment-button value="iRated">
+        I rated
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
   
   <ion-content>
     <div [ngSwitch]="ratings">

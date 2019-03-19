@@ -1,6 +1,7 @@
 export const EVENTS = {
     loggedIn: 'logged-in',
     appointmentsUpdated: 'appointments-updated',
+    jobsUpdated: 'jobs-updated',
 };
 
 export const APPOINTMENT_STATUS = {

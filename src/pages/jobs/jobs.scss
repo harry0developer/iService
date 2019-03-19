@@ -7,6 +7,10 @@ page-jobs {
 		margin: 5px 0 !important;
 	}
 
+	ion-label {
+		margin: 0 !important;
+	}
+
 	ion-item {
 		margin: 0 !important;
 		min-height: 90px !important;
@@ -22,6 +26,8 @@ page-jobs {
 		.info-bar {
 			background-color: red;;
 		}
+
+		
 	}
 
 	.job ion-label {

@@ -100,11 +100,11 @@ export class DashboardPage {
   }
 
   viewAppointments() {
-    this.navCtrl.push(AppointmentsPage, { appointments: this.appointments });
+    this.feedbackProvider.presentModal(AppointmentsPage, { appointments: this.appointments });
   }
 
   viewPostedJobs() {
-    this.navCtrl.push(MyJobsPage, { jobs: this.postedJobs });
+    this.feedbackProvider.presentModal(MyJobsPage, { jobs: this.postedJobs });
   }
 
   getJobSummary(): number {
@@ -112,11 +112,11 @@ export class DashboardPage {
   }
 
   viewViewedJobs() {
-    this.navCtrl.push(ViewedJobsPage, { category: 'viewed', data: this.jobsSummary });
+    this.feedbackProvider.presentModal(ViewedJobsPage, { category: 'viewed', data: this.jobsSummary });
   }
 
   viewRaters() {
-    this.navCtrl.push(RatingsPage, { ratingsData: this.ratingsData });
+    this.feedbackProvider.presentModal(RatingsPage, { ratingsData: this.ratingsData });
   }
 
 

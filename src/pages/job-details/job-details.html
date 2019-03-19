@@ -3,10 +3,10 @@
     <ion-title>
       Job Details
     </ion-title>
-    <ion-buttons *ngIf="job" [hidden]="!isCandidate()" end>
+    <ion-buttons *ngIf="job" [hidden]="isRecruiter()" end>
       <button ion-button icon-left (click)="presentShareJobActionSheet(job)"><ion-icon name="share-alt"></ion-icon>Share</button>
     </ion-buttons>
-    <ion-buttons *ngIf="job" [hidden]="isCandidate()" end>
+    <ion-buttons *ngIf="job" [hidden]="!isRecruiter()" end>
       <button ion-button icon-left (click)="manageJob(job)">
         <!-- <ion-icon name="create"></ion-icon> -->
         <i class="fa fa-2x fa-ellipsis-h"></i>
@@ -83,12 +83,12 @@
 
     </div>
 
-  <div *ngIf="isCandidate()">
-    <div padding [hidden]="applied">
+  <div *ngIf="!isRecruiter()">
+    <div padding [hidden]="hasApplied">
       <button ion-button  color="dark" class="dark" block (click)="applyNow(job)">Apply</button>
     </div>
-    <div padding [hidden]="!applied">
-      <button ion-button  color="dark" class="dark" block (click)="confirmWithdrawApplication(job)">Cancel Application</button>
+    <div padding [hidden]="!hasApplied">
+      <button ion-button  color="dark" class="dark" block (click)="confirmCancelApplication(job)">Cancel Application</button>
     </div>
   </div>
 

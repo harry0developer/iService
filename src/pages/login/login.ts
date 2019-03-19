@@ -63,7 +63,7 @@ export class LoginPage {
   }
 
   signinWithEmailAndPassword() {
-    this.authProvider.signInWithEmailAndPassword(this.data.email, this.data.password).then((res) => {
+    this.authProvider.signInWithEmailAndPassword(this.data.email, this.data.password).then(res => {
       this.dataProvider.getItemById(COLLECTION.users, res.user.uid).subscribe(u => {
         this.navigate(u);
       });

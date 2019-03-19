@@ -100,7 +100,7 @@ export class UserDetailsPage {
       dateCreated: this.dateProvider.getDate(),
       dateCompleted: '',
     }
-    this.dataProvider.addItem(COLLECTION.appointments, appointment, user.id).then(() => {
+    this.dataProvider.addNewItem(COLLECTION.appointments, appointment).then(() => {
       this.ionEvent.publish(EVENTS.appointmentsUpdated);
       this.hired = true;
       this.feedbackProvider.dismissLoading();
@@ -108,7 +108,7 @@ export class UserDetailsPage {
     }).catch(err => {
       console.log(err);
       this.feedbackProvider.dismissLoading();
-      this.feedbackProvider.presentErrorAlert('Making appointment', 'Error while making an appointment');
+      this.feedbackProvider.presentErrorAlert('Making appointment', 'An error occured while making an appointment');
     });
   }
 
@@ -121,7 +121,7 @@ export class UserDetailsPage {
       status: APPOINTMENT_STATUS.completed,
       dateCompleted: this.dateProvider.getDate()
     }
-    this.dataProvider.addItem(COLLECTION.appointments, appointment, user.id).then(() => {
+    this.dataProvider.addNewItem(COLLECTION.appointments, appointment).then(() => {
       this.ionEvent.publish(EVENTS.appointmentsUpdated);
       this.hired = false;
       this.feedbackProvider.dismissLoading();
@@ -129,7 +129,7 @@ export class UserDetailsPage {
     }).catch(err => {
       console.log(err);
       this.feedbackProvider.dismissLoading();
-      this.feedbackProvider.presentErrorAlert('Making appointment', 'Error while making an appointment');
+      this.feedbackProvider.presentErrorAlert('Making appointment', 'An error occured while making an appointment');
     });
   }
 

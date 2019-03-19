@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
 import { UserDetailsPage } from '../user-details/user-details';
 import { DataProvider } from '../../providers/data/data';
 import { DateProvider } from '../../providers/date/date';
@@ -29,6 +29,7 @@ export class RatingsPage {
     public dataProvider: DataProvider,
     public authProvider: AuthProvider,
     public dateProvider: DateProvider,
+    public viewCtrl: ViewController,
   ) {
   }
 
@@ -77,5 +78,9 @@ export class RatingsPage {
 
   profilePicture(profile): string {
     return this.dataProvider.getProfilePicture();
+  }
+
+  dismissModal() {
+    this.viewCtrl.dismiss();
   }
 }

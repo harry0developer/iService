@@ -5,32 +5,32 @@
 </ion-header>
 
 <ion-content>
-    <div *ngIf="users && users.length > 0">
-        <div [@listAnimation]="users.length">
-          <ion-list class="main">
-            <ion-card class="user" *ngFor="let user of users">
-              <ion-item (click)="viewUserDetails(user)">
-                <ion-avatar class="border-dark" item-start>
-                  <img [src]="profilePicture(user)" (error)="img.src = getDefaultProfilePic(user)" #img alt="profile" class="profile-picture">
-                </ion-avatar>
-                <h2>{{user.firstname}} {{user.lastname}}</h2>
-                <p class="title">{{user.title}}</p>
-                <!-- <p>
-                  <rating [float]="true" [(ngModel)]="user.ratings.rating" [readonly]="true" ></rating>
-                </p> -->
-                <p item-end class="distance">
-                  <ion-icon name="calendar"  item-start></ion-icon>
-                  {{getDate(user)}}
-                </p>
-                
-                <i class="fa fa-chevron-right" item-end></i>
-              </ion-item>
-            </ion-card>
-            <ion-card padding text-wrap class="not-found" *ngIf="!users || (users && users.length < 1)">
-              <i class="fa fa-4x fa-search"></i>
-              <p>No users found matching this search criteria</p>
-            </ion-card>
-          </ion-list>
-        </div>
-      </div>
+  <div *ngIf="users && users.length > 0">
+    <div [@listAnimation]="users.length">
+      <ion-list class="main">
+        <ion-card class="user" *ngFor="let user of users">
+          <ion-item (click)="viewUserDetails(user)">
+            <ion-avatar class="border-dark" item-start>
+              <img [src]="profilePicture(user)" (error)="img.src = getDefaultProfilePic(user)" #img alt="profile" class="profile-picture">
+            </ion-avatar>
+            <h2>{{user.firstname}} {{user.lastname}}</h2>
+            <p class="title">{{user.title}}</p>
+            <!-- <p>
+              <rating [float]="true" [(ngModel)]="user.ratings.rating" [readonly]="true" ></rating>
+            </p> -->
+            <p item-end class="distance">
+              <ion-icon name="calendar"  item-start></ion-icon>
+              {{getDate(user)}}
+            </p>
+            
+            <i class="fa fa-chevron-right" item-end></i>
+          </ion-item>
+        </ion-card>
+        <ion-card padding text-wrap class="not-found" *ngIf="!users || (users && users.length < 1)">
+          <i class="fa fa-4x fa-search"></i>
+          <p>No users found matching this search criteria</p>
+        </ion-card>
+      </ion-list>
+    </div>
+  </div>
 </ion-content>

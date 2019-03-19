@@ -1,24 +1,27 @@
 <ion-header>
-    <ion-navbar color="dark">
-      <ion-title>
-        Viewed Jobs
-      </ion-title>
-    </ion-navbar>
+  <ion-navbar color="dark">
+    <ion-title>Jobs Summary</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="dismissModal()">
+        Cancel
+      </button>
+    </ion-buttons>
+  </ion-navbar>
   
-    <ion-toolbar color="light">
-      <ion-segment color="dark" [(ngModel)]="category">
-        <ion-segment-button value="viewed" (ionSelect)="getViewedJobs()">
-          Viewed
-        </ion-segment-button>
-        <ion-segment-button value="applied" (ionSelect)="getAppliedJobs()">
-          Applied
-        </ion-segment-button>
-        <ion-segment-button value="shared" (ionSelect)="getSharedJobs()">
-          Shared
-        </ion-segment-button>
-      </ion-segment>
-    </ion-toolbar>
-  </ion-header>
+  <ion-toolbar color="light">
+    <ion-segment color="dark" [(ngModel)]="category">
+      <ion-segment-button value="viewed" (ionSelect)="getViewedJobs()">
+        Viewed
+      </ion-segment-button>
+      <ion-segment-button value="applied" (ionSelect)="getAppliedJobs()">
+        Applied
+      </ion-segment-button>
+      <ion-segment-button value="shared" (ionSelect)="getSharedJobs()">
+        Shared
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
   
   <ion-content>
     <div [ngSwitch]="category">
