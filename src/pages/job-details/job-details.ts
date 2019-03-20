@@ -42,17 +42,51 @@ export class JobDetailsPage {
     this.job = this.navParams.get('job');
     this.dataProvider.getItemById(COLLECTION.users, this.job.rid).subscribe(user => {
       this.postedBy = user;
+      this.addJobToViewed(this.job);
     });
     this.initializeJobs();
     this.hasUserApplied(this.profile);
   }
 
+  userHasViewed(): boolean {
+    let viewed = false;
+    if (this.viewed && this.viewed.length > 0) {
+      this.viewed.forEach(viewedJob => {
+        if (viewedJob.jid === this.job.id && this.profile.uid === viewedJob.uid) {
+          viewed = true;
+        }
+      });
+    }
+    return viewed;
+  }
 
-  private _setAppliedJobs() {
+  private addJobToViewed(job) {
+    this.feedbackProvider.presentLoading();
+
+    if (!this.userHasViewed()) {
+      const viewedJob: ViewedJob = {
+        uid: this.profile.uid,
+        jid: job.id,
+        rid: this.postedBy.uid,
+        dateViewed: this.dateProvider.getDate()
+      }
+      this.dataProvider.addNewItem(COLLECTION.viewedJobs, viewedJob).then(() => {
+        this.ionEvent.publish(EVENTS.viewedJobsUpdated);
+        this._setViewedJobs(this.dataProvider.viewedJobs);
+        this.feedbackProvider.dismissLoading();
+      }).catch(err => {
+        console.log(err);
+        this.feedbackProvider.dismissLoading();
+      });
+    } else {
+      this.feedbackProvider.dismissLoading();
+    }
+  }
+
+  private _setAppliedJobs(applied: AppliedJob[]) {
     this.applied = [];
-    const data = this.dataProvider.appliedJobs;
-    if (data && data.length > 0) {
-      data.map(a => {
+    if (applied && applied.length > 0) {
+      applied.map(a => {
         if (a.jid === this.job.id) {
           this.applied.push(a);
         }
@@ -60,23 +94,23 @@ export class JobDetailsPage {
     }
   }
 
-  private _setViewedJobs() {
+  private _setViewedJobs(viewed: ViewedJob[]) {
     this.viewed = [];
-    const data = this.dataProvider.viewedJobs;
-    if (data && data.length > 0) {
-      data.map(v => {
+    if (viewed && viewed.length > 0) {
+      viewed.map(v => {
         if (v.jid === this.job.id) {
+          console.log(v);
+
           this.viewed.push(v);
         }
       });
     }
   }
 
-  private _setSharedJobs() {
+  private _setSharedJobs(shared: SharedJob[]) {
     this.shared = [];
-    const data = this.dataProvider.sharedJobs;
-    if (data && data.length > 0) {
-      data.map(s => {
+    if (shared && shared.length > 0) {
+      shared.map(s => {
         if (s.jid === this.job.id) {
           this.shared.push(s);
         }
@@ -85,9 +119,12 @@ export class JobDetailsPage {
   }
 
   initializeJobs() {
-    this._setAppliedJobs();
-    this._setViewedJobs();
-    this._setSharedJobs();
+    const viewed = this.dataProvider.viewedJobs;
+    const applied = this.dataProvider.appliedJobs;
+    const shared = this.dataProvider.sharedJobs;
+    this._setViewedJobs(viewed);
+    this._setAppliedJobs(applied);
+    this._setSharedJobs(shared);
   }
 
   isRecruiter(): boolean {

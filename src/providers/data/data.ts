@@ -99,11 +99,11 @@ export class DataProvider {
     return this.afStore.collection(collectionName).doc<any>(id).valueChanges();
   }
 
-  updateItem(collectionName: string, data: User | Job | Appointment | AppliedJob | SharedJob, id: string) {
+  updateItem(collectionName: string, data: User | Job | Appointment | AppliedJob | SharedJob | ViewedJob, id: string) {
     return this.afStore.collection(collectionName).doc<any>(id).set(data, { merge: true });
   }
 
-  addNewItem(collectionName: string, data: User | Job | Appointment | AppliedJob | SharedJob) {
+  addNewItem(collectionName: string, data: User | Job | Appointment | AppliedJob | SharedJob | ViewedJob) {
     return this.afStore.collection(collectionName).add(data);
   }
 
