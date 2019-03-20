@@ -3,6 +3,8 @@ export const EVENTS = {
     appointmentsUpdated: 'appointments-updated',
     jobsUpdated: 'jobs-updated',
     sharedJobsUpdated: 'shared-jobs-updated',
+    appliedJobsUpdated: 'applied-jobs-updated',
+    viewedJobsUpdated: 'viewed-jobs-updated',
     facebookShare: 'share:facebook',
     twitterShare: 'share:twitter',
     instagramShare: 'share:instagram',

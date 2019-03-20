@@ -27,7 +27,7 @@ export class JobsPage {
   tempJobs: any = [];
   location: Location;
   profile: User;
-  items = ['item 1', 'item 2', 'item 3', 'item 4', 'item 5'];
+  postedBy: User;
 
   constructor(
     public navCtrl: NavController,

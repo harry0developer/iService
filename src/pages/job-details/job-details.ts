@@ -5,11 +5,10 @@ import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { DateProvider } from '../../providers/date/date';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
-import { Job, AppliedJob, SharedJob } from '../../models/job';
+import { Job, AppliedJob, SharedJob, ViewedJob } from '../../models/job';
 import { ViewUsersPage } from '../view-users/view-users';
 import { COLLECTION, EVENTS, PLATFORM } from '../../utils/const';
 import { SocialSharing } from '@ionic-native/social-sharing';
-
 
 @IonicPage()
 @Component({
@@ -23,9 +22,9 @@ export class JobDetailsPage {
 
   hasApplied: boolean = false;
 
-  applied: any[] = [];
-  viewed: any[] = [];
-  shared: any[] = [];
+  applied: AppliedJob[] = [];
+  viewed: ViewedJob[] = [];
+  shared: SharedJob[] = [];
 
   constructor(
     public navCtrl: NavController, public ionEvent: Events,
@@ -41,34 +40,54 @@ export class JobDetailsPage {
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
     this.job = this.navParams.get('job');
-
-    const jid = this.job.rid;
-    this.authProvider.getFirebaseUserData(jid).subscribe(user => {
-      this.postedBy = user.data();
+    this.dataProvider.getItemById(COLLECTION.users, this.job.rid).subscribe(user => {
+      this.postedBy = user;
     });
+    this.initializeJobs();
+    this.hasUserApplied(this.profile);
+  }
 
-    const appliedJobs = this.dataProvider.appliedJobs;
-    const viewedJobs = this.dataProvider.viewedJobs;
-    const sharedJobs = this.dataProvider.sharedJobs;
 
-    appliedJobs.map(a => {
-      if (a.jid === this.job.id) {
-        this.applied.push(a);
-      }
-    });
+  private _setAppliedJobs() {
+    this.applied = [];
+    const data = this.dataProvider.appliedJobs;
+    if (data && data.length > 0) {
+      data.map(a => {
+        if (a.jid === this.job.id) {
+          this.applied.push(a);
+        }
+      });
+    }
+  }
 
-    viewedJobs.map(v => {
-      if (v.jid === this.job.id) {
-        this.viewed.push(v);
-      }
-    });
+  private _setViewedJobs() {
+    this.viewed = [];
+    const data = this.dataProvider.viewedJobs;
+    if (data && data.length > 0) {
+      data.map(v => {
+        if (v.jid === this.job.id) {
+          this.viewed.push(v);
+        }
+      });
+    }
+  }
 
-    sharedJobs.map(s => {
-      if (s.jid === this.job.id) {
-        this.shared.push(s);
-      }
-    });
+  private _setSharedJobs() {
+    this.shared = [];
+    const data = this.dataProvider.sharedJobs;
+    if (data && data.length > 0) {
+      data.map(s => {
+        if (s.jid === this.job.id) {
+          this.shared.push(s);
+        }
+      });
+    }
+  }
 
+  initializeJobs() {
+    this._setAppliedJobs();
+    this._setViewedJobs();
+    this._setSharedJobs();
   }
 
   isRecruiter(): boolean {
@@ -77,10 +96,10 @@ export class JobDetailsPage {
 
   hasUserApplied(user) {
     this.applied.map(appliedJob => {
-      if (appliedJob.uid === user.id) {
+      if (appliedJob.uid === user.uid) {
         this.hasApplied = true;
       }
-    })
+    });
   }
 
   applyNow(job) {
@@ -92,8 +111,9 @@ export class JobDetailsPage {
       dateApplied: this.dateProvider.getDate()
     }
     this.dataProvider.addNewItem(COLLECTION.appliedJobs, appliedJob).then(() => {
-      this.ionEvent.publish(EVENTS.jobsUpdated);
+      this.ionEvent.publish(EVENTS.appliedJobsUpdated);
       this.hasApplied = true;
+      this.applied = this.dataProvider.appliedJobs;
       this.feedbackProvider.dismissLoading();
       this.feedbackProvider.presentToast('Job applied successfully');
     }).catch(err => {
@@ -103,6 +123,24 @@ export class JobDetailsPage {
     });
   }
 
+  withdrawApplication(job) {
+    this.feedbackProvider.presentLoading();
+    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.appliedJobs, 'jid', job.id).subscribe(doc => {
+      const deleteJob = doc.filter(dJob => dJob.jid === job.id);
+      if (deleteJob[0]) {
+        this.dataProvider.removeItem(COLLECTION.appliedJobs, deleteJob[0].id).then(() => {
+          this.hasApplied = false;
+          this.applied = this.dataProvider.appliedJobs;
+          this.feedbackProvider.dismissLoading();
+          this.feedbackProvider.presentToast('Job application cancelled successfully');
+        }).catch(err => {
+          this.feedbackProvider.dismissLoading();
+          this.feedbackProvider.presentErrorAlert('Cancel Application', 'An error occured while cancelling job application');
+        });
+      }
+
+    });
+  }
 
   confirmCancelApplication(job) {
     let actionSheet = this.actionSheetCtrl.create({
@@ -126,24 +164,6 @@ export class JobDetailsPage {
     actionSheet.present();
   }
 
-  withdrawApplication(job) {
-    this.feedbackProvider.presentLoading();
-    this.dataProvider.getCollectionByKeyValuePair(COLLECTION.appliedJobs, 'jid', job.id).subscribe((doc) => {
-      const deleteJob = doc.filter(dJob => dJob.jid === job.id);
-      if (deleteJob[0]) {
-        this.dataProvider.removeItem(COLLECTION.appliedJobs, deleteJob[0].id).then(() => {
-          this.ionEvent.publish(EVENTS.jobsUpdated);
-          this.hasApplied = false;
-          this.feedbackProvider.dismissLoading();
-          this.feedbackProvider.presentToast('Job application cancelled successfully');
-        }).catch(err => {
-          this.feedbackProvider.dismissLoading();
-          this.feedbackProvider.presentErrorAlert('Cancel Application', 'An error occured while cancelling job application');
-        });
-      }
-
-    });
-  }
 
   viewAppliedUsers() {
     this.navCtrl.push(ViewUsersPage, { users: this.applied });
@@ -158,8 +178,6 @@ export class JobDetailsPage {
   getSkills(skills) {
     return []; //  skills.split(',');
   }
-
-
 
   countAppliedUsers() {
 

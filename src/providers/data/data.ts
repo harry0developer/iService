@@ -38,22 +38,25 @@ export class DataProvider {
     this.getAllFromCollection(COLLECTION.users).subscribe(users => this.users = users);
 
     this.ionEvents.subscribe(EVENTS.appointmentsUpdated, () => {
-      this.getAllAppointments(id);
+      this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
     });
-    this.getAllAppointments(id);
-
-    this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
+    this.ionEvents.subscribe(EVENTS.appliedJobsUpdated, () => {
+      this.getCollectionByKeyValuePair(COLLECTION.appliedJobs, id, this.profile.uid).subscribe(appliedJobs => this.appliedJobs = appliedJobs);
+    });
+    this.ionEvents.subscribe(EVENTS.sharedJobsUpdated, () => {
+      this.getCollectionByKeyValuePair(COLLECTION.sharedJobs, id, this.profile.uid).subscribe(sharedJobs => this.sharedJobs = sharedJobs);
+    });
+    this.ionEvents.subscribe(EVENTS.viewedJobsUpdated, () => {
+      this.getCollectionByKeyValuePair(COLLECTION.viewedJobs, id, this.profile.uid).subscribe(viewedJobs => this.viewedJobs = viewedJobs);
+    });
 
     this.getCollectionByKeyValuePair(COLLECTION.ratings, 'rid', this.profile.uid).subscribe(ratings => this.iRated = ratings);
     this.getCollectionByKeyValuePair(COLLECTION.ratings, 'uid', this.profile.uid).subscribe(ratings => this.ratedMe = ratings);
 
+    this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
     this.getCollectionByKeyValuePair(COLLECTION.appliedJobs, id, this.profile.uid).subscribe(appliedJobs => this.appliedJobs = appliedJobs);
     this.getCollectionByKeyValuePair(COLLECTION.viewedJobs, id, this.profile.uid).subscribe(viewedJobs => this.viewedJobs = viewedJobs);
     this.getCollectionByKeyValuePair(COLLECTION.sharedJobs, id, this.profile.uid).subscribe(sharedJobs => this.sharedJobs = sharedJobs);
-  }
-
-  getAllAppointments(id) {
-    this.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).subscribe(appointments => this.appointments = appointments);
   }
 
   getAllFromCollection(collectionName: string): Observable<any> {
