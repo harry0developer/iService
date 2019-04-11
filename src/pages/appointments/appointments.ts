@@ -5,12 +5,10 @@ import { bounceIn } from '../../utils/animations';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
 import { Appointment } from '../../models/appointment';
-import { STATUS, COLLECTION } from '../../utils/const';
-import { filter, take } from 'rxjs/operators';
-import { app } from 'firebase';
-import { forkJoin } from 'rxjs';
+import { STATUS } from '../../utils/const';
 import { DateProvider } from '../../providers/date/date';
 import { UserDetailsPage } from '../user-details/user-details';
+import { LoginPage } from '../login/login';
 
 @IonicPage()
 @Component({
@@ -25,7 +23,6 @@ export class AppointmentsPage {
   completedAppointments: User[];
   appointments: Appointment[];
 
-
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     private dataProvider: DataProvider,
@@ -36,32 +33,11 @@ export class AppointmentsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    this.getUsers();
-  }
-
-  getUsers() {
-    const id = this.authProvider.isRecruiter() ? 'rid' : 'uid';
-    forkJoin(
-      this.dataProvider.getCollectionByKeyValuePair(COLLECTION.appointments, id, this.profile.uid).pipe(take(1)),
-      this.dataProvider.getAllFromCollection(COLLECTION.users).pipe(take(1))
-    ).subscribe(([appointments, users]) => {
-      const usersWithAppointments = this.getUserWithAppointmets(users, appointments);
-      this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
-      this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
-    });
-  }
-
-  getUserWithAppointmets(users: User[], appointments: Appointment[]) {
-    const userz = [];
-
-    users.map(user => {
-      appointments.map(app => {
-        if (user.uid === app.uid) {
-          userz.push(Object.assign(user, { appointment: app }));
-        }
-      })
-    })
-    return userz;
+    const users = this.dataProvider.users;
+    const appointments = this.navParams.get('appointments');
+    const usersWithAppointments = this.dataProvider.getUserWithAppointmets(users, appointments);
+    this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
+    this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
   }
 
   profilePicture(user): string {

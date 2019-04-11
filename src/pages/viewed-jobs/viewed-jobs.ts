@@ -5,6 +5,7 @@ import { DataProvider } from '../../providers/data/data';
 import { AuthProvider } from '../../providers/auth/auth';
 import { bounceIn } from '../../utils/animations';
 import { DateProvider } from '../../providers/date/date';
+import { EVENTS } from '../../utils/const';
 
 @IonicPage()
 @Component({
@@ -36,14 +37,25 @@ export class ViewedJobsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.profile;
-    this.category = this.navParams.get('category');
+    this.category = 'viewed';
     const data = this.navParams.get('data');
 
-    this.appliedJobs = this.dataProvider.mapJobs(data.applied);
-    this.viewedJobs = this.dataProvider.mapJobs(data.viewed);
-    this.sharedJobs = this.dataProvider.mapJobs(data.shared);
+    this.appliedJobs = this.dataProvider.mapJobs(data.appliedJobs);
+    this.viewedJobs = this.dataProvider.mapJobs(data.viewedJobs);
+    this.sharedJobs = this.dataProvider.mapJobs(data.sharedJobs);
 
-    this.getCategoryInfo(this.category);
+
+    // this.ionEvents.subscribe(EVENTS.newAppliedJobs, (appliedJobs) => {
+    //   this.appliedJobs = this.dataProvider.mapJobs(appliedJobs);
+    // });
+    // this.ionEvents.subscribe(EVENTS.newViewedJobs, (viewedJobs) => {
+    //   this.viewedJobs = this.dataProvider.mapJobs(viewedJobs);
+    // });
+    // this.ionEvents.subscribe(EVENTS.newSharedJobs, (sharedJobs) => {
+    //   this.sharedJobs = this.dataProvider.mapJobs(sharedJobs);
+    // });
+
+    // this.getCategoryInfo(this.category);
   }
 
 
@@ -136,7 +148,7 @@ export class ViewedJobsPage {
   }
 
   profilePicture(profile): string {
-    return this.dataProvider.getProfilePicture();
+    return this.dataProvider.getProfilePicture(profile);
   }
 
   getDefaultProfilePic(profile) {

@@ -7,12 +7,11 @@ import { SignupPage } from '../signup/signup';
 import { ForgotPasswordPage } from '../forgot-password/forgot-password';
 import { USER_NOT_FOUND, INVALID_PASSWORD } from '../../config';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
-import { User } from '../../models/user';
 import { DataProvider } from '../../providers/data/data';
-import { CandidatesPage } from '../candidates/candidates';
-import { JobsPage } from '../jobs/jobs';
 import { DateProvider } from '../../providers/date/date';
 import { COLLECTION, USER_TYPE, EVENTS } from '../../utils/const';
+import { forkJoin } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'page-login',
@@ -25,7 +24,6 @@ export class LoginPage {
   }
   type = 'password';
   showPass = false;
-
   constructor(
     public afAuth: AngularFireAuth,
     public navCtrl: NavController,
@@ -43,31 +41,15 @@ export class LoginPage {
     }
   }
 
-  addUser() {
-    const user: User = {
-      firstname: 'Lesang',
-      lastname: 'Chini',
-      type: 'candidate',
-      gender: 'female',
-      email: 'lesang@chini.com',
-      password: '123456',
-      dateCreated: this.dateProvider.getDate(),
-      phone: '0798829922',
-      location: {
-        latitude: '18.999',
-        longitude: '-29.9999'
-      }
-
-    }
-    this.authProvider.signUpWithEmailAndPassword(user).then(s => console.log).catch(err => console.log);
-  }
-
   signinWithEmailAndPassword() {
+    this.feedbackProvider.presentLoading();
     this.authProvider.signInWithEmailAndPassword(this.data.email, this.data.password).then(res => {
       this.dataProvider.getItemById(COLLECTION.users, res.user.uid).subscribe(u => {
+        this.feedbackProvider.dismissLoading();
         this.navigate(u);
       });
     }).catch(err => {
+      this.feedbackProvider.dismissLoading();
       if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
         this.feedbackProvider.presentErrorAlert('Login failed', 'Username an password do not match');
       }
@@ -76,11 +58,14 @@ export class LoginPage {
   }
 
   signInWithFacebook() {
+    this.feedbackProvider.presentLoading();
     this.authProvider.signInWithFacebook().then((res) => {
       this.dataProvider.getItemById(COLLECTION.users, res.user.uid).subscribe(u => {
+        this.feedbackProvider.dismissLoading();
         this.navigate(u);
       });
     }).catch(err => {
+      this.feedbackProvider.dismissLoading();
       if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
         this.feedbackProvider.presentErrorAlert('Login failed', 'Username an password do not match');
       }
@@ -89,11 +74,14 @@ export class LoginPage {
   }
 
   signInWithTwitter() {
+    this.feedbackProvider.presentLoading();
     this.authProvider.signInWithFacebook().then((res) => {
       this.dataProvider.getItemById(COLLECTION.users, res.user.uid).subscribe(u => {
+        this.feedbackProvider.dismissLoading();
         this.navigate(u);
       });
     }).catch(err => {
+      this.feedbackProvider.dismissLoading();
       if (err.code === USER_NOT_FOUND || err.code == INVALID_PASSWORD) {
         this.feedbackProvider.presentErrorAlert('Login failed', 'Username an password do not match');
       }
@@ -102,10 +90,37 @@ export class LoginPage {
   }
 
   navigate(user) {
-    this.ionEvents.publish(EVENTS.loggedIn, { user });
+    this.feedbackProvider.presentLoading();
     this.authProvider.storeUser(user);
-    user.type == USER_TYPE.recruiter ? this.navCtrl.setRoot(CandidatesPage) : this.navCtrl.setRoot(JobsPage);
+    const type = user.type === USER_TYPE.recruiter ? 'rid' : 'uid';
+    forkJoin(
+      this.dataProvider.getJobs().pipe(take(1)),
+      this.dataProvider.getUsers().pipe(take(1)),
+      this.dataProvider.getMyAppointments(type, user.uid).pipe(take(1)),
+      this.dataProvider.getMyPostedJobs(user.uid).pipe(take(1)),
+      this.dataProvider.getUsersIRated('rid', user.uid).pipe(take(1)),
+      this.dataProvider.getUsersRatedMe('uid', user.uid).pipe(take(1)),
+      this.dataProvider.getMyViewedJobs(type, user.uid).pipe(take(1)),
+      this.dataProvider.getMyAppliedJobs(type, user.uid).pipe(take(1)),
+      this.dataProvider.getMySharedJobs(type, user.uid).pipe(take(1))
+    ).subscribe(([jobs, users, appointments, postedJobs, iRated, ratedMe, viewedJobs, appliedJobs, sharedJobs]) => {
+      this.feedbackProvider.dismissLoading();
+      const myRating = this.dataProvider.getMyRating(ratedMe);
+      const userData = {
+        jobs, users, appointments, postedJobs, iRated, ratedMe, viewedJobs, appliedJobs, sharedJobs, myRating
+      }
+      this.dataProvider.init(userData);
+      this.ionEvents.publish(EVENTS.loggedIn, user);
+      this.navCtrl.setRoot(DashboardPage, { user });
+    });
+    //Amazing left join
 
+    // this.dataProvider.getUserJobsData(user).subscribe(data => {
+    //   this.feedbackProvider.dismissLoading();
+    //   this.dataProvider.userData = data;
+    //   this.authProvider.storeUser(user);
+    //   this.navCtrl.setRoot(DashboardPage);
+    // });
   }
 
   goToSignup() {

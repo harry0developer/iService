@@ -14,7 +14,7 @@
         #img>
     </div>
     <div class="animated slideInRight">
-      <rating [float]="true" [(ngModel)]="profile.rating " [readonly]="true" ></rating>
+      <rating [float]="true" [(ngModel)]="myRating" [readonly]="true" ></rating>
     </div>
     <h2 class="animated slideInLeft">{{profile.firstname}} {{profile.lastname}} </h2>
     <p class="animated slideInRight">{{profile.title || profile.type}}</p>
@@ -68,8 +68,8 @@
               <i class="fa fa-eye"></i>
             </div>
             <div class="card-details" text-wrap>
-              <h2>{{viewedJobs?.length || 0}}</h2>
-              <p>Jobs Viewed</p>
+              <h2>{{getJobsSummary() || 0}}</h2>
+              <p>Jobs Summary</p>
             </div>
           </ion-item>
         </ion-card>
@@ -97,7 +97,7 @@
               <i class="fa fa-star"></i>
             </div>
             <div class="card-details" text-wrap>
-              <h2>{{countMyRaters()}}</h2>
+              <h2>{{getRaters()}}</h2>
               <p>Raters</p>
             </div>
           </ion-item>

@@ -5,20 +5,19 @@ import { auth } from 'firebase';
 import { User } from '../../models/user';
 import { DateProvider } from '../date/date';
 import { USER_TYPE } from '../../utils/const';
+import { LoginPage } from '../../pages/login/login';
+import { NavController } from 'ionic-angular';
 
 @Injectable()
 export class AuthProvider {
-  userData: any;
-
   profile: User;
 
   constructor(
     public afs: AngularFirestore,
     public afAuth: AngularFireAuth,
     public afStore: AngularFirestore,
-    public dateProvider: DateProvider
+    public dateProvider: DateProvider,
   ) {
-    this.profile = this.getStoredUser();
     // this.afAuth.authState.subscribe(user => {
     //   if (user) {
     //     this.userData = user;
@@ -106,8 +105,8 @@ export class AuthProvider {
     return this.afAuth.auth.signOut();
   }
 
-  isRecruiter(): boolean {
-    return this.profile.type === USER_TYPE.recruiter;
+  isRecruiter(profile): boolean {
+    return profile && profile.type === USER_TYPE.recruiter;
   }
 
 }

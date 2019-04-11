@@ -2,9 +2,15 @@ export const EVENTS = {
     loggedIn: 'logged-in',
     appointmentsUpdated: 'appointments-updated',
     jobsUpdated: 'jobs-updated',
+
     sharedJobsUpdated: 'shared-jobs-updated',
     appliedJobsUpdated: 'applied-jobs-updated',
     viewedJobsUpdated: 'viewed-jobs-updated',
+
+    newSharedJobs: 'new-shared-jobs',
+    newAppliedJobs: 'new-applied-jobs',
+    newViewedJobs: 'new-viewed-jobs',
+
     facebookShare: 'share:facebook',
     twitterShare: 'share:twitter',
     instagramShare: 'share:instagram',
@@ -35,3 +41,4 @@ export const USER_TYPE = {
     candidate: 'candidate',
     recruiter: 'recruiter'
 }
+

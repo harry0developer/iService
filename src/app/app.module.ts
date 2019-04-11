@@ -8,7 +8,7 @@ import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 import { RatingModule } from "ngx-rating";
-
+import { Network } from '@ionic-native/network';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -27,7 +27,6 @@ import { CandidatesPage } from '../pages/candidates/candidates';
 import { DateProvider } from '../providers/date/date';
 import { JobDetailsPage } from '../pages/job-details/job-details';
 import { ProfilePage } from '../pages/profile/profile';
-import { AppointmentsPage } from '../pages/appointments/appointments';
 import { UserDetailsPage } from '../pages/user-details/user-details';
 import { MyJobsPage } from '../pages/my-jobs/my-jobs';
 import { ViewedJobsPage } from '../pages/viewed-jobs/viewed-jobs';
@@ -38,12 +37,13 @@ import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 import { PlacesPage } from '../pages/places/places';
 import { ChangePasswordPage } from '../pages/change-password/change-password';
 import { SettingsPage } from '../pages/settings/settings';
-
+import { AppointmentsPage } from '../pages/appointments/appointments';
+import { NetworkErrorPage } from '../pages/network-error/network-error';
+import { NetworkProvider } from '../providers/network/network';
 
 @NgModule({
   declarations: [
     MyApp,
-    AppointmentsPage,
     CandidatesPage,
     DashboardPage,
     ForgotPasswordPage,
@@ -61,7 +61,9 @@ import { SettingsPage } from '../pages/settings/settings';
     EditProfilePage,
     PlacesPage,
     ChangePasswordPage,
-    SettingsPage
+    SettingsPage,
+    AppointmentsPage,
+    NetworkErrorPage
   ],
   imports: [
     BrowserModule,
@@ -74,7 +76,6 @@ import { SettingsPage } from '../pages/settings/settings';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    AppointmentsPage,
     CandidatesPage,
     DashboardPage,
     ForgotPasswordPage,
@@ -92,7 +93,9 @@ import { SettingsPage } from '../pages/settings/settings';
     EditProfilePage,
     PlacesPage,
     ChangePasswordPage,
-    SettingsPage
+    SettingsPage,
+    AppointmentsPage,
+    NetworkErrorPage
   ],
   providers: [
     StatusBar,
@@ -100,10 +103,12 @@ import { SettingsPage } from '../pages/settings/settings';
     AngularFireAuth,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     SocialSharing,
+    Network,
     DataProvider,
     AuthProvider,
     FeedbackProvider,
-    DateProvider
+    DateProvider,
+    NetworkProvider
   ]
 })
 export class AppModule { }

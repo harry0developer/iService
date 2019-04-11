@@ -26,11 +26,12 @@
             <i class="fa fa-chevron-right" item-end></i>
           </ion-item>
         </ion-card>
-        <ion-card padding text-wrap class="not-found" *ngIf="!users || (users && users.length < 1)">
-          <i class="fa fa-4x fa-search"></i>
-          <p>No users found matching this search criteria</p>
-        </ion-card>
+       
       </ion-list>
     </div>
   </div>
+  <ion-card padding text-wrap class="not-found" *ngIf="!users || (users && users.length < 1)">
+    <i class="fa fa-4x fa-search"></i>
+    <p>No user has {{category}} for this job yet.</p>
+  </ion-card>
 </ion-content>

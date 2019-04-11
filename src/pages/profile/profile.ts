@@ -57,14 +57,24 @@ export class ProfilePage {
   }
 
   initialize() {
-    let id = this.isRecruiter() ? 'rid' : 'uid';
+    let type = this.isRecruiter() ? 'rid' : 'uid';
     if (this.isRecruiter()) {
-      this.postedJobs = this.dataProvider.getMyJobs();
+      this.dataProvider.getMyPostedJobs(this.profile.uid).subscribe(jobs => {
+        console.log(jobs);
+      })
     }
-    this.appointments = this.dataProvider.getMyAppointments();
+    this.dataProvider.getMyAppointments(type, this.profile.uid).subscribe(appointments => {
+      console.log(appointments);
+    });
 
-    const ratings = this.dataProvider.getMyRatings();
-    Object.assign(this.profile, { rating: this.dataProvider.mapRatings(ratings.ratedMe) });
+    this.dataProvider.getUsersRatedMe(type, this.profile.uid).subscribe(ratedMe => {
+      console.log(ratedMe);
+    });
+    // this.dataProvider.getUsersIRated(type, this.profile.uid).subscribe(iRated => {
+    //   console.log(iRated);
+    // });
+
+    // Object.assign(this.profile, { rating: this.dataProvider.mapRatings(ratings.ratedMe) });
 
     // this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
     //   Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
@@ -72,7 +82,7 @@ export class ProfilePage {
   }
 
   profilePicture(): string {
-    return this.dataProvider.getProfilePicture();
+    return this.dataProvider.getProfilePicture(this.profile);
   }
 
   getSettings(): any {
@@ -96,7 +106,7 @@ export class ProfilePage {
   }
 
   isRecruiter(): boolean {
-    return this.authProvider.isRecruiter();
+    return this.authProvider.isRecruiter(this.profile);
   }
 
 

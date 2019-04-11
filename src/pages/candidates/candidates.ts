@@ -49,21 +49,18 @@ export class CandidatesPage {
 
 
   ionViewDidLoad() {
-    this.feedbackProvider.presentLoading();
     if (this.authProvider.isLoggedIn()) {
       this.profile = this.authProvider.getStoredUser();
-      this.dataProvider.getCollectionByKeyValuePair(COLLECTION.users, 'type', USER_TYPE.candidate).subscribe(users => {
-        const loc = {
-          lat: 19.999,
-          lng: -19.000
-        }
-        this.candidates = this.dataProvider.applyHaversine(users, loc.lat, loc.lng);
-        this.feedbackProvider.dismissLoading();
-      });
+      const candidates = this.dataProvider.candidates;
+      const loc = {
+        lat: 19.999,
+        lng: -19.000
+      };
+      this.candidates = this.dataProvider.applyHaversine(candidates, loc.lat, loc.lng);
     } else {
-      this.feedbackProvider.dismissLoading();
-      this.authProvider.logout();
-      this.navCtrl.setRoot(LoginPage);
+      this.authProvider.logout().then(() => {
+        this.navCtrl.setRoot(LoginPage);
+      });
     }
   }
 

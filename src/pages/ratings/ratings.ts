@@ -36,36 +36,9 @@ export class RatingsPage {
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
     this.users = this.dataProvider.users;
-    this.userRatings = this.navParams.get('ratingsData');
+    this.userRatings = this.navParams.get('raters');
     this.usersIRated = this.dataProvider.mapIRated(this.userRatings.iRated);
     this.usersRatedMe = this.dataProvider.mapRatedMe(this.userRatings.ratedMe);
-  }
-
-  mapUserIRated(): any {
-    // let iRated = [];
-    // this.userRatings.iRated.forEach(rater => {
-    //   this.users.forEach(user => {
-    //     if (this.profile.uid === rater.rater_id_fk && user.uid === rater.rated_id_fk) {
-    //       iRated.push(user);
-    //     }
-    //   });
-    // });
-    // return iRated;
-  }
-
-
-  mapRaters(raters) {
-    const users = [];
-    if (raters) {
-      raters.forEach(rater => {
-        this.users.forEach(user => {
-          if (rater.rater_id_fk === user.user_id || rater.rated_id_fk === user.user_id) {
-            users.push(Object.assign(user, rater));
-          }
-        });
-      });
-    }
-    return users;
   }
 
   getUserDetails(user) {
@@ -77,7 +50,7 @@ export class RatingsPage {
   }
 
   profilePicture(profile): string {
-    return this.dataProvider.getProfilePicture();
+    return this.dataProvider.getProfilePicture(profile);
   }
 
   dismissModal() {

@@ -24,37 +24,7 @@
 </ion-header>
   
   <ion-content>
-    <div [ngSwitch]="category">
-      <ion-list *ngSwitchCase="'applied'">
-        <div *ngIf="appliedJobs.length > 0" [@listAnimation]="appliedJobs.length">
-          <ion-list no-lines class="job" *ngFor="let job of appliedJobs">
-            <ion-card>
-              <ion-item (click)="jobDetails(job)">
-                <ion-thumbnail item-start>
-                  <img src="assets/imgs/category/{{job.category}}.svg">
-                </ion-thumbnail>
-                <h2>{{ job.title }}</h2>
-                <p>{{ job.description }}</p>
-              </ion-item>
-              <ion-item-divider color="light" class="grey">
-                <span item-start>
-                  <i class="fa fa-calendar light" item-start></i>
-                  {{ getDate(job.dateAapplied) }}
-                </span>
-                <span item-end>
-                  <i class="fa fa-bookmark light" item-start></i>
-                  {{ countApplied(job) }} applied
-                </span>
-              </ion-item-divider>
-            </ion-card>
-          </ion-list>
-        </div>
-        <ion-card padding text-wrap class="not-found" *ngIf="!appliedJobs || appliedJobs.length < 1">
-          <i class="fa fa-4x fa-file"></i>
-          <p>{{isRecruiter() ? 'You have not posted a job yet' : 'You have not applied for any job yet'}}</p>
-        </ion-card>
-      </ion-list>
-  
+    <div [ngSwitch]="category">  
       <ion-list *ngSwitchCase="'viewed'">
         <div *ngIf="viewedJobs.length > 0" [@listAnimation]="viewedJobs.length">
           <ion-list no-lines class="job" *ngFor="let job of viewedJobs">
@@ -82,6 +52,36 @@
         <ion-card padding text-wrap class="not-found" *ngIf="!viewedJobs || viewedJobs.length < 1">
           <i class="fa fa-4x fa-eye"></i>
           <p>{{isRecruiter() ? 'You have not viewed a candidate yet' : 'You have not viewed for any job yet'}}</p>
+        </ion-card>
+      </ion-list>
+      
+      <ion-list *ngSwitchCase="'applied'">
+        <div *ngIf="appliedJobs.length > 0" [@listAnimation]="appliedJobs.length">
+          <ion-list no-lines class="job" *ngFor="let job of appliedJobs">
+            <ion-card>
+              <ion-item (click)="jobDetails(job)">
+                <ion-thumbnail item-start>
+                  <img src="assets/imgs/category/{{job.category}}.svg">
+                </ion-thumbnail>
+                <h2>{{ job.title }}</h2>
+                <p>{{ job.description }}</p>
+              </ion-item>
+              <ion-item-divider color="light" class="grey">
+                <span item-start>
+                  <i class="fa fa-calendar light" item-start></i>
+                  {{ getDate(job.dateAapplied) }}
+                </span>
+                <span item-end>
+                  <i class="fa fa-bookmark light" item-start></i>
+                  {{ countApplied(job) }} applied
+                </span>
+              </ion-item-divider>
+            </ion-card>
+          </ion-list>
+        </div>
+        <ion-card padding text-wrap class="not-found" *ngIf="!appliedJobs || appliedJobs.length < 1">
+          <i class="fa fa-4x fa-file"></i>
+          <p>{{isRecruiter() ? 'You have not posted a job yet' : 'You have not applied for any job yet'}}</p>
         </ion-card>
       </ion-list>
   

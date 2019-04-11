@@ -5,7 +5,7 @@ import { DataProvider } from '../../providers/data/data';
 import { LoginPage } from '../login/login';
 import { User } from '../../models/user';
 import { AuthProvider } from '../../providers/auth/auth';
-import { COLLECTION, EVENTS, STATUS } from '../../utils/const';
+import { COLLECTION, EVENTS, STATUS, USER_TYPE } from '../../utils/const';
 import { RatingData } from '../../models/rating';
 import { Appointment } from '../../models/appointment';
 import { DateProvider } from '../../providers/date/date';
@@ -65,18 +65,29 @@ export class UserDetailsPage {
 
   ionViewDidLoad() {
     this.candidate = this.navParams.get('user');
+    const type = this.profile.type === USER_TYPE.candidate ? 'rid' : 'uid';
     this.profile = this.authProvider.getStoredUser();
     this.appointments = this.dataProvider.appointments;
     this.isUserInAppointment(this.candidate);
     this.getMyRating(this.candidate);
 
     if (this.isRecruiter()) {
-      this.postedJobs = this.dataProvider.getMyJobs();
+      this.dataProvider.getMyPostedJobs(this.profile.uid).subscribe(jobs => {
+        this.postedJobs = jobs;
+        console.log(jobs);
+
+      });
     } else {
-      this.appliedJobs = this.dataProvider.getMyAppliedJobs();
+      this.dataProvider.getMyAppliedJobs(type, this.profile.uid).subscribe(jobs => {
+        this.appliedJobs = jobs;
+      });
     }
-    this.viewedJobs = this.dataProvider.getMyViewedJobs();
-    this.appointments = this.dataProvider.getMyAppointments();
+    this.dataProvider.getMyViewedJobs(type, this.profile.uid).subscribe(jobs => {
+      this.viewedJobs = jobs;
+    });
+    this.dataProvider.getMyAppointments(type, this.profile.uid).subscribe(jobs => {
+      this.appointments = jobs;
+    });
   }
 
   isUserInAppointment(user) {
@@ -90,12 +101,16 @@ export class UserDetailsPage {
   getMyRating(candidate: User) {
     let total = 0;
     let rate = 0;
-    const ratings: RatingData = this.dataProvider.getMyRatings();
-    this.candidateRating = this.dataProvider.mapRatings(ratings.ratedMe);
+    const type = this.profile.type === USER_TYPE.candidate ? 'rid' : 'uid';
+    this.dataProvider.getUsersRatedMe(type, this.profile.uid).subscribe(ratings => {
+      console.log(ratings);
+
+      //this.candidateRating = this.dataProvider.mapRatings(ratings);
+    });
   }
 
   isRecruiter(): boolean {
-    return this.authProvider.isRecruiter();
+    return this.authProvider.isRecruiter(this.profile);
   }
 
   profilePicture(user): string {
@@ -184,8 +199,6 @@ export class UserDetailsPage {
   }
 
   get userCanBeRated(): boolean {
-    console.log(this.appointments);
-
     return true; //this.candidate.appointments;
   }
 
@@ -241,11 +254,6 @@ export class UserDetailsPage {
   rateUser(rating) {
     this.isRated = true;
     this.rating = rating;
-  }
-
-  logout() {
-    localStorage.clear();
-    this.navCtrl.setRoot(LoginPage);
   }
 
   getUserSettings(user, settingz) {

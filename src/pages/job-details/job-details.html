@@ -26,7 +26,7 @@
     <ion-grid class="info">
       <ion-row>
         <ion-col col-4 class="animated slideInDown" (tap)="viewViewedUsers()">
-          <h2>{{viewed?.length || 0}}</h2>
+          <h2>{{ viewed?.length || 0}}</h2>
           <p>Viewed</p>
         </ion-col>
         <ion-col col-4 class="animated slideInDown" (tap)="viewAppliedUsers()">
@@ -68,15 +68,15 @@
         </ion-item>
       </ion-card>
 
-      <ion-card class="center" *ngIf="postedBy">
+      <ion-card class="center" *ngIf="job.postedBy">
         <ion-item text-wrap>
-          <h2 class="animated slideInDown">Posted by <span class="black">{{ postedBy.firstname }} {{postedBy.lastname}}</span></h2>
+          <h2 class="animated slideInDown">Posted by <span class="black">{{ job.postedBy.firstname }} {{job.postedBy.lastname}}</span></h2>
           <p class="animated slideInUp">
             <i class="animated slideInLeft fa fa-envelope icon" item-start></i>
-            {{ postedBy.email}} 
+            {{ job.postedBy.email}} 
             <br>
             <i class="animated slideInLeft fa fa-phone icon" item-start></i>
-            {{ postedBy.phone}} 
+            {{ job.postedBy.phone}} 
           </p>
         </ion-item>
       </ion-card>

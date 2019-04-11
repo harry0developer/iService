@@ -37,28 +37,23 @@ export class JobsPage {
     private authProvider: AuthProvider,
     private dateProvider: DateProvider,
     private feedbackProvider: FeedbackProvider,
-    private modalCtrl: ModalController,
   ) {
     this.searchControl = new FormControl();
-    // this.profile = this.dataProvider.getProfile();
   }
 
   ionViewDidLoad() {
-    this.feedbackProvider.presentLoading();
+    this.profile = this.authProvider.getStoredUser();
     if (this.authProvider.isLoggedIn()) {
-      this.profile = this.authProvider.getStoredUser();
-      this.dataProvider.getAllFromCollection(COLLECTION.jobs).subscribe(jobs => {
-        const loc = {
-          lat: 19.999,
-          lng: -29.000
-        }
-        this.jobs = this.dataProvider.applyHaversine(jobs, loc.lat, loc.lng);
-        this.feedbackProvider.dismissLoading();
-      });
+      const jobs = this.dataProvider.jobs;
+      const loc = {
+        lat: 19.999,
+        lng: -29.000
+      }
+      this.jobs = this.dataProvider.applyHaversine(jobs, loc.lat, loc.lng);
     } else {
-      this.feedbackProvider.dismissLoading();
-      this.authProvider.logout();
-      this.navCtrl.setRoot(LoginPage);
+      this.authProvider.logout().then(() => {
+        this.navCtrl.setRoot(LoginPage);
+      });
     }
   }
 
@@ -67,11 +62,6 @@ export class JobsPage {
   }
 
 
-  logout() {
-    this.authProvider.logout().then(() => {
-      this.navCtrl.setRoot(LoginPage);
-    });
-  }
 
   setFilteredJobs() {
     // this.location = this.dataProvider.getLocation();
@@ -88,8 +78,6 @@ export class JobsPage {
   }
 
   getDateTime(date) {
-    console.log(date);
-
     return this.dateProvider.getDateFromNow(date);
   }
 

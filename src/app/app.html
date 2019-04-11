@@ -5,6 +5,7 @@
       <h2>{{profile.firstname}} {{profile.lastname}}</h2>
       <p>{{profile.email}}</p>
       <p>{{profile.type}}</p>
+      <p>{{profile.uid}}</p>
     </div>
     <ion-list *ngIf="profile" class="menu">
       <ion-item menuClose ion-item icon-left (click)="nav.setRoot(pages.dashboardPage)">

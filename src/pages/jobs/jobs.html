@@ -28,35 +28,37 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <div [@listAnimation]="jobs.length">
-    <ion-list *ngFor="let job of jobs">
-      <ion-card>
-        <ion-item *ngIf="job" class="job" (click)="jobDetails(job)">
-          <ion-thumbnail item-start>
-            <img src="../../assets/imgs/category/{{job.category}}.svg">
-          </ion-thumbnail>
-          <h2>{{job.title}}</h2>
-          <p>{{job.category}}</p>
-          <i class="fa fa-chevron-right light" item-end></i>
-        </ion-item>
-        <ion-item-divider color="light">
-          <div class="row">
-            <div class="col col-6 info-bar">
-              <div item-start>
-                <i class="fa fa-calendar" item-start></i>
-                <span>{{getDateFromNow(job.dateCreated)}}</span>
+  <div *ngIf="jobs">
+    <div [@listAnimation]="jobs.length">
+      <ion-list *ngFor="let job of jobs">
+        <ion-card>
+          <ion-item *ngIf="job" class="job" (click)="jobDetails(job)">
+            <ion-thumbnail item-start>
+              <img src="../../assets/imgs/category/{{job.category}}.svg">
+            </ion-thumbnail>
+            <h2>{{job.title}}</h2>
+            <p>{{job.category}}</p>
+            <i class="fa fa-chevron-right light" item-end></i>
+          </ion-item>
+          <ion-item-divider color="light">
+            <div class="row">
+              <div class="col col-6 info-bar">
+                <div item-start>
+                  <i class="fa fa-calendar" item-start></i>
+                  <span>{{getDateFromNow(job.dateCreated)}}</span>
+                </div>
+              </div>
+              <div class="col col-6 info-bar ">
+                <div [hidden]="!job.distance" class="distance" item-end>
+                  <i class="fa fa-map-marker" item-start></i>
+                  <span>{{job.distance}} km away</span>
+                </div>
               </div>
             </div>
-            <div class="col col-6 info-bar ">
-              <div [hidden]="!job.distance" class="distance" item-end>
-                <i class="fa fa-map-marker" item-start></i>
-              <span>{{job.distance}} km away</span>
-              </div>
-            </div>
-          </div>
-        </ion-item-divider>
-      </ion-card>
+          </ion-item-divider>
+        </ion-card>
       </ion-list>
+    </div>
   </div>
   <ion-card padding text-wrap class="not-found" *ngIf="!jobs">
     <i class="fa fa-4x fa-briefcase"></i>

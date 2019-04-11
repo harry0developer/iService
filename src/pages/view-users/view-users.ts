@@ -15,6 +15,7 @@ import { bounceIn } from '../../utils/animations';
 export class ViewUsersPage {
 
   users: User[] = [];
+  category: string = '';
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -25,6 +26,7 @@ export class ViewUsersPage {
 
   ionViewDidLoad() {
     const users = this.navParams.get('users');
+    this.category = this.navParams.get('category');
     this.users = this.dataProvider.mapUsers(users);
   }
 
@@ -38,5 +40,6 @@ export class ViewUsersPage {
   profilePicture(user): string {
     return this.dataProvider.getProfilePicture();
   }
+
 
 }
