@@ -11,9 +11,10 @@ import { LoginPage } from '../login/login';
 import { Appointment } from '../../models/appointment';
 import { AppliedJob, ViewedJob, SharedJob, Job } from '../../models/job';
 import { ViewedJobsPage } from '../viewed-jobs/viewed-jobs';
-import { Rating } from '../../models/rating';
+import { Rating, RatingData } from '../../models/rating';
 import { RatingsPage } from '../ratings/ratings';
 import { SettingsPage } from '../settings/settings';
+import { UserData } from '../../models/data';
 
 @IonicPage()
 @Component({
@@ -25,14 +26,12 @@ export class DashboardPage {
 
   postedJobs: Job[] = [];
   appointments: Appointment[] = [];
-  raters = {
-    iRated: [],
-    ratedMe: []
-  };
-  myRating: string;
+  ratings: RatingData;
   viewedJobs: ViewedJob[] = [];
   sharedJobs: SharedJob[] = [];
   appliedJobs: AppliedJob[] = [];
+
+  userData: UserData;
 
   constructor(
     public navCtrl: NavController,
@@ -46,18 +45,15 @@ export class DashboardPage {
 
 
   ionViewDidLoad() {
-    this.profile = this.navParams.get('user');
-
-    if (this.dataProvider.userData) {
-      this.postedJobs = this.dataProvider.userData.postedJobs;
-      this.raters = this.dataProvider.userData.raters;
-      this.appointments = this.dataProvider.userData.appointments;
-      this.myRating = this.dataProvider.userData.myRating;
-      this.raters = { iRated: this.dataProvider.userData.iRated, ratedMe: this.dataProvider.userData.ratedMe };
-      this.viewedJobs = this.dataProvider.userData.viewedJobs;
-      this.appliedJobs = this.dataProvider.userData.appliedJobs;
-      this.sharedJobs = this.dataProvider.userData.sharedJobs;
-    }
+    this.dataProvider.userData$.subscribe(data => {
+      this.profile = data.profile;
+      this.appliedJobs = data.appliedJobs;
+      this.viewedJobs = data.viewedJobs;
+      this.sharedJobs = data.sharedJobs;
+      this.appointments = data.appointments;
+      this.postedJobs = data.postedJobs;
+      this.ratings = data.ratings;
+    });
   }
 
   profilePicture(): string {
@@ -69,7 +65,7 @@ export class DashboardPage {
   }
 
   getRaters(): number {
-    return this.raters ? this.raters.ratedMe.length + this.raters.iRated.length : 0;
+    return this.ratings ? this.ratings.ratedMe.length + this.ratings.iRated.length : 0;
   }
 
   isRecruiter(): boolean {
@@ -89,7 +85,7 @@ export class DashboardPage {
   }
 
   viewRaters() {
-    this.feedbackProvider.presentModal(RatingsPage, { raters: this.raters });
+    this.feedbackProvider.presentModal(RatingsPage, { raters: this.ratings });
   }
 
   editProfile() {

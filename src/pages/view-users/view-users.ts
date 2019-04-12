@@ -38,7 +38,7 @@ export class ViewUsersPage {
   }
 
   profilePicture(user): string {
-    return this.dataProvider.getProfilePicture();
+    return this.dataProvider.getProfilePicture(user);
   }
 
 

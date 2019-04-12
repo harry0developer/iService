@@ -5,6 +5,6 @@ export interface Rating {
 }
 
 export interface RatingData {
-    iRated: Rating[],
-    ratedMe: Rating[]
+    iRated?: Rating[],
+    ratedMe?: Rating[]
 }

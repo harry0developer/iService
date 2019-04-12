@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Job, ViewedJob, SharedJob, AppliedJob } from '../../models/job';
 import { User } from '../../models/user';
@@ -17,7 +17,6 @@ export class DataProvider {
   collectionName: any;
   dataCollection: AngularFirestoreCollection<Job | User>;
   data$: Observable<Job[] | User[] | Appointment[] | AppliedJob[]>;
-  userData: any;
   jobs: Job[] = [];
   postedJobs: Job[] = [];
   users: User[] = [];
@@ -28,39 +27,84 @@ export class DataProvider {
   viewedJobs: ViewedJob[] = [];
   sharedJobs: SharedJob[] = [];
   candidates: User[] = [];
-  ratings: RatingData[] = [];
   userId: string;
-
+  profile: User;
   KM: number = 1.60934;
+
+  private userDataSubject = new BehaviorSubject<UserData>(null);
+  userData$ = this.userDataSubject.asObservable();
+
+  private jobsSubject = new BehaviorSubject<Job[]>(null);
+  jobs$ = this.jobsSubject.asObservable();
+
+  private usersSubject = new BehaviorSubject<User[]>(null);
+  users$ = this.usersSubject.asObservable();
+
+  userData: UserData = new UserData();
+
   constructor(
     public afStore: AngularFirestore,
     public afAuth: AngularFirestore,
-    private authProvider: AuthProvider) { }
+    private authProvider: AuthProvider) {
+    //  profile, appointments, postedJobs, ratings, viewedJobs, appliedJobs, sharedJobs
 
-  // getUserJobsData(user) {
-  //   let type = user.type === USER_TYPE.recruiter ? 'rid' : 'uid';
-  //   const user$ = this.getCollectionByKeyValuePair(COLLECTION.users, 'uid', user.uid);
-  //   const postedJobs$ = user$.pipe(leftJoin(this.afStore, 'id', type, 'jobs'));
-  //   const ratings$ = postedJobs$.pipe(leftJoin(this.afStore, 'id', type, 'ratings'));
-  //   const viewed$ = ratings$.pipe(leftJoin(this.afStore, 'id', type, 'viewed-jobs'));
-  //   const applied$ = viewed$.pipe(leftJoin(this.afStore, 'id', type, 'applied-jobs'));
-  //   const shared$ = applied$.pipe(leftJoin(this.afStore, 'id', type, 'shared-jobs'));
-  //   return shared$.pipe(leftJoin(this.afStore, 'id', type, 'appointments'));
-  // }
+    this.profile = this.authProvider.getStoredUser();
+    let type = this.profile.type === USER_TYPE.recruiter ? 'rid' : 'uid';
 
-  init(userData) {
-    this.userData = userData;
-    if (userData) {
-      this.jobs = userData.jobs;
-      this.postedJobs = userData.postedJobs;
-      this.users = userData.users;
-      this.viewedJobs = userData.viewedJobs;
-      this.sharedJobs = userData.sharedJobs;
-      this.appliedJobs = userData.appliedJobs;
-      this.appointments = userData.appointments;
-      this.iRated = userData.iRated;
-      this.ratedMe = userData.ratedMe;
-    }
+    this.getJobs().subscribe(jobs => {
+      this.jobsSubject.next(jobs);
+    });
+
+    this.getUsers().subscribe(users => {
+      this.usersSubject.next(users);
+    });
+
+    this.getMyAppointments(type, this.profile.uid).subscribe(appointments => {
+      this.userData.setAppointments(appointments);
+      this.updateUserData(this.userData);
+    });
+
+    this.getMyPostedJobs(this.profile.uid).subscribe(postedJobs => {
+      this.userData.setPostedJobs(postedJobs);
+      this.updateUserData(this.userData);
+    });
+
+
+    this.getUsersIRated('rid', this.profile.uid).subscribe(iRated => {
+      const rate: RatingData = {
+        iRated
+      };
+      this.userData.setRatings(rate);
+      this.updateUserData(this.userData);
+    });
+
+    this.getUsersRatedMe('uid', this.profile.uid).subscribe(ratedMe => {
+      const rate: RatingData = {
+        ratedMe
+      };
+      this.userData.setRatings(rate);
+      this.updateUserData(this.userData);
+    });
+
+    this.getMyViewedJobs(type, this.profile.uid).subscribe(jobs => {
+      this.userData.setViewedJobs(jobs);
+      this.updateUserData(this.userData);
+    });
+
+    this.getMyAppliedJobs(type, this.profile.uid).subscribe(jobs => {
+      this.userData.setAppliedJob(jobs);
+      this.updateUserData(this.userData);
+    });
+
+    this.getMySharedJobs(type, this.profile.uid).subscribe(jobs => {
+      this.userData.setSharedJobs(jobs);
+      this.updateUserData(this.userData);
+    });
+  }
+
+  updateUserData(userData: UserData) {
+    this.userData = new UserData(userData);
+    this.userDataSubject.next(userData);
   }
 
   getRecruitersWithPostedJobs() {
@@ -91,7 +135,7 @@ export class DataProvider {
 
   getMyJobPoster(job: Job): any {
     if (this.jobs && this.jobs.length > 0) {
-      this.getUserById(job.rid).subscribe(user => {
+      this.getUserById(job.uid).subscribe(user => {
         return Object.assign(job, { postedBy: user });
       });
     }
@@ -112,11 +156,11 @@ export class DataProvider {
     return this.getItemById(COLLECTION.users, id);
   }
 
-  getUsersIRated(type: string, id: string): Observable<Job> {
+  getUsersIRated(type: string, id: string): Observable<Rating[]> {
     return this.getCollectionByKeyValuePair(COLLECTION.ratings, type, id);
   }
 
-  getUsersRatedMe(type: string, id: string): Observable<Job> {
+  getUsersRatedMe(type: string, id: string): Observable<Rating[]> {
     return this.getCollectionByKeyValuePair(COLLECTION.ratings, type, id);
   }
 
@@ -285,7 +329,7 @@ export class DataProvider {
   // }
 
   // getMyJobs(): Job[] {
-  //   const jobs: Job[] = this.jobs.filter(job => job.rid === this.profile.uid);
+  //   const jobs: Job[] = this.jobs.filter(job => job.uid === this.profile.uid);
   //   return jobs;
   // }
 
@@ -304,12 +348,11 @@ export class DataProvider {
   // }
 
 
-  mapJobs(myJobs: any[]): Job[] {
+  mapJobs(jobs, myJobs: any[]): Job[] {
     let mappedJobs: Job[] = [];
-
     if (myJobs && myJobs.length > 0) {
       myJobs.forEach(myJob => {
-        this.jobs.forEach(job => {
+        jobs.forEach(job => {
           if (myJob.jid === job.id) {
             mappedJobs.push(job);
           }

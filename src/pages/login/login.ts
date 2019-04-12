@@ -12,6 +12,7 @@ import { DateProvider } from '../../providers/date/date';
 import { COLLECTION, USER_TYPE, EVENTS } from '../../utils/const';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { UserData } from '../../models/data';
 
 @Component({
   selector: 'page-login',
@@ -95,7 +96,6 @@ export class LoginPage {
     const type = user.type === USER_TYPE.recruiter ? 'rid' : 'uid';
     forkJoin(
       this.dataProvider.getJobs().pipe(take(1)),
-      this.dataProvider.getUsers().pipe(take(1)),
       this.dataProvider.getMyAppointments(type, user.uid).pipe(take(1)),
       this.dataProvider.getMyPostedJobs(user.uid).pipe(take(1)),
       this.dataProvider.getUsersIRated('rid', user.uid).pipe(take(1)),
@@ -103,13 +103,12 @@ export class LoginPage {
       this.dataProvider.getMyViewedJobs(type, user.uid).pipe(take(1)),
       this.dataProvider.getMyAppliedJobs(type, user.uid).pipe(take(1)),
       this.dataProvider.getMySharedJobs(type, user.uid).pipe(take(1))
-    ).subscribe(([jobs, users, appointments, postedJobs, iRated, ratedMe, viewedJobs, appliedJobs, sharedJobs]) => {
+    ).subscribe(([jobs, appointments, postedJobs, iRated, ratedMe, viewedJobs, appliedJobs, sharedJobs]) => {
       this.feedbackProvider.dismissLoading();
-      const myRating = this.dataProvider.getMyRating(ratedMe);
-      const userData = {
-        jobs, users, appointments, postedJobs, iRated, ratedMe, viewedJobs, appliedJobs, sharedJobs, myRating
-      }
-      this.dataProvider.init(userData);
+      const profile = Object.assign(user, { rating: this.dataProvider.getMyRating(ratedMe) });
+      const ratings = { iRated, ratedMe };
+      const data = { profile, jobs, appointments, postedJobs, ratings, viewedJobs, appliedJobs, sharedJobs };
+      this.dataProvider.updateUserData(new UserData(data));
       this.ionEvents.publish(EVENTS.loggedIn, user);
       this.navCtrl.setRoot(DashboardPage, { user });
     });

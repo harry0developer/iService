@@ -6,6 +6,9 @@ import { AuthProvider } from '../../providers/auth/auth';
 import { bounceIn } from '../../utils/animations';
 import { DateProvider } from '../../providers/date/date';
 import { EVENTS } from '../../utils/const';
+import { AppliedJob, ViewedJob, SharedJob, Job } from '../../models/job';
+import { Appointment } from '../../models/appointment';
+import { User } from 'firebase';
 
 @IonicPage()
 @Component({
@@ -16,13 +19,13 @@ import { EVENTS } from '../../utils/const';
 })
 export class ViewedJobsPage {
 
-  appliedJobs = [];
-  viewedJobs = [];
-  sharedJobs = [];
-  appointments = [];
+  appliedJobs: Job[] = [];
+  viewedJobs: Job[] = [];
+  sharedJobs: Job[] = [];
+  appointments: Appointment[] = [];
+  jobs: Job[] = [];
   category: string = '';
   pageTitle: string = '';
-  somethings: any = new Array(20);
   profile: any;
   constructor(
     public navCtrl: NavController,
@@ -36,29 +39,17 @@ export class ViewedJobsPage {
   }
 
   ionViewDidLoad() {
-    this.profile = this.authProvider.profile;
     this.category = 'viewed';
-    const data = this.navParams.get('data');
-
-    this.appliedJobs = this.dataProvider.mapJobs(data.appliedJobs);
-    this.viewedJobs = this.dataProvider.mapJobs(data.viewedJobs);
-    this.sharedJobs = this.dataProvider.mapJobs(data.sharedJobs);
-
-
-    // this.ionEvents.subscribe(EVENTS.newAppliedJobs, (appliedJobs) => {
-    //   this.appliedJobs = this.dataProvider.mapJobs(appliedJobs);
-    // });
-    // this.ionEvents.subscribe(EVENTS.newViewedJobs, (viewedJobs) => {
-    //   this.viewedJobs = this.dataProvider.mapJobs(viewedJobs);
-    // });
-    // this.ionEvents.subscribe(EVENTS.newSharedJobs, (sharedJobs) => {
-    //   this.sharedJobs = this.dataProvider.mapJobs(sharedJobs);
-    // });
-
-    // this.getCategoryInfo(this.category);
+    this.dataProvider.userData$.subscribe(data => {
+      this.dataProvider.jobs$.subscribe(jobs => {
+        this.jobs = jobs;
+        this.profile = data.profile;
+        this.appliedJobs = this.dataProvider.mapJobs(this.jobs, data.appliedJobs);
+        this.viewedJobs = this.dataProvider.mapJobs(this.jobs, data.viewedJobs);
+        this.sharedJobs = this.dataProvider.mapJobs(this.jobs, data.sharedJobs);
+      });
+    });
   }
-
-
 
   countApplied(job) {
     let count = 0;

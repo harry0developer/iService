@@ -19,16 +19,7 @@
       <ion-item menuClose ion-item icon-left *ngIf="profile.type === 'candidate'" (click)="nav.setRoot(pages.jobsPage)">
         <ion-icon class="light" name="people" item-start></ion-icon>
           Jobs
-      </ion-item>
-      <!-- <ion-item menuClose ion-item icon-left (click)="nav.setRoot(pages.appointmentPage)">
-        <ion-icon class="light" name="calendar" item-start></ion-icon>
-          Appointments
-      </ion-item> -->
-      <!-- <ion-item menuClose ion-item icon-left (click)="nav.setRoot(pages.myJobsPage)">
-        <ion-icon class="light" name="briefcase" item-start></ion-icon>
-          <span *ngIf="profile.type === 'Recruiter'">Posted Jobs</span>
-          <span *ngIf="profile.type !== 'Recruiter'">Applied Jobs</span>
-      </ion-item> -->
+      </ion-item> 
       <ion-item menuClose ion-item icon-left (click)="nav.setRoot(pages.profilePage)">
         <ion-icon class="light" name="person" item-start></ion-icon>
           Profile

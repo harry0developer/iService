@@ -8,6 +8,7 @@ import { AppliedJob, SharedJob, ViewedJob } from '../../models/job';
 import { ViewUsersPage } from '../view-users/view-users';
 import { COLLECTION } from '../../utils/const';
 import { SocialSharing } from '@ionic-native/social-sharing';
+import { UserData } from '../../models/data';
 
 @IonicPage()
 @Component({
@@ -20,9 +21,10 @@ export class JobDetailsPage {
 
   hasApplied: boolean = false;
 
-  applied: AppliedJob[] = [];
-  viewed: ViewedJob[] = [];
-  shared: SharedJob[] = [];
+  appliedJobs: AppliedJob[] = [];
+  viewedJobs: ViewedJob[] = [];
+  sharedJobs: SharedJob[] = [];
+  userData: UserData;
 
   constructor(
     public navCtrl: NavController,
@@ -40,36 +42,48 @@ export class JobDetailsPage {
     this.profile = this.authProvider.getStoredUser();
     this.job = this.dataProvider.getMyJobPoster(this.navParams.get('job'));
 
-    this.viewed = this.dataProvider.viewedJobs.filter(viewed => viewed.jid === this.job.id);
-    this.applied = this.dataProvider.appliedJobs.filter(viewed => viewed.jid === this.job.id);
-    this.shared = this.dataProvider.sharedJobs.filter(viewed => viewed.jid === this.job.id);
+    this.dataProvider.userData$.subscribe(data => {
+      this.userData = data;
+      this.viewedJobs = data.viewedJobs;
+      this.sharedJobs = data.sharedJobs;
+      this.appliedJobs = data.appliedJobs;
+    });
 
-    if (!this.isJobViewed()) {
-      this.addJobToViewed();
-    };
+
+    if (!this.hasViewedJob()) {
+      this.addToViewedJobs();
+    }
+
     this.hasUserApplied();
   }
 
 
-  private addJobToViewed() {
-    this.feedbackProvider.presentLoading();
-    const viewedJob: ViewedJob = {
-      uid: this.profile.uid,
-      jid: this.job.id,
-      rid: this.job.rid,
-      dateViewed: this.dateProvider.getDate()
-    }
-    this.dataProvider.addNewItem(COLLECTION.viewedJobs, viewedJob).then(() => {
-      this.dataProvider.getViewedJobs().subscribe(viewed => {
-        this.viewed = viewed;
-        this.feedbackProvider.dismissLoading();
-      });
-    }).catch(err => {
-      console.log(err);
-      this.feedbackProvider.dismissLoading();
+  hasViewedJob(): boolean {
+    let hasSeen = false;
+    this.viewedJobs.forEach(viewedJob => {
+      if (viewedJob.jid === this.job.id && viewedJob.uid === this.profile.uid) {
+        hasSeen = true;
+      }
     });
+    return hasSeen;
   }
 
+  addToViewedJobs() {
+    if (!this.hasViewedJob()) {
+      this.feedbackProvider.presentLoading();
+      const viewedJob: ViewedJob = {
+        uid: this.profile.uid,
+        jid: this.job.id,
+        rid: this.job.uid,
+        dateViewed: this.dateProvider.getDate()
+      }
+      this.dataProvider.addNewItem(COLLECTION.viewedJobs, viewedJob).then(() => {
+        this.feedbackProvider.dismissLoading();
+      }).catch(err => {
+        this.feedbackProvider.dismissLoading();
+      });
+    }
+  }
 
   applyNow(job) {
     this.feedbackProvider.presentLoading();
@@ -81,11 +95,8 @@ export class JobDetailsPage {
     }
     this.dataProvider.addNewItem(COLLECTION.appliedJobs, appliedJob).then(() => {
       this.hasApplied = true;
-      this.dataProvider.getAppliedJobs().subscribe(appliedJobs => {
-        this.applied = appliedJobs;
-        this.feedbackProvider.dismissLoading();
-        this.feedbackProvider.presentToast('You have successfully applied');
-      });
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentToast('You have successfully applied');
     }).catch(err => {
       console.log(err);
       this.feedbackProvider.dismissLoading();
@@ -100,11 +111,8 @@ export class JobDetailsPage {
       if (deleteJob[0]) {
         this.dataProvider.removeItem(COLLECTION.appliedJobs, deleteJob[0].id).then(() => {
           this.hasApplied = false;
-          this.dataProvider.getAppliedJobs().subscribe(appliedJobs => {
-            this.applied = appliedJobs;
-            this.feedbackProvider.dismissLoading();
-            this.feedbackProvider.presentToast('Job application cancelled successfully');
-          });
+          this.feedbackProvider.dismissLoading();
+          this.feedbackProvider.presentToast('Job application cancelled successfully');
         }).catch(err => {
           console.log(err);
           this.feedbackProvider.dismissLoading();
@@ -115,12 +123,40 @@ export class JobDetailsPage {
     });
   }
 
+  getUsersViewed() {
+    let users = 0;
+    this.viewedJobs.forEach(vjob => {
+      if (vjob.jid === this.job.id) {
+        users++;
+      }
+    });
+    return users;
+  }
+  getUsersApplied() {
+    let users = 0;
+    this.appliedJobs.forEach(ajob => {
+      if (ajob.jid === this.job.id) {
+        users++;
+      }
+    });
+    return users;
+  }
+  getUsersShared() {
+    let users = 0;
+    this.sharedJobs.forEach(sjob => {
+      if (sjob.jid === this.job.id) {
+        users++;
+      }
+    });
+    return users;
+  }
+
   isRecruiter(): boolean {
     return this.authProvider.isRecruiter(this.profile);
   }
 
   hasUserApplied() {
-    this.applied.map(appliedJob => {
+    this.appliedJobs.map(appliedJob => {
       if (appliedJob.uid === this.profile.uid && this.job.id === appliedJob.jid) {
         this.hasApplied = true;
       }
@@ -128,8 +164,8 @@ export class JobDetailsPage {
   }
 
   isJobViewed(): boolean {
-    if (this.viewed && this.viewed.length > 0) {
-      const v = this.viewed.filter(viewed => viewed.uid === this.profile.uid && viewed.jid === this.job.id);
+    if (this.viewedJobs && this.viewedJobs.length > 0) {
+      const v = this.viewedJobs.filter(viewed => viewed.uid === this.profile.uid && viewed.jid === this.job.id);
       return v.length > 0;
     } else {
       return false;
@@ -160,13 +196,13 @@ export class JobDetailsPage {
 
 
   viewAppliedUsers() {
-    this.navCtrl.push(ViewUsersPage, { category: 'applied', users: this.applied });
+    this.navCtrl.push(ViewUsersPage, { category: 'applied', users: this.appliedJobs });
   }
   viewViewedUsers() {
-    this.navCtrl.push(ViewUsersPage, { category: 'viewed', users: this.viewed });
+    this.navCtrl.push(ViewUsersPage, { category: 'viewed', users: this.viewedJobs });
   }
   viewSharedUsers() {
-    this.navCtrl.push(ViewUsersPage, { category: 'shared', users: this.shared });
+    this.navCtrl.push(ViewUsersPage, { category: 'shared', users: this.sharedJobs });
   }
 
   getSkills(skills) {
@@ -285,15 +321,15 @@ export class JobDetailsPage {
   //       }
   //     });
   //   }
-  //   this.applied = aa;
+  //   this.appliedJobs = aa;
   // }
 
   // private _setViewedJobs(viewed: ViewedJob[]) {
-  //   this.viewed = [];
+  //   this.viewedJobs = [];
   //   if (viewed && viewed.length > 0) {
   //     viewed.map(v => {
   //       if (v.jid === this.job.id) {
-  //         this.viewed.push(v);
+  //         this.viewedJobs.push(v);
   //       }
   //     });
   //   }

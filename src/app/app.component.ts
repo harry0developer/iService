@@ -51,10 +51,8 @@ export class MyApp {
 
     });
 
-    this.ionEvents.subscribe(EVENTS.loggedIn, data => {
-      if (data) {
-        this.profile = data.user;
-      }
+    this.ionEvents.subscribe(EVENTS.loggedIn, user => {
+      this.profile = user;
     });
 
     this.pages = {

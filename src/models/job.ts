@@ -2,7 +2,7 @@ export interface Job {
     jid?: string;
     id?: string;
     rating?: number;
-    rid: string;
+    uid: string;
     title: string;
     address: string;
     description: string;
