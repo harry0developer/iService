@@ -66,24 +66,12 @@ export class UserDetailsPage {
   ionViewDidLoad() {
     this.candidate = this.navParams.get('user');
     this.profile = this.authProvider.getStoredUser();
-    const type = this.profile.type === USER_TYPE.candidate ? 'rid' : 'uid';
-
     this.dataProvider.userData$.subscribe(data => {
       this.appointments = data.appointments;
       this.isUserInAppointment(this.candidate);
       this.candidateRating = this.dataProvider.getMyRating(data.ratings.ratedMe);
       this.postedJobs = data.postedJobs;
-    })
-
-    // this.dataProvider.getMyAppliedJobs(type, this.profile.uid).subscribe(jobs => {
-    //   this.appliedJobs = jobs;
-    // });
-    // this.dataProvider.getMyViewedJobs(type, this.profile.uid).subscribe(jobs => {
-    //   this.viewedJobs = jobs;
-    // });
-    // this.dataProvider.getMyAppointments(type, this.profile.uid).subscribe(jobs => {
-    //   this.appointments = jobs;
-    // });
+    });
   }
 
   isUserInAppointment(user) {
@@ -126,14 +114,13 @@ export class UserDetailsPage {
 
   completeAppointment(user) {
     this.feedbackProvider.presentLoading();
-    const appointment: Appointment = {
+    const newUpdatedAppointment: Appointment = {
       uid: user.id,
       rid: this.profile.uid,
       status: STATUS.completed,
       dateCompleted: this.dateProvider.getDate()
     }
-    this.dataProvider.addNewItem(COLLECTION.appointments, appointment).then(() => {
-      this.ionEvent.publish(EVENTS.appointmentsUpdated);
+    this.dataProvider.updateItem(COLLECTION.appointments, newUpdatedAppointment, user.appointment.id).then(() => {
       this.hired = false;
       this.feedbackProvider.dismissLoading();
       this.feedbackProvider.presentToast('Appointment completed successfully');
