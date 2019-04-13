@@ -33,7 +33,9 @@ export class MyJobsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    this.jobs = this.navParama.get('jobs');
+    this.dataProvider.userData$.subscribe(data => {
+      this.jobs = data.postedJobs;
+    });
   }
 
   isRecruiter(): boolean {

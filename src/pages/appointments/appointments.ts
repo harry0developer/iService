@@ -33,11 +33,13 @@ export class AppointmentsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    const users = this.dataProvider.users;
-    const appointments = this.navParams.get('appointments');
-    const usersWithAppointments = this.dataProvider.getUserWithAppointmets(users, appointments);
-    this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
-    this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
+    this.dataProvider.userData$.subscribe(data => {
+      this.dataProvider.users$.subscribe(users => {
+        const usersWithAppointments = this.dataProvider.getUserWithAppointmets(users, data.appointments);
+        this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
+        this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
+      });
+    });
   }
 
   profilePicture(user): string {

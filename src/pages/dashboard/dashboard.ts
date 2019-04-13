@@ -73,19 +73,19 @@ export class DashboardPage {
   }
 
   viewAppointments() {
-    this.feedbackProvider.presentModal(AppointmentsPage, { appointments: this.appointments });
+    this.feedbackProvider.presentModal(AppointmentsPage);
   }
 
   viewPostedJobs() {
-    this.feedbackProvider.presentModal(MyJobsPage, { jobs: this.postedJobs });
+    this.feedbackProvider.presentModal(MyJobsPage);
   }
 
   viewViewedJobs() {
-    this.feedbackProvider.presentModal(ViewedJobsPage, { data: { viewedJobs: this.viewedJobs, appliedJobs: this.appliedJobs, sharedJobs: this.sharedJobs } });
+    this.feedbackProvider.presentModal(ViewedJobsPage);
   }
 
   viewRaters() {
-    this.feedbackProvider.presentModal(RatingsPage, { raters: this.ratings });
+    this.feedbackProvider.presentModal(RatingsPage);
   }
 
   editProfile() {

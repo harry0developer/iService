@@ -65,29 +65,25 @@ export class UserDetailsPage {
 
   ionViewDidLoad() {
     this.candidate = this.navParams.get('user');
-    const type = this.profile.type === USER_TYPE.candidate ? 'rid' : 'uid';
     this.profile = this.authProvider.getStoredUser();
-    this.appointments = this.dataProvider.appointments;
-    this.isUserInAppointment(this.candidate);
-    this.getMyRating(this.candidate);
+    const type = this.profile.type === USER_TYPE.candidate ? 'rid' : 'uid';
 
-    if (this.isRecruiter()) {
-      this.dataProvider.getMyPostedJobs(this.profile.uid).subscribe(jobs => {
-        this.postedJobs = jobs;
-        console.log(jobs);
+    this.dataProvider.userData$.subscribe(data => {
+      this.appointments = data.appointments;
+      this.isUserInAppointment(this.candidate);
+      this.candidateRating = this.dataProvider.getMyRating(data.ratings.ratedMe);
+      this.postedJobs = data.postedJobs;
+    })
 
-      });
-    } else {
-      this.dataProvider.getMyAppliedJobs(type, this.profile.uid).subscribe(jobs => {
-        this.appliedJobs = jobs;
-      });
-    }
-    this.dataProvider.getMyViewedJobs(type, this.profile.uid).subscribe(jobs => {
-      this.viewedJobs = jobs;
-    });
-    this.dataProvider.getMyAppointments(type, this.profile.uid).subscribe(jobs => {
-      this.appointments = jobs;
-    });
+    // this.dataProvider.getMyAppliedJobs(type, this.profile.uid).subscribe(jobs => {
+    //   this.appliedJobs = jobs;
+    // });
+    // this.dataProvider.getMyViewedJobs(type, this.profile.uid).subscribe(jobs => {
+    //   this.viewedJobs = jobs;
+    // });
+    // this.dataProvider.getMyAppointments(type, this.profile.uid).subscribe(jobs => {
+    //   this.appointments = jobs;
+    // });
   }
 
   isUserInAppointment(user) {
@@ -95,17 +91,6 @@ export class UserDetailsPage {
       if (app.uid === user.id && app.status === STATUS.inProgress) {
         this.hired = true;
       }
-    });
-  }
-
-  getMyRating(candidate: User) {
-    let total = 0;
-    let rate = 0;
-    const type = this.profile.type === USER_TYPE.candidate ? 'rid' : 'uid';
-    this.dataProvider.getUsersRatedMe(type, this.profile.uid).subscribe(ratings => {
-      console.log(ratings);
-
-      //this.candidateRating = this.dataProvider.mapRatings(ratings);
     });
   }
 

@@ -250,8 +250,6 @@ export class DataProvider {
 
   getUserWithAppointmets(users: User[], appointments: Appointment[]) {
     const userz = [];
-    console.log(users);
-
     users.map(user => {
       appointments.map(app => {
         if (user.uid === app.uid) {
@@ -276,11 +274,11 @@ export class DataProvider {
     return userz;
   }
 
-  mapIRated(iRated: Rating[]) {
+  mapIRated(users, iRated: Rating[]) {
     let raters = [];
-    if (iRated && this.users) {
+    if (iRated && users) {
       iRated.map(r => {
-        this.users.map(user => {
+        users.map(user => {
           if (r.uid === user.id) {
             raters.push(user);
           }
@@ -290,11 +288,11 @@ export class DataProvider {
     return raters;
   }
 
-  mapRatedMe(ratedMe: Rating[]) {
+  mapRatedMe(users, ratedMe: Rating[]) {
     let raters = [];
-    if (ratedMe && this.users) {
+    if (ratedMe && users) {
       ratedMe.map(r => {
-        this.users.map(user => {
+        users.map(user => {
           if (r.rid === user.id) {
             raters.push(user);
           }

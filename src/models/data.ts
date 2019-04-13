@@ -24,8 +24,6 @@ export class UserData {
             this.sharedJobs = userData.sharedJobs;
             this.appointments = userData.appointments;
             this.ratings = userData.ratings;
-            // this.iRated = userData.rating.iRated;
-            // this.ratedMe = userData.rating.ratedMe;
         }
     }
 
@@ -50,10 +48,5 @@ export class UserData {
     setRatings(ratings: RatingData) {
         this.ratings = ratings;
     }
-    setIRated(iRated: Rating[]) {
-        this.iRated = iRated;
-    }
-    setRatedMe(ratedMe: Rating[]) {
-        this.ratedMe = ratedMe;
-    }
+
 }

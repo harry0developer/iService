@@ -45,23 +45,21 @@ export class CandidatesPage {
   ) {
     this.searchControl = new FormControl();
     this.getCategories();
+
   }
 
 
   ionViewDidLoad() {
-    if (this.authProvider.isLoggedIn()) {
-      this.profile = this.authProvider.getStoredUser();
-      const candidates = this.dataProvider.candidates;
+    this.profile = this.authProvider.getStoredUser();
+    this.dataProvider.users$.subscribe(users => {
+      const candidates = users.filter(user => user.type === USER_TYPE.candidate);
       const loc = {
         lat: 19.999,
         lng: -19.000
       };
       this.candidates = this.dataProvider.applyHaversine(candidates, loc.lat, loc.lng);
-    } else {
-      this.authProvider.logout().then(() => {
-        this.navCtrl.setRoot(LoginPage);
-      });
-    }
+    });
+
   }
 
   profilePicture(user): string {

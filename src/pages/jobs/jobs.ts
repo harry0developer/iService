@@ -43,18 +43,13 @@ export class JobsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    if (this.authProvider.isLoggedIn()) {
-      const jobs = this.dataProvider.jobs;
+    this.dataProvider.jobs$.subscribe(jobs => {
       const loc = {
         lat: 19.999,
         lng: -29.000
       }
       this.jobs = this.dataProvider.applyHaversine(jobs, loc.lat, loc.lng);
-    } else {
-      this.authProvider.logout().then(() => {
-        this.navCtrl.setRoot(LoginPage);
-      });
-    }
+    });
   }
 
   getDateFromNow(date: string): string {
