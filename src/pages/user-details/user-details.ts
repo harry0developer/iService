@@ -67,7 +67,9 @@ export class UserDetailsPage {
     this.candidate = this.navParams.get('user');
     this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
-      this.appointments = data.appointments;
+      this.appointments = data.appointments.filter(app => app.uid === this.candidate.uid);
+      this.viewedJobs = data.viewedJobs.filter(viewed => viewed.uid === this.candidate.uid);
+      this.appliedJobs = data.appliedJobs.filter(applied => applied.uid === this.candidate.uid);
       this.isUserInAppointment(this.candidate);
       this.candidateRating = this.dataProvider.getMyRating(data.ratings.ratedMe);
       this.postedJobs = data.postedJobs;
@@ -82,8 +84,8 @@ export class UserDetailsPage {
     });
   }
 
-  isRecruiter(): boolean {
-    return this.authProvider.isRecruiter(this.profile);
+  isRecruiter(candidate): boolean {
+    return this.authProvider.isRecruiter(candidate);
   }
 
   profilePicture(user): string {

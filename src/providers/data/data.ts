@@ -248,15 +248,25 @@ export class DataProvider {
     return this.getItemById(COLLECTION.users, id);
   }
 
-  getUserWithAppointmets(users: User[], appointments: Appointment[]) {
+  getUserWithAppointmets(profile, users: User[], appointments: Appointment[]) {
     const userz = [];
-    users.map(user => {
-      appointments.map(app => {
-        if (user.uid === app.uid) {
-          userz.push(Object.assign(user, { appointment: app }));
-        }
-      })
-    })
+    if (profile.type === USER_TYPE.recruiter) {
+      users.map(user => {
+        appointments.map(app => {
+          if (user.uid === app.uid) {
+            userz.push(Object.assign(user, { appointment: app }));
+          }
+        })
+      });
+    } else {
+      users.map(user => {
+        appointments.map(app => {
+          if (user.uid === app.rid) {
+            userz.push(Object.assign(user, { appointment: app }));
+          }
+        })
+      });
+    }
     return userz;
   }
 

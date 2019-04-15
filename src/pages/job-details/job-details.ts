@@ -40,8 +40,10 @@ export class JobDetailsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    this.job = this.dataProvider.getMyJobPoster(this.navParams.get('job'));
-
+    this.job = this.navParams.get('job');
+    this.dataProvider.getItemById(COLLECTION.users, this.job.uid).subscribe(user => {
+      this.job.postedBy = user;
+    });
     this.dataProvider.userData$.subscribe(data => {
       this.userData = data;
       this.viewedJobs = data.viewedJobs;
@@ -87,10 +89,12 @@ export class JobDetailsPage {
 
   applyNow(job) {
     this.feedbackProvider.presentLoading();
+    console.log(job);
+
     const appliedJob: AppliedJob = {
       uid: this.profile.uid,
       jid: job.id,
-      rid: this.job.postedBy.uid,
+      rid: job.postedBy.uid,
       dateApplied: this.dateProvider.getDate()
     }
     this.dataProvider.addNewItem(COLLECTION.appliedJobs, appliedJob).then(() => {

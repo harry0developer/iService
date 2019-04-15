@@ -5,7 +5,7 @@ import { DataProvider } from '../../providers/data/data';
 import { AuthProvider } from '../../providers/auth/auth';
 import { bounceIn } from '../../utils/animations';
 import { DateProvider } from '../../providers/date/date';
-import { EVENTS } from '../../utils/const';
+import { EVENTS, USER_TYPE } from '../../utils/const';
 import { AppliedJob, ViewedJob, SharedJob, Job } from '../../models/job';
 import { Appointment } from '../../models/appointment';
 import { User } from 'firebase';
@@ -44,9 +44,25 @@ export class ViewedJobsPage {
       this.dataProvider.jobs$.subscribe(jobs => {
         this.jobs = jobs;
         this.profile = data.profile;
-        this.appliedJobs = this.dataProvider.mapJobs(this.jobs, data.appliedJobs);
-        this.viewedJobs = this.dataProvider.mapJobs(this.jobs, data.viewedJobs);
-        this.sharedJobs = this.dataProvider.mapJobs(this.jobs, data.sharedJobs);
+
+        if (this.profile.type === USER_TYPE.recruiter) {
+          const appliedJobs = data.appliedJobs.filter(job => job.rid === this.profile.uid);
+          const viewedJobs = data.viewedJobs.filter(job => job.rid === this.profile.uid);
+          const sharedJobs = data.sharedJobs.filter(job => job.rid === this.profile.uid);
+
+          this.appliedJobs = this.dataProvider.mapJobs(this.jobs, appliedJobs);
+          this.viewedJobs = this.dataProvider.mapJobs(this.jobs, viewedJobs);
+          this.sharedJobs = this.dataProvider.mapJobs(this.jobs, sharedJobs);
+        } else {
+          const appliedJobs = data.appliedJobs.filter(job => job.uid === this.profile.uid);
+          const viewedJobs = data.viewedJobs.filter(job => job.uid === this.profile.uid);
+          const sharedJobs = data.sharedJobs.filter(job => job.uid === this.profile.uid);
+
+          this.appliedJobs = this.dataProvider.mapJobs(this.jobs, appliedJobs);
+          this.viewedJobs = this.dataProvider.mapJobs(this.jobs, viewedJobs);
+          this.sharedJobs = this.dataProvider.mapJobs(this.jobs, sharedJobs);
+
+        }
       });
     });
   }

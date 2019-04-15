@@ -59,7 +59,7 @@
       </div> -->
   
       <div class="row summary">
-        <div class="col animated slideInDown col-4" *ngIf="isRecruiter()">
+        <div class="col animated slideInDown col-4" *ngIf="isRecruiter(candidate)">
           <h2>{{postedJobs?.length || 0}}</h2>
           <p *ngIf="appliedJobs?.length != 1">Jobs Applied</p>
           <p *ngIf="appliedJobs?.length == 1">Job Applied</p>
@@ -75,7 +75,7 @@
           <p *ngIf="viewedJobs?.length == 1">Job Viewed</p>
         </div>
         <div class="col animated slideInDown col-4">
-          <h2>{{appointment?.length || 0}}</h2>
+          <h2>{{appointments?.length || 0}}</h2>
           <p *ngIf="appointments?.length != 1">Appointments</p>
           <p *ngIf="appointments?.length == 1">Appointment</p>
         </div>

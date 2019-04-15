@@ -15,6 +15,7 @@ import { Rating, RatingData } from '../../models/rating';
 import { RatingsPage } from '../ratings/ratings';
 import { SettingsPage } from '../settings/settings';
 import { UserData } from '../../models/data';
+import { USER_TYPE } from '../../utils/const';
 
 @IonicPage()
 @Component({
@@ -47,12 +48,21 @@ export class DashboardPage {
   ionViewDidLoad() {
     this.dataProvider.userData$.subscribe(data => {
       this.profile = data.profile;
-      this.appliedJobs = data.appliedJobs;
-      this.viewedJobs = data.viewedJobs;
-      this.sharedJobs = data.sharedJobs;
-      this.appointments = data.appointments;
-      this.postedJobs = data.postedJobs;
-      this.ratings = data.ratings;
+      if (this.profile.type === USER_TYPE.recruiter) {
+        this.appliedJobs = data.appliedJobs.filter(job => job.rid === this.profile.uid);
+        this.viewedJobs = data.viewedJobs.filter(job => job.rid === this.profile.uid);
+        this.sharedJobs = data.sharedJobs.filter(job => job.rid === this.profile.uid);
+        this.appointments = data.appointments.filter(job => job.rid === this.profile.uid);
+        this.postedJobs = data.postedJobs;
+        this.ratings = data.ratings;
+      } else {
+        this.appliedJobs = data.appliedJobs.filter(job => job.uid === this.profile.uid);
+        this.viewedJobs = data.viewedJobs.filter(job => job.uid === this.profile.uid);
+        this.sharedJobs = data.sharedJobs.filter(job => job.uid === this.profile.uid);
+        this.appointments = data.appointments.filter(job => job.uid === this.profile.uid);
+        this.postedJobs = data.postedJobs;
+        this.ratings = data.ratings;
+      }
     });
   }
 
@@ -61,11 +71,11 @@ export class DashboardPage {
   }
 
   getJobsSummary(): number {
-    return this.viewedJobs.length + this.appliedJobs.length + this.sharedJobs.length;
+    return this.viewedJobs.length + this.appliedJobs.length + this.sharedJobs.length || 0;
   }
 
   getRaters(): number {
-    return this.ratings ? this.ratings.ratedMe.length + this.ratings.iRated.length : 0;
+    return this.ratings && this.ratings.iRated && this.ratings.ratedMe ? this.ratings.ratedMe.length + this.ratings.iRated.length : 0;
   }
 
   isRecruiter(): boolean {

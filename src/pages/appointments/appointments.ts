@@ -5,7 +5,7 @@ import { bounceIn } from '../../utils/animations';
 import { AuthProvider } from '../../providers/auth/auth';
 import { User } from '../../models/user';
 import { Appointment } from '../../models/appointment';
-import { STATUS } from '../../utils/const';
+import { STATUS, USER_TYPE } from '../../utils/const';
 import { DateProvider } from '../../providers/date/date';
 import { UserDetailsPage } from '../user-details/user-details';
 import { LoginPage } from '../login/login';
@@ -33,11 +33,23 @@ export class AppointmentsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    this.dataProvider.userData$.subscribe(data => {
-      this.dataProvider.users$.subscribe(users => {
-        const usersWithAppointments = this.dataProvider.getUserWithAppointmets(users, data.appointments);
-        this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
-        this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
+    this.dataProvider.users$.subscribe(users => {
+      this.dataProvider.userData$.subscribe(data => {
+        if (this.profile.type === USER_TYPE.recruiter) {
+          const appointments = data.appointments.filter(job => job.rid === this.profile.uid);
+          const usersWithAppointments = this.dataProvider.getUserWithAppointmets(this.profile, users, appointments);
+          this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
+          this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
+        } else {
+          const appointments = data.appointments.filter(job => job.uid === this.profile.uid);
+          console.log(appointments);
+
+          const usersWithAppointments = this.dataProvider.getUserWithAppointmets(this.profile, users, appointments);
+          console.log(usersWithAppointments);
+
+          this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
+          this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
+        }
       });
     });
   }
