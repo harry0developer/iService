@@ -49,7 +49,7 @@
       </ion-list>
   
       <ion-list *ngSwitchCase="'completed'">
-        <div [@listAnimation]="completedAppointments.length">
+        <div [@listAnimation]="completedAppointments && completedAppointments.length > 0">
           <ion-list *ngFor="let user of completedAppointments">
             <ion-card >
               <ion-item (click)="viewUserDetails(user)">

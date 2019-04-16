@@ -61,10 +61,9 @@
       <div class="row summary">
         <div class="col animated slideInDown col-4" *ngIf="isRecruiter(candidate)">
           <h2>{{postedJobs?.length || 0}}</h2>
-          <p *ngIf="appliedJobs?.length != 1">Jobs Applied</p>
-          <p *ngIf="appliedJobs?.length == 1">Job Applied</p>
+          <p>Jobs Posted</p>
         </div>
-        <div class="col animated slideInDown col-4" *ngIf="!isRecruiter()">
+        <div class="col animated slideInDown col-4" *ngIf="!isRecruiter(candidate)">
           <h2>{{appliedJobs?.length || 0}}</h2>
           <p *ngIf="appliedJobs?.length != 1">Jobs Applied</p>
           <p *ngIf="appliedJobs?.length == 1">Job Applied</p>

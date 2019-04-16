@@ -9,6 +9,7 @@ import { ViewUsersPage } from '../view-users/view-users';
 import { COLLECTION } from '../../utils/const';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { UserData } from '../../models/data';
+import { User } from 'firebase';
 
 @IonicPage()
 @Component({
@@ -21,10 +22,9 @@ export class JobDetailsPage {
 
   hasApplied: boolean = false;
 
-  appliedJobs: AppliedJob[] = [];
-  viewedJobs: ViewedJob[] = [];
-  sharedJobs: SharedJob[] = [];
-  userData: UserData;
+  appliedUsers: AppliedJob[] = [];
+  viewedUsers: ViewedJob[] = [];
+  sharedUsers: SharedJob[] = [];
 
   constructor(
     public navCtrl: NavController,
@@ -45,24 +45,23 @@ export class JobDetailsPage {
       this.job.postedBy = user;
     });
     this.dataProvider.userData$.subscribe(data => {
-      this.userData = data;
-      this.viewedJobs = data.viewedJobs;
-      this.sharedJobs = data.sharedJobs;
-      this.appliedJobs = data.appliedJobs;
+      this.viewedUsers = data.viewedJobs.filter(job => job.jid === this.job.id);
+      this.sharedUsers = data.sharedJobs.filter(job => job.jid === this.job.id);
+      this.appliedUsers = data.appliedJobs.filter(job => job.jid === this.job.id);
+      if (!this.hasViewedJob()) {
+        this.addToViewedJobs();
+      }
+      this.hasUserApplied();
     });
 
 
-    if (!this.hasViewedJob()) {
-      this.addToViewedJobs();
-    }
 
-    this.hasUserApplied();
   }
 
 
   hasViewedJob(): boolean {
     let hasSeen = false;
-    this.viewedJobs.forEach(viewedJob => {
+    this.viewedUsers.forEach(viewedJob => {
       if (viewedJob.jid === this.job.id && viewedJob.uid === this.profile.uid) {
         hasSeen = true;
       }
@@ -129,7 +128,7 @@ export class JobDetailsPage {
 
   getUsersViewed() {
     let users = 0;
-    this.viewedJobs.forEach(vjob => {
+    this.viewedUsers.forEach(vjob => {
       if (vjob.jid === this.job.id) {
         users++;
       }
@@ -138,7 +137,7 @@ export class JobDetailsPage {
   }
   getUsersApplied() {
     let users = 0;
-    this.appliedJobs.forEach(ajob => {
+    this.appliedUsers.forEach(ajob => {
       if (ajob.jid === this.job.id) {
         users++;
       }
@@ -147,7 +146,7 @@ export class JobDetailsPage {
   }
   getUsersShared() {
     let users = 0;
-    this.sharedJobs.forEach(sjob => {
+    this.sharedUsers.forEach(sjob => {
       if (sjob.jid === this.job.id) {
         users++;
       }
@@ -160,7 +159,7 @@ export class JobDetailsPage {
   }
 
   hasUserApplied() {
-    this.appliedJobs.map(appliedJob => {
+    this.appliedUsers.map(appliedJob => {
       if (appliedJob.uid === this.profile.uid && this.job.id === appliedJob.jid) {
         this.hasApplied = true;
       }
@@ -168,8 +167,8 @@ export class JobDetailsPage {
   }
 
   isJobViewed(): boolean {
-    if (this.viewedJobs && this.viewedJobs.length > 0) {
-      const v = this.viewedJobs.filter(viewed => viewed.uid === this.profile.uid && viewed.jid === this.job.id);
+    if (this.viewedUsers && this.viewedUsers.length > 0) {
+      const v = this.viewedUsers.filter(viewed => viewed.uid === this.profile.uid && viewed.jid === this.job.id);
       return v.length > 0;
     } else {
       return false;
@@ -200,13 +199,13 @@ export class JobDetailsPage {
 
 
   viewAppliedUsers() {
-    this.navCtrl.push(ViewUsersPage, { category: 'applied', users: this.appliedJobs });
+    this.navCtrl.push(ViewUsersPage, { category: 'applied', users: this.appliedUsers });
   }
   viewViewedUsers() {
-    this.navCtrl.push(ViewUsersPage, { category: 'viewed', users: this.viewedJobs });
+    this.navCtrl.push(ViewUsersPage, { category: 'viewed', users: this.viewedUsers });
   }
   viewSharedUsers() {
-    this.navCtrl.push(ViewUsersPage, { category: 'shared', users: this.sharedJobs });
+    this.navCtrl.push(ViewUsersPage, { category: 'shared', users: this.sharedUsers });
   }
 
   getSkills(skills) {
@@ -262,7 +261,7 @@ export class JobDetailsPage {
   }
 
 
-  addToSharedJobs(job, platform) {
+  addToShareduserssharedUsers(job, platform) {
     this.feedbackProvider.presentLoading();
     const sharedJob: SharedJob = {
       jid: job.jid,
@@ -316,7 +315,7 @@ export class JobDetailsPage {
     actionSheet.present();
   }
 
-  // private _setAppliedJobs(applied: AppliedJob[]) {
+  // private _setAppliedUsers(applied: AppliedJob[]) {
   //   let aa = [];
   //   if (applied && applied.length > 0) {
   //     applied.map(a => {
@@ -325,10 +324,10 @@ export class JobDetailsPage {
   //       }
   //     });
   //   }
-  //   this.appliedJobs = aa;
+  //   this.appliedUsers = aa;
   // }
 
-  // private _setViewedJobs(viewed: ViewedJob[]) {
+  // private _setViewedUsers(viewed: ViewedJob[]) {
   //   this.viewedJobs = [];
   //   if (viewed && viewed.length > 0) {
   //     viewed.map(v => {
@@ -339,7 +338,7 @@ export class JobDetailsPage {
   //   }
   // }
 
-  // private _setSharedJobs(shared: SharedJob[]) {
+  // private _setShareduserssharedUsers(shared: SharedJob[]) {
   //   this.shared = [];
   //   if (shared && shared.length > 0) {
   //     shared.map(s => {
@@ -352,11 +351,11 @@ export class JobDetailsPage {
 
   // initializeJobs() {
   //   const viewed = this.dataProvider.viewedJobs;
-  //   const applied = this.dataProvider.appliedJobs;
-  //   const shared = this.dataProvider.sharedJobs;
+  //   const applied = this.dataProvider.appliedUsers;
+  //   const shared = this.dataProvider.sharedUsers;
   //   this._setViewedJobs(viewed);
-  //   this._setAppliedJobs(applied);
-  //   this._setSharedJobs(shared);
+  //   this._setAppliedUsers(applied);
+  //   this._setShareduserssharedUsers(shared);
   // }
 
   // unsubscribeFromSocialEvents() {
@@ -370,7 +369,7 @@ export class JobDetailsPage {
   //   this.ionEvent.subscribe(EVENTS.facebookShare, () => {
   //     this.unsubscribeFromSocialEvents();
   //     if (this.shareJobWithFacebook(job)) {
-  //       this.addToSharedJobs(job, PLATFORM.facebook);
+  //       this.addToShareduserssharedUsers(job, PLATFORM.facebook);
   //     } else {
   //       this.feedbackProvider.presentToast('Sharing job with Facebook failed, try again');
   //     }
@@ -379,7 +378,7 @@ export class JobDetailsPage {
   //   this.ionEvent.subscribe(EVENTS.twitterShare, () => {
   //     this.unsubscribeFromSocialEvents();
   //     if (this.shareJobWithTwitter(job)) {
-  //       this.addToSharedJobs(job, PLATFORM.twitter);
+  //       this.addToShareduserssharedUsers(job, PLATFORM.twitter);
   //     } else {
   //       this.feedbackProvider.presentToast('Sharing job with Twitter failed, try again');
   //     }
@@ -388,7 +387,7 @@ export class JobDetailsPage {
   //   this.ionEvent.subscribe(EVENTS.instagramShare, () => {
   //     this.unsubscribeFromSocialEvents();
   //     if (this.shareJobWithInstagram(job)) {
-  //       this.addToSharedJobs(job, PLATFORM.instagram);
+  //       this.addToShareduserssharedUsers(job, PLATFORM.instagram);
   //     } else {
   //       this.feedbackProvider.presentToast('Sharing job with Instagram failed, try again');
   //     }

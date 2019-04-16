@@ -34,7 +34,7 @@ export class MyJobsPage {
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
-      this.jobs = data.postedJobs;
+      this.jobs = data.jobs.filter(job => job.uid === this.profile.uid);
     });
   }
 

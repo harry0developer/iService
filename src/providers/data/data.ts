@@ -17,28 +17,18 @@ export class DataProvider {
   collectionName: any;
   dataCollection: AngularFirestoreCollection<Job | User>;
   data$: Observable<Job[] | User[] | Appointment[] | AppliedJob[]>;
-  jobs: Job[] = [];
-  postedJobs: Job[] = [];
-  users: User[] = [];
-  iRated: Rating[] = [];
-  ratedMe: Rating[] = [];
-  appointments: Appointment[] = [];
-  appliedJobs: AppliedJob[] = [];
-  viewedJobs: ViewedJob[] = [];
-  sharedJobs: SharedJob[] = [];
-  candidates: User[] = [];
-  userId: string;
+
   profile: User;
   KM: number = 1.60934;
 
   private userDataSubject = new BehaviorSubject<UserData>(null);
   userData$ = this.userDataSubject.asObservable();
 
-  private jobsSubject = new BehaviorSubject<Job[]>(null);
-  jobs$ = this.jobsSubject.asObservable();
+  // private jobsSubject = new BehaviorSubject<Job[]>(null);
+  // jobs$ = this.jobsSubject.asObservable();
 
-  private usersSubject = new BehaviorSubject<User[]>(null);
-  users$ = this.usersSubject.asObservable();
+  // private usersSubject = new BehaviorSubject<User[]>(null);
+  // users$ = this.usersSubject.asObservable();
 
   userData: UserData = new UserData();
 
@@ -46,43 +36,22 @@ export class DataProvider {
     public afStore: AngularFirestore,
     public afAuth: AngularFirestore,
     private authProvider: AuthProvider) {
-    //  profile, appointments, postedJobs, ratings, viewedJobs, appliedJobs, sharedJobs
-
+    // { users, jobs, appointments, ratings, viewedJobs, appliedJobs, sharedJobs };
     this.profile = this.authProvider.getStoredUser();
     let type = this.profile.type === USER_TYPE.recruiter ? 'rid' : 'uid';
 
-    this.getJobs().subscribe(jobs => {
-      this.jobsSubject.next(jobs);
+    this.getUsers().subscribe(users => {
+      this.userData.setUsers(users);
+      this.updateUserData(this.userData);
     });
 
-    this.getUsers().subscribe(users => {
-      this.usersSubject.next(users);
+    this.getJobs().subscribe(jobs => {
+      this.userData.setJobs(jobs);
+      this.updateUserData(this.userData);
     });
 
     this.getMyAppointments(type, this.profile.uid).subscribe(appointments => {
       this.userData.setAppointments(appointments);
-      this.updateUserData(this.userData);
-    });
-
-    this.getMyPostedJobs(this.profile.uid).subscribe(postedJobs => {
-      this.userData.setPostedJobs(postedJobs);
-      this.updateUserData(this.userData);
-    });
-
-
-    this.getUsersIRated('rid', this.profile.uid).subscribe(iRated => {
-      const rate: RatingData = {
-        iRated
-      };
-      this.userData.setRatings(rate);
-      this.updateUserData(this.userData);
-    });
-
-    this.getUsersRatedMe('uid', this.profile.uid).subscribe(ratedMe => {
-      const rate: RatingData = {
-        ratedMe
-      };
-      this.userData.setRatings(rate);
       this.updateUserData(this.userData);
     });
 
@@ -100,6 +69,27 @@ export class DataProvider {
       this.userData.setSharedJobs(jobs);
       this.updateUserData(this.userData);
     });
+
+    // this.getMyPostedJobs(this.profile.uid).subscribe(postedJobs => {
+    //   this.userData.setPostedJobs(postedJobs);
+    //   this.updateUserData(this.userData);
+    // });
+
+    // this.getUsersIRated('rid', this.profile.uid).subscribe(iRated => {
+    //   const rate: RatingData = {
+    //     iRated
+    //   };
+    //   this.userData.setRatings(rate);
+    //   this.updateUserData(this.userData);
+    // });
+
+    // this.getUsersRatedMe('uid', this.profile.uid).subscribe(ratedMe => {
+    //   const rate: RatingData = {
+    //     ratedMe
+    //   };
+    //   this.userData.setRatings(rate);
+    //   this.updateUserData(this.userData);
+    // });
   }
 
   updateUserData(userData: UserData) {
@@ -128,20 +118,41 @@ export class DataProvider {
     users$.pipe(leftJoin(this.afStore, 'id', 'jid', 'applied-jobs'));
   }
 
-
-  getMappedUsers(jobs, jid): any[] {
-    return jobs.filter(user => jid === user.jid);
-  }
-
-  getMyJobPoster(job: Job): any {
-    if (this.jobs && this.jobs.length > 0) {
-      this.getUserById(job.uid).subscribe(user => {
-        return Object.assign(job, { postedBy: user });
+  getMappedCandidates(users, toBeMappedUsers): User[] {
+    const candidates: User[] = [];
+    users.map(user => {
+      toBeMappedUsers.map(mUser => {
+        if (user.uid === mUser.uid) {
+          candidates.push(user);
+        }
       });
-    }
-    return job;
+    });
+    return candidates;
   }
 
+  getMappedRecruiters(users, toBeMappedUsers): User[] {
+    const recruiters: User[] = [];
+    users.map(user => {
+      toBeMappedUsers.map(mUser => {
+        if (user.uid === mUser.rid) {
+          recruiters.push(user);
+        }
+      });
+    });
+    return recruiters;
+  }
+
+  getMappedJobs(jobs: Job[], toBeMappedJobs): Job[] {
+    const jobz: Job[] = [];
+    jobs.map(job => {
+      toBeMappedJobs.map(mJob => {
+        if (job.id === mJob.jid) {
+          jobz.push(job);
+        }
+      });
+    });
+    return jobz;
+  }
   getMyPostedJobs(id: string): Observable<Job[]> {
     return this.getCollectionByKeyValuePair(COLLECTION.jobs, 'uid', id);
   }
@@ -270,19 +281,19 @@ export class DataProvider {
     return userz;
   }
 
-  mapUsers(users) {
-    let userz = [];
-    if (users && this.users) {
-      users.map(u => {
-        this.users.map(user => {
-          if (u.uid === user.id) {
-            userz.push(user);
-          }
-        });
-      });
-    }
-    return userz;
-  }
+  // mapUsers(users) {
+  //   let userz = [];
+  //   if (users && this.users) {
+  //     users.map(u => {
+  //       this.users.map(user => {
+  //         if (u.uid === user.id) {
+  //           userz.push(user);
+  //         }
+  //       });
+  //     });
+  //   }
+  //   return userz;
+  // }
 
   mapIRated(users, iRated: Rating[]) {
     let raters = [];
@@ -324,6 +335,25 @@ export class DataProvider {
     return rate.toFixed(1);
   }
 
+  getUserData(user: User) {
+    const userData = {
+      viewedJobs: [],
+      appliedJobs: [],
+      sharedJobs: [],
+    }
+    this.userData$.subscribe(data => {
+      if (user.type === USER_TYPE.recruiter) {
+        userData.viewedJobs = data.viewedJobs.filter(job => job.uid === user.uid);
+        userData.appliedJobs = data.appliedJobs.filter(job => job.uid === user.uid);
+        userData.sharedJobs = data.sharedJobs.filter(job => job.uid === user.uid);
+      } else {
+        userData.viewedJobs = data.viewedJobs.filter(job => job.rid === user.uid);
+        userData.appliedJobs = data.appliedJobs.filter(job => job.rid === user.uid);
+        userData.sharedJobs = data.sharedJobs.filter(job => job.rid === user.uid);
+      }
+      return userData;
+    });
+  }
   // getMyAppliedJobs(): AppliedJob[] {
   //   return this.appliedJobs.filter(job => job.uid === this.profile.uid);
   // }

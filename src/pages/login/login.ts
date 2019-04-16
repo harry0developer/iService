@@ -93,42 +93,21 @@ export class LoginPage {
   navigate(user) {
     this.feedbackProvider.presentLoading();
     this.authProvider.storeUser(user);
-    const type = user.type === USER_TYPE.recruiter ? 'rid' : 'uid';
     forkJoin(
+      this.dataProvider.getAllFromCollection(COLLECTION.users).pipe(take(1)),
       this.dataProvider.getAllFromCollection(COLLECTION.jobs).pipe(take(1)),
       this.dataProvider.getAllFromCollection(COLLECTION.appointments).pipe(take(1)),
-      this.dataProvider.getMyPostedJobs(user.uid).pipe(take(1)),
-      this.dataProvider.getUsersIRated('rid', user.uid).pipe(take(1)),
-      this.dataProvider.getUsersRatedMe('uid', user.uid).pipe(take(1)),
+      this.dataProvider.getAllFromCollection(COLLECTION.ratings).pipe(take(1)),
       this.dataProvider.getAllFromCollection(COLLECTION.viewedJobs).pipe(take(1)),
       this.dataProvider.getAllFromCollection(COLLECTION.appliedJobs).pipe(take(1)),
       this.dataProvider.getAllFromCollection(COLLECTION.sharedJobs).pipe(take(1))
-
-      // this.dataProvider.getJobs().pipe(take(1)),
-      // this.dataProvider.getMyAppointments(type, user.uid).pipe(take(1)),
-      // this.dataProvider.getMyPostedJobs(user.uid).pipe(take(1)),
-      // this.dataProvider.getUsersIRated('rid', user.uid).pipe(take(1)),
-      // this.dataProvider.getUsersRatedMe('uid', user.uid).pipe(take(1)),
-      // this.dataProvider.getMyViewedJobs(type, user.uid).pipe(take(1)),
-      // this.dataProvider.getMyAppliedJobs(type, user.uid).pipe(take(1)),
-      // this.dataProvider.getMySharedJobs(type, user.uid).pipe(take(1))
-    ).subscribe(([jobs, appointments, postedJobs, iRated, ratedMe, viewedJobs, appliedJobs, sharedJobs]) => {
+    ).subscribe(([users, jobs, appointments, ratings, viewedJobs, appliedJobs, sharedJobs]) => {
       this.feedbackProvider.dismissLoading();
-      const profile = Object.assign(user, { rating: this.dataProvider.getMyRating(ratedMe) });
-      const ratings = { iRated, ratedMe };
-      const data = { profile, jobs, appointments, postedJobs, ratings, viewedJobs, appliedJobs, sharedJobs };
+      const data = { users, jobs, appointments, ratings, viewedJobs, appliedJobs, sharedJobs };
       this.dataProvider.updateUserData(new UserData(data));
       this.ionEvents.publish(EVENTS.loggedIn, user);
       this.navCtrl.setRoot(DashboardPage, { user });
     });
-    //Amazing left join
-
-    // this.dataProvider.getUserJobsData(user).subscribe(data => {
-    //   this.feedbackProvider.dismissLoading();
-    //   this.dataProvider.userData = data;
-    //   this.authProvider.storeUser(user);
-    //   this.navCtrl.setRoot(DashboardPage);
-    // });
   }
 
   goToSignup() {

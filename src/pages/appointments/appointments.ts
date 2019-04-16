@@ -17,11 +17,11 @@ import { LoginPage } from '../login/login';
   animations: [bounceIn]
 })
 export class AppointmentsPage {
-  profile: any;
   appointment_type: string = 'inProgress';
+  profile: any;
   inProgressAppointments: User[];
   completedAppointments: User[];
-  appointments: Appointment[];
+
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -33,24 +33,18 @@ export class AppointmentsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    this.dataProvider.users$.subscribe(users => {
-      this.dataProvider.userData$.subscribe(data => {
-        if (this.profile.type === USER_TYPE.recruiter) {
-          const appointments = data.appointments.filter(job => job.rid === this.profile.uid);
-          const usersWithAppointments = this.dataProvider.getUserWithAppointmets(this.profile, users, appointments);
-          this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
-          this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
-        } else {
-          const appointments = data.appointments.filter(job => job.uid === this.profile.uid);
-          console.log(appointments);
-
-          const usersWithAppointments = this.dataProvider.getUserWithAppointmets(this.profile, users, appointments);
-          console.log(usersWithAppointments);
-
-          this.completedAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.completed);
-          this.inProgressAppointments = usersWithAppointments.filter(user => user.appointment.status === STATUS.inProgress);
-        }
-      });
+    this.dataProvider.userData$.subscribe(data => {
+      if (this.profile.type === USER_TYPE.recruiter) {
+        const inProgressAppointments = data.appointments.filter(app => app.rid === this.profile.uid && app.status === STATUS.inProgress);
+        const completedAppointments = data.appointments.filter(app => app.rid === this.profile.uid && app.status === STATUS.completed);
+        this.inProgressAppointments = this.dataProvider.getMappedCandidates(data.users, inProgressAppointments);
+        this.completedAppointments = this.dataProvider.getMappedCandidates(data.users, completedAppointments);
+      } else {
+        const inProgressAppointments = data.appointments.filter(app => app.uid === this.profile.uid && app.status === STATUS.inProgress);
+        const completedAppointments = data.appointments.filter(app => app.uid === this.profile.uid && app.status === STATUS.completed);
+        this.inProgressAppointments = this.dataProvider.getMappedRecruiters(data.users, inProgressAppointments);
+        this.completedAppointments = this.dataProvider.getMappedRecruiters(data.users, completedAppointments);
+      }
     });
   }
 

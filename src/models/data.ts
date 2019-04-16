@@ -1,24 +1,21 @@
 import { User } from "./user";
 import { ViewedJob, AppliedJob, SharedJob, Job } from "./job";
 import { Appointment } from "./appointment";
-import { RatingData } from "./rating";
-import { Rating } from "ngx-rating";
+import { RatingData, Rating } from "./rating";
 
 export class UserData {
-    profile: User;
-    postedJobs: Job[];
+    users: User[];
+    jobs: Job[];
     viewedJobs: ViewedJob[];
     appliedJobs: AppliedJob[];
     sharedJobs: SharedJob[];
     appointments: Appointment[];
-    iRated: Rating[];
-    ratedMe: Rating[];
+    ratings: Rating[];
 
-    ratings: RatingData;
     constructor(userData?: any) {
         if (userData) {
-            this.profile = userData.profile;
-            this.postedJobs = userData.postedJobs;
+            this.jobs = userData.jobs;
+            this.users = userData.users;
             this.viewedJobs = userData.viewedJobs;
             this.appliedJobs = userData.appliedJobs;
             this.sharedJobs = userData.sharedJobs;
@@ -27,12 +24,13 @@ export class UserData {
         }
     }
 
-    setProfile(profile: User) {
-        this.profile = profile
+    setUsers(users: User[]) {
+        this.users = users;
     }
-    setPostedJobs(postedJobs: Job[]) {
-        this.postedJobs = postedJobs
+    setJobs(jobs: Job[]) {
+        this.jobs = jobs;
     }
+
     setViewedJobs(viewedJobs: ViewedJob[]) {
         this.viewedJobs = viewedJobs
     }
@@ -45,7 +43,7 @@ export class UserData {
     setAppointments(appointments: Appointment[]) {
         this.appointments = appointments;
     }
-    setRatings(ratings: RatingData) {
+    setRatings(ratings: Rating[]) {
         this.ratings = ratings;
     }
 

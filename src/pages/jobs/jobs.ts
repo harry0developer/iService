@@ -43,12 +43,14 @@ export class JobsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    this.dataProvider.jobs$.subscribe(jobs => {
+    this.dataProvider.userData$.subscribe(data => {
+      console.log(data);
+
       const loc = {
         lat: 19.999,
         lng: -29.000
       }
-      this.jobs = this.dataProvider.applyHaversine(jobs, loc.lat, loc.lng);
+      this.jobs = this.dataProvider.applyHaversine(data.jobs, loc.lat, loc.lng);
     });
   }
 

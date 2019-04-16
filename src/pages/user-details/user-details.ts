@@ -1,19 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events, ActionSheetController, ModalController } from 'ionic-angular';
+import { Component } from '@angular/core';
+import { IonicPage, NavController, NavParams, Events, ActionSheetController } from 'ionic-angular';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { DataProvider } from '../../providers/data/data';
-import { LoginPage } from '../login/login';
 import { User } from '../../models/user';
 import { AuthProvider } from '../../providers/auth/auth';
-import { COLLECTION, EVENTS, STATUS, USER_TYPE } from '../../utils/const';
-import { RatingData } from '../../models/rating';
+import { COLLECTION, EVENTS, STATUS, USER_TYPE, } from '../../utils/const';
 import { Appointment } from '../../models/appointment';
 import { DateProvider } from '../../providers/date/date';
-import { ViewedJob, Job, AppliedJob } from '../../models/job';
-// import { Rating, Rate } from '../../models/Ratings';
-// import { Error } from '../../models/error';
-// import { RatingsModalPage } from '../ratings-modal/ratings-modal';
-
+import { ViewedJob, Job, AppliedJob, SharedJob } from '../../models/job';
+import { UserData } from '../../models/data';
 
 @IonicPage()
 @Component({
@@ -21,59 +16,58 @@ import { ViewedJob, Job, AppliedJob } from '../../models/job';
   templateUrl: 'user-details.html',
 })
 export class UserDetailsPage {
-  profile: any;
-  hired: boolean = false;
-  settings: any;
-  defaultImg: string = '';
-  viewedCandidates: any = [];
-  appliedUsers: any = [];
 
-  postedJobs: Job[] = [];
-  appliedJobs: AppliedJob[] = [];
+
+  profile: User;
+  users: User[] = [];
+  jobs: Job[] = [];
   viewedJobs: ViewedJob[] = [];
+  appliedJobs: AppliedJob[] = [];
+  sharedJobs: SharedJob[] = [];
   appointments: Appointment[] = [];
 
+  user: UserData;
+  hired: boolean = false;
 
-
-  isRated: boolean = false;
-  rating: number;
-  // userRating: Rate;
-
-  fromPage: string;
-  didView: boolean;
-  countViews: number;
-  appointmentDate: string;
-
-  candidateRating: string;
-
-
-  candidate: User;
   constructor(
     public navCtrl: NavController, public navParams: NavParams,
     private feedbackProvider: FeedbackProvider,
     private dataProvider: DataProvider,
     private authProvider: AuthProvider,
     private dateProvider: DateProvider,
-    private events: Events,
     private actionSheetCtrl: ActionSheetController,
     private ionEvent: Events,
-    private modalCtrl: ModalController,
   ) {
-    this.didView = false;
+
   }
 
 
   ionViewDidLoad() {
-    this.candidate = this.navParams.get('user');
+    // this.getUserDetails(this.navParams.get('user'));
+    const user = this.navParams.get('user');
     this.profile = this.authProvider.getStoredUser();
+    console.log(user);
+    console.log(this.profile);
+
+    const userData = {
+      viewedJobs: [],
+      appliedJobs: [],
+      sharedJobs: [],
+    }
     this.dataProvider.userData$.subscribe(data => {
-      this.appointments = data.appointments.filter(app => app.uid === this.candidate.uid);
-      this.viewedJobs = data.viewedJobs.filter(viewed => viewed.uid === this.candidate.uid);
-      this.appliedJobs = data.appliedJobs.filter(applied => applied.uid === this.candidate.uid);
-      this.isUserInAppointment(this.candidate);
-      this.candidateRating = this.dataProvider.getMyRating(data.ratings.ratedMe);
-      this.postedJobs = data.postedJobs;
+      if (user.type === USER_TYPE.recruiter) {
+        userData.viewedJobs = data.viewedJobs.filter(job => job.uid === user.uid);
+        userData.appliedJobs = data.appliedJobs.filter(job => job.uid === user.uid);
+        userData.sharedJobs = data.sharedJobs.filter(job => job.uid === user.uid);
+      } else {
+        userData.viewedJobs = data.viewedJobs.filter(job => job.rid === user.uid);
+        userData.appliedJobs = data.appliedJobs.filter(job => job.rid === user.uid);
+        userData.sharedJobs = data.sharedJobs.filter(job => job.rid === user.uid);
+      }
+      console.log(userData);
     });
+
+    this.profile = this.authProvider.getStoredUser();
   }
 
   isUserInAppointment(user) {
@@ -82,6 +76,39 @@ export class UserDetailsPage {
         this.hired = true;
       }
     });
+  }
+
+  getUserDetails(user) {
+    this.dataProvider.userData$.subscribe(data => {
+
+      if (user.type === USER_TYPE.recruiter) {
+        this.init(user.rid, data);
+        // this.user.postedJobs = data.postedJobs;
+      } else {
+        this.init(user.uid, data);
+        this.isUserInAppointment(user);
+      }
+
+    });
+  }
+
+  init(id: string, data: UserData) {
+    // this.users = data.users;
+    // this.jobs = data.jobs;
+    // this.appliedJobs = data.appliedJobs;
+    // this.viewedJobs = data.viewedJobs;
+    // this.sharedJobs = data.sharedJobs;
+    // this.appointments = data.appointments;
+
+    // this.user = new UserData(data);
+    // console.log(this.user);
+
+
+    // this.user.appliedJobs = data.appliedJobs.filter(job => job.rid === id);
+    // this.user.viewedJobs = data.viewedJobs.filter(job => job.rid === id);
+    // this.user.sharedJobs = data.sharedJobs.filter(job => job.rid === id);
+    // this.user.appointments = data.appointments.filter(job => job.rid === id);
+    // this.user.ratings = data.ratings;
   }
 
   isRecruiter(candidate): boolean {
@@ -155,125 +182,5 @@ export class UserDetailsPage {
     actionSheet.present();
   }
 
-
-  loadMyAppliedJobs() {
-  }
-
-  hasAppointments() {
-  }
-
-  get canRateUser(): boolean {
-    return this.fromPage === 'Appointments' || this.fromPage === 'Ratings';
-  }
-
-  get updateUserRate() {
-    return 0;
-    // const rate = this.rating > 0 ? (this.userRating.rating + this.rating) / 2 : this.userRating.rating;
-    // return (Math.floor(rate * 100) / 100).toFixed(1);
-  }
-
-  get userCanBeRated(): boolean {
-    return true; //this.candidate.appointments;
-  }
-
-  private hasViewedCandidate() {
-
-  }
-
-  private countViewedCandidates(viewed) {
-    // let count = 0;
-    // viewed.forEach(v => {
-    //   if (v.candidate_id_fk == this.candidate.user_id) {
-    //     count++;
-    //   }
-    // });
-    // this.countViews = count;
-  }
-
-
-  private addToViewedHelper() {
-
-  }
-
-  private setData() {
-  }
-
-  // calculateRatings() {
-  //   if (!this.ratings || !this.ratings.user_id_fk) {
-  //     return {
-  //       rating: this.rating,
-  //       user_id_fk: this.candidate.user_id,
-  //       count_raters: 1,
-  //       date_rated: this.dataProvider.getDate()
-  //     }
-  //   } else {
-  //     return {
-  //       rating: (parseInt(this.ratings.rating) + this.rating) / 2,
-  //       user_id_fk: this.candidate.user_id,
-  //       count_raters: parseInt(this.ratings.count_raters) + 1,
-  //       date_rated: this.dataProvider.getDate()
-  //     }
-  //   }
-  // }
-
-
-  calculateAverageRating(rating) {
-    //  return this.userRating && this.userRating.rating ? (rating + this.userRating.rating) / 2 : rating;
-  }
-
-  rateCandidate(rating) {
-
-  }
-
-  rateUser(rating) {
-    this.isRated = true;
-    this.rating = rating;
-  }
-
-  getUserSettings(user, settingz) {
-    let settings;
-    let newSettings;
-    settingz.forEach(s => {
-      if (s.user_id_fk === user.user_id) {
-        settings = s;
-      }
-    });
-    if (settings && settings.hide_dob && settings.hide_email && settings.hide_phone && settings.hide_nationality) {
-      newSettings = {
-        hide_dob: settings.hide_dob === '1' ? true : false,
-        hide_email: settings.hide_email === '1' ? true : false,
-        hide_phone: settings.hide_phone === '1' ? true : false,
-        hide_nationality: settings.hide_nationality === '1' ? true : false,
-      }
-    } else {
-      newSettings = {
-        hide_dob: false,
-        hide_email: false,
-        hide_phone: false,
-        hide_nationality: false,
-      };
-    }
-    return newSettings;
-  }
-
-
-
-  hasBeenHired(user) {
-
-  }
-
-  getLastSeen(date): string {
-    return '';// return this.dataProvider.getDateTime(date);
-  }
-
-
-
-  getDefaultProfilePic(profile) {
-    return '';// return `${this.dataProvider.getMediaUrl()}${profile.gender}.svg`;
-  }
-
-  presentRateUserModal(user) {
-
-  }
 
 }

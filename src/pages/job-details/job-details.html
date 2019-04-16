@@ -26,15 +26,15 @@
     <ion-grid class="info">
       <ion-row>
         <ion-col col-4 class="animated slideInDown" (tap)="viewViewedUsers()">
-          <h2>{{ getUsersViewed() }}</h2>
+          <h2>{{ viewedUsers.length || 0 }}</h2>
           <p>Viewed</p>
         </ion-col>
         <ion-col col-4 class="animated slideInDown" (tap)="viewAppliedUsers()">
-          <h2>{{ getUsersApplied() }}</h2>
+          <h2>{{ appliedUsers.length || 0 }}</h2>
           <p>Applied</p>
         </ion-col>
         <ion-col col-4 class="animated slideInDown" (tap)="viewSharedUsers()">
-          <h2>{{ getUsersShared() }}</h2>
+          <h2>{{ sharedUsers.length || 0 }}</h2>
           <p>Shared</p>
         </ion-col>
       </ion-row>

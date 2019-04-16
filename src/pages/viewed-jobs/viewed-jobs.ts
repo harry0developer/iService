@@ -22,9 +22,8 @@ export class ViewedJobsPage {
   appliedJobs: Job[] = [];
   viewedJobs: Job[] = [];
   sharedJobs: Job[] = [];
-  appointments: Appointment[] = [];
   jobs: Job[] = [];
-  category: string = '';
+  category: string = 'viewed';
   pageTitle: string = '';
   profile: any;
   constructor(
@@ -39,31 +38,23 @@ export class ViewedJobsPage {
   }
 
   ionViewDidLoad() {
-    this.category = 'viewed';
+    this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
-      this.dataProvider.jobs$.subscribe(jobs => {
-        this.jobs = jobs;
-        this.profile = data.profile;
-
-        if (this.profile.type === USER_TYPE.recruiter) {
-          const appliedJobs = data.appliedJobs.filter(job => job.rid === this.profile.uid);
-          const viewedJobs = data.viewedJobs.filter(job => job.rid === this.profile.uid);
-          const sharedJobs = data.sharedJobs.filter(job => job.rid === this.profile.uid);
-
-          this.appliedJobs = this.dataProvider.mapJobs(this.jobs, appliedJobs);
-          this.viewedJobs = this.dataProvider.mapJobs(this.jobs, viewedJobs);
-          this.sharedJobs = this.dataProvider.mapJobs(this.jobs, sharedJobs);
-        } else {
-          const appliedJobs = data.appliedJobs.filter(job => job.uid === this.profile.uid);
-          const viewedJobs = data.viewedJobs.filter(job => job.uid === this.profile.uid);
-          const sharedJobs = data.sharedJobs.filter(job => job.uid === this.profile.uid);
-
-          this.appliedJobs = this.dataProvider.mapJobs(this.jobs, appliedJobs);
-          this.viewedJobs = this.dataProvider.mapJobs(this.jobs, viewedJobs);
-          this.sharedJobs = this.dataProvider.mapJobs(this.jobs, sharedJobs);
-
-        }
-      });
+      if (this.profile.type === USER_TYPE.recruiter) {
+        const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid)
+        const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid)
+        const shared = data.sharedJobs.filter(job => job.rid === this.profile.uid)
+        this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, applied);
+        this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, viewed);
+        this.sharedJobs = this.dataProvider.getMappedJobs(data.jobs, shared);
+      } else {
+        const applied = data.appliedJobs.filter(job => job.uid === this.profile.uid)
+        const viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid)
+        const shared = data.sharedJobs.filter(job => job.uid === this.profile.uid)
+        this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, applied);
+        this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, viewed);
+        this.sharedJobs = this.dataProvider.getMappedJobs(data.jobs, shared);
+      }
     });
   }
 
@@ -112,29 +103,6 @@ export class ViewedJobsPage {
     return this.sharedJobs;
   }
 
-  getAppointments(): Array<any> {
-    this.category = 'appointments';
-    // this.appointments = this.dataProvider.getMyAppointments(this.profile.user_id, this.profile.type);
-    return this.appointments;
-  }
-
-  getCategoryInfo(category) {
-    switch (category) {
-      case 'applied':
-        this.pageTitle = 'My Applied Jobs';
-        return this.getAppliedJobs();
-      case 'viewed':
-        this.pageTitle = 'My Viewed Jobs';
-        return this.getViewedJobs();
-
-      case 'shared':
-        this.pageTitle = 'My Shared Jobs';
-        return this.getSharedJobs();
-
-      default:
-        return [];
-    }
-  }
 
   isRecruiter() {
     return this.profile && this.profile.type === 'recruiter';

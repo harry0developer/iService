@@ -7,6 +7,7 @@ import { AuthProvider } from '../../providers/auth/auth';
 import { bounceIn } from '../../utils/animations';
 import { Rating, RatingData } from '../../models/rating';
 import { User } from '../../models/user';
+import { USER_TYPE } from '../../utils/const';
 
 @IonicPage()
 @Component({
@@ -15,10 +16,8 @@ import { User } from '../../models/user';
   animations: [bounceIn]
 })
 export class RatingsPage {
-  usersIRated: Rating[] = [];
-  usersRatedMe: Rating[] = [];
-  userRatings: RatingData;
-  users = [];
+  usersIRated: User[] = [];
+  usersRatedMe: User[] = [];
   profile: User;
   ratings: string = 'ratedMe';
 
@@ -35,12 +34,19 @@ export class RatingsPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    this.users = this.dataProvider.users;
     this.dataProvider.userData$.subscribe(data => {
-      this.dataProvider.users$.subscribe(users => {
-        this.usersIRated = this.dataProvider.mapIRated(users, data.ratings.iRated);
-        this.usersRatedMe = this.dataProvider.mapIRated(users, data.ratings.ratedMe);
-      });
+      if (this.profile.type === USER_TYPE.recruiter) {
+        const usersIRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
+        const usersRatedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);
+        this.usersIRated = this.dataProvider.getMappedCandidates(data.users, usersIRated);
+        this.usersRatedMe = this.dataProvider.getMappedRecruiters(data.users, usersRatedMe);
+
+      } else {
+        const usersIRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
+        const usersRatedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);
+        this.usersIRated = this.dataProvider.getMappedRecruiters(data.users, usersIRated);
+        this.usersRatedMe = this.dataProvider.getMappedCandidates(data.users, usersRatedMe);
+      }
     });
   }
 
