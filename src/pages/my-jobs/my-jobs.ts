@@ -6,6 +6,7 @@ import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { bounceIn } from '../../utils/animations';
 import { AuthProvider } from '../../providers/auth/auth';
 import { DateProvider } from '../../providers/date/date';
+import { ViewedJob } from '../../models/job';
 
 @IonicPage()
 @Component({
@@ -16,6 +17,7 @@ import { DateProvider } from '../../providers/date/date';
 export class MyJobsPage {
   profile: any;
   jobs: any = [];
+  viewedJobs: ViewedJob[] = [];
 
   constructor(
     public navCtrl: NavController,
@@ -35,6 +37,7 @@ export class MyJobsPage {
     this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
       this.jobs = data.jobs.filter(job => job.uid === this.profile.uid);
+      this.viewedJobs = data.viewedJobs;
     });
   }
 
@@ -50,6 +53,17 @@ export class MyJobsPage {
     return this.dateProvider.getDateFromNow(date);
   }
 
-  jobDetails() { }
+  getUsersViewed(job): number {
+    let views = 0;
+    this.viewedJobs.forEach(vjob => {
+      if (vjob.jid === job.id) {
+        views++;
+      }
+    });
+    return views;
+  }
 
+  jobDetails(job) {
+    this.navCtrl.push(JobDetailsPage, { job });
+  }
 }
