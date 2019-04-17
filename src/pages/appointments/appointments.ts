@@ -19,6 +19,7 @@ import { LoginPage } from '../login/login';
 export class AppointmentsPage {
   appointment_type: string = 'inProgress';
   profile: any;
+  appointments: Appointment[] = []
   inProgressAppointments: User[];
   completedAppointments: User[];
 
@@ -35,13 +36,15 @@ export class AppointmentsPage {
     this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
       if (this.profile.type === USER_TYPE.recruiter) {
-        const inProgressAppointments = data.appointments.filter(app => app.rid === this.profile.uid && app.status === STATUS.inProgress);
-        const completedAppointments = data.appointments.filter(app => app.rid === this.profile.uid && app.status === STATUS.completed);
+        this.appointments = data.appointments.filter(app => app.rid === this.profile.uid);
+        const inProgressAppointments = this.appointments.filter(app => app.rid === this.profile.uid && app.status === STATUS.inProgress);
+        const completedAppointments = this.appointments.filter(app => app.rid === this.profile.uid && app.status === STATUS.completed);
         this.inProgressAppointments = this.dataProvider.getMappedCandidates(data.users, inProgressAppointments);
         this.completedAppointments = this.dataProvider.getMappedCandidates(data.users, completedAppointments);
       } else {
-        const inProgressAppointments = data.appointments.filter(app => app.uid === this.profile.uid && app.status === STATUS.inProgress);
-        const completedAppointments = data.appointments.filter(app => app.uid === this.profile.uid && app.status === STATUS.completed);
+        this.appointments = data.appointments.filter(app => app.uid === this.profile.uid);
+        const inProgressAppointments = this.appointments.filter(app => app.uid === this.profile.uid && app.status === STATUS.inProgress);
+        const completedAppointments = this.appointments.filter(app => app.uid === this.profile.uid && app.status === STATUS.completed);
         this.inProgressAppointments = this.dataProvider.getMappedRecruiters(data.users, inProgressAppointments);
         this.completedAppointments = this.dataProvider.getMappedRecruiters(data.users, completedAppointments);
       }

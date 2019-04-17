@@ -69,9 +69,11 @@ export class UserDetailsPage {
 
   isUserInAppointment() {
     this.appointments.forEach(app => {
-      if (app.uid === this.user.uid && app.status === STATUS.inProgress) {
-        this.hired = true;
+      if (app.uid === this.user.uid) {
         this.appointment = app;
+        if (app.status === STATUS.inProgress) {
+          this.hired = true;
+        }
       }
     });
   }
@@ -88,11 +90,9 @@ export class UserDetailsPage {
     return false;
   }
 
-  updateAppointment() {
+  updateAppointment(appointment) {
     this.feedbackProvider.presentLoading();
-    this.appointment.status = STATUS.completed;
-    this.appointment.dateCompleted = this.dateProvider.getDate();
-    this.dataProvider.updateItem(COLLECTION.appointments, this.appointment, this.appointment.id).then(() => {
+    this.dataProvider.updateItem(COLLECTION.appointments, appointment, appointment.id).then(() => {
       this.hired = false;
       this.feedbackProvider.dismissLoading();
       this.feedbackProvider.presentToast('Appointment completed successfully');
@@ -103,24 +103,38 @@ export class UserDetailsPage {
     });
   }
 
+  makeAppointment() {
+    this.appointment.status = STATUS.completed;
+    this.appointment.dateCompleted = this.dateProvider.getDate();
+    this.updateAppointment(this.appointment);
+  }
+
   createAppointment() {
-    this.feedbackProvider.presentLoading();
-    const appointment: Appointment = {
-      uid: this.user.id,
-      rid: this.profile.uid,
-      status: STATUS.inProgress,
-      dateCreated: this.dateProvider.getDate(),
-      dateCompleted: ''
+    if (this.appointment && this.appointment.id) {
+      this.appointment.status = STATUS.inProgress;
+      this.appointment.dateCreated = this.dateProvider.getDate();
+      this.appointment.dateCompleted = '';
+      this.updateAppointment(this.appointment);
+    } else {
+      this.feedbackProvider.presentLoading();
+      this.appointment = {
+        uid: this.user.id,
+        rid: this.profile.uid,
+        status: STATUS.inProgress,
+        dateCreated: this.dateProvider.getDate(),
+        dateCompleted: ''
+      }
+
+      this.dataProvider.addNewItem(COLLECTION.appointments, this.appointment).then(() => {
+        this.hired = true;
+        this.feedbackProvider.dismissLoading();
+        this.feedbackProvider.presentToast('Appointment made successfully');
+      }).catch(err => {
+        console.log(err);
+        this.feedbackProvider.dismissLoading();
+        this.feedbackProvider.presentErrorAlert('Making appointment', 'An error occured while making an appointment');
+      });
     }
-    this.dataProvider.addNewItem(COLLECTION.appointments, appointment).then(() => {
-      this.hired = true;
-      this.feedbackProvider.dismissLoading();
-      this.feedbackProvider.presentToast('Appointment made successfully');
-    }).catch(err => {
-      console.log(err);
-      this.feedbackProvider.dismissLoading();
-      this.feedbackProvider.presentErrorAlert('Making appointment', 'An error occured while making an appointment');
-    });
   }
 
 
@@ -132,7 +146,7 @@ export class UserDetailsPage {
           text: 'Complete appointment',
           role: 'destructive',
           handler: () => {
-            this.updateAppointment();
+            this.makeAppointment();
           }
         },
         {
