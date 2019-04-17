@@ -105,8 +105,8 @@ export class AuthProvider {
     return this.afAuth.auth.signOut();
   }
 
-  isRecruiter(profile): boolean {
-    return profile && profile.type === USER_TYPE.recruiter;
+  isRecruiter(user): boolean {
+    return user && user.type === USER_TYPE.recruiter;
   }
 
 }

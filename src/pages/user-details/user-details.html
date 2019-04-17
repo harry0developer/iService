@@ -2,7 +2,7 @@
     <ion-navbar color="dark">
       <ion-title>User Profile</ion-title>
       <!-- <ion-buttons end *ngIf="userCanBeRated">
-        <button ion-button icon-only (click)="presentRateUserModal(candidate)">
+        <button ion-button icon-only (click)="presentRateUserModal(user)">
           <ion-icon name="star"></ion-icon>
         </button>
       </ion-buttons> -->
@@ -10,7 +10,7 @@
   </ion-header>
   
   <ion-content>
-    <div class="top" *ngIf="candidate">
+    <div class="top" *ngIf="user">
       <div class="status-info animated slideInDown" *ngIf="hasAppointments()">
         <i class="fa fa-info-circle"></i>
         <!-- Job offered <span class="date">{{ appointmentDate }}</span> -->
@@ -19,24 +19,24 @@
         <i class="fa fa-calendar" item-start></i>
         Offered Job
       </div>
-      <div class="animated slideInRight distance" [hidden]="!candidate.distance">
+      <div class="animated slideInRight distance" [hidden]="!user.distance">
         <ion-icon name="pin" item-start></ion-icon>
-        {{candidate.distance}} KM
+        {{user.distance}} KM
       </div>
     -->
       <div class="profile-image">
         <div class="imagex">
-          <img class="image animated slideInLeft" [src]="profilePicture(candidate)" (error)="img.src = getDefaultProfilePic(candidate)" #img alt="profile">
+          <img class="image animated slideInLeft" [src]="profilePicture(user)" (error)="img.src = getDefaultProfilePic(user)" #img alt="profile">
           <span class="ratings animated slideInRight">
            <i class="fa fa-star"></i> 
            <br>
-           {{ candidateRating }}
+           {{ rating }}
           </span>
         </div>
       </div>
   
-      <h2 class="animated slideInRight">{{candidate.firstname}} {{candidate.lastname}} </h2>
-      <p class="animated slideInLeft">{{candidate.title || candidate.type}}</p>
+      <h2 class="animated slideInRight">{{user.firstname}} {{user.lastname}} </h2>
+      <p class="animated slideInLeft">{{user.title || user.type}}</p>
       <!-- <span class="animated slideInDown">
         <rating *ngIf="!canRateUser" [float]="true" [(ngModel)]="userRating.rating" [readonly]="true"></rating>
         <rating *ngIf="canRateUser" [float]="true" [(ngModel)]="ratings" (click)="rateUser(ratings)"></rating>
@@ -59,11 +59,11 @@
       </div> -->
   
       <div class="row summary">
-        <div class="col animated slideInDown col-4" *ngIf="isRecruiter(candidate)">
+        <div class="col animated slideInDown col-4" *ngIf="isRecruiter(user)">
           <h2>{{postedJobs?.length || 0}}</h2>
           <p>Jobs Posted</p>
         </div>
-        <div class="col animated slideInDown col-4" *ngIf="!isRecruiter(candidate)">
+        <div class="col animated slideInDown col-4" *ngIf="!isRecruiter(user)">
           <h2>{{appliedJobs?.length || 0}}</h2>
           <p *ngIf="appliedJobs?.length != 1">Jobs Applied</p>
           <p *ngIf="appliedJobs?.length == 1">Job Applied</p>
@@ -74,68 +74,68 @@
           <p *ngIf="viewedJobs?.length == 1">Job Viewed</p>
         </div>
         <div class="col animated slideInDown col-4">
-          <h2>{{appointments?.length || 0}}</h2>
+          <h2>{{appointmentsInProgress?.length || 0}}</h2>
           <p *ngIf="appointments?.length != 1">Appointments</p>
           <p *ngIf="appointments?.length == 1">Appointment</p>
         </div>
       </div>
     </div>
   
-    <div *ngIf="candidate" class="info">
+    <div *ngIf="user" class="info">
       <ion-grid>
         <ion-row>
           <ion-col col-6 class="animated zoomIn">
             <h2>
-              <i [ngClass]="candidate.gender === 'male' ? 'fa fa-male enlarge' : 'fa fa-female enlarge'" item-start></i>
+              <i [ngClass]="user.gender === 'male' ? 'fa fa-male enlarge' : 'fa fa-female enlarge'" item-start></i>
             </h2>
-            <p>{{candidate.gender}}</p>
+            <p>{{user.gender}}</p>
           </ion-col>
           <ion-col col-6 class="animated zoomIn">
             <h2>
               <i class="fa fa-calendar" item-start></i>
             </h2>
-            <p>{{candidate.dob}}</p>
+            <p>{{user.dob}}</p>
           </ion-col>
         </ion-row>
   
         <ion-row>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_dob || !candidate.race">
+          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_dob || !user.race">
             <h2>
               <i class="fa fa-users" item-start></i>
             </h2>
-            <p>{{candidate.race}}</p>
+            <p>{{user.race}}</p>
           </ion-col>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_nationality || !candidate.nationality">
+          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_nationality || !user.nationality">
             <h2>
               <i class="fa fa-flag" item-start></i>
             </h2>
-            <p>{{candidate.nationality}}</p>
+            <p>{{user.nationality}}</p>
           </ion-col>
         </ion-row>
         <ion-row>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_phone || !candidate.phone">
+          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_phone || !user.phone">
             <h2>
               <i class="fa fa-phone enlarge" item-start></i>
             </h2>
-            <p>{{candidate.phone}}</p>
+            <p>{{user.phone}}</p>
           </ion-col>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_email || !candidate.email">
+          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_email || !user.email">
             <h2>
               <i class="fa fa-envelope" item-start></i>
             </h2>
-            <p>{{candidate.email}}</p>
+            <p>{{user.email}}</p>
           </ion-col>
         </ion-row>
   
       </ion-grid>
     </div>
   
-    <div *ngIf="isRecruiter()">
+    <div *ngIf="isRecruiter(profile)">
       <div padding [hidden]="hired">
-        <button ion-button color="light" class="dark" block (click)="makeAppointment(candidate)">Make Appointment</button>
+        <button ion-button color="light" class="dark" block (click)="createAppointment()">Make Appointment</button>
       </div>
       <div padding [hidden]="!hired">
-        <button ion-button color="light" class="dark" block (click)="completeAppointment(candidate)">Complete Appointment</button>
+        <button ion-button color="light" class="dark" block (click)="completeAppointmentActionSheet()">Complete Appointment</button>
       </div>
     </div>
   

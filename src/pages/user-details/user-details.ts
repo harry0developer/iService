@@ -19,14 +19,16 @@ export class UserDetailsPage {
 
 
   profile: User;
-  users: User[] = [];
-  jobs: Job[] = [];
   viewedJobs: ViewedJob[] = [];
   appliedJobs: AppliedJob[] = [];
   sharedJobs: SharedJob[] = [];
+  postedJobs: Job[] = [];
   appointments: Appointment[] = [];
+  appointment: any;
+  appointmentsInProgress: Appointment[] = [];
+  rating: string;
 
-  user: UserData;
+  user: User;
   hired: boolean = false;
 
   constructor(
@@ -43,93 +45,74 @@ export class UserDetailsPage {
 
 
   ionViewDidLoad() {
-    // this.getUserDetails(this.navParams.get('user'));
-    const user = this.navParams.get('user');
+    this.user = this.navParams.get('user');
     this.profile = this.authProvider.getStoredUser();
-    console.log(user);
-    console.log(this.profile);
-
-    const userData = {
-      viewedJobs: [],
-      appliedJobs: [],
-      sharedJobs: [],
-    }
     this.dataProvider.userData$.subscribe(data => {
-      if (user.type === USER_TYPE.recruiter) {
-        userData.viewedJobs = data.viewedJobs.filter(job => job.uid === user.uid);
-        userData.appliedJobs = data.appliedJobs.filter(job => job.uid === user.uid);
-        userData.sharedJobs = data.sharedJobs.filter(job => job.uid === user.uid);
+      if (this.user.type === USER_TYPE.recruiter) {
+        this.viewedJobs = data.viewedJobs.filter(job => job.rid === this.user.uid);
+        this.appliedJobs = data.appliedJobs.filter(job => job.rid === this.user.uid);
+        this.sharedJobs = data.sharedJobs.filter(job => job.rid === this.user.uid);
+        this.postedJobs = data.jobs.filter(job => job.uid === this.user.uid);
+        this.appointments = data.appointments.filter(app => app.rid === this.user.uid);
+        this.appointmentsInProgress = data.appointments.filter(app => app.rid === this.user.uid && app.status === STATUS.inProgress);
       } else {
-        userData.viewedJobs = data.viewedJobs.filter(job => job.rid === user.uid);
-        userData.appliedJobs = data.appliedJobs.filter(job => job.rid === user.uid);
-        userData.sharedJobs = data.sharedJobs.filter(job => job.rid === user.uid);
+        this.viewedJobs = data.viewedJobs.filter(job => job.uid === this.user.uid);
+        this.appliedJobs = data.appliedJobs.filter(job => job.uid === this.user.uid);
+        this.sharedJobs = data.sharedJobs.filter(job => job.uid === this.user.uid);
+        this.appointments = data.appointments.filter(app => app.uid === this.user.uid);
+        this.appointmentsInProgress = data.appointments.filter(app => app.uid === this.user.uid && app.status === STATUS.inProgress);
+        this.isUserInAppointment();
       }
-      console.log(userData);
+      this.rating = this.dataProvider.getMyRating(data.ratings.filter(user => user.uid === this.user.uid));
     });
-
-    this.profile = this.authProvider.getStoredUser();
   }
 
-  isUserInAppointment(user) {
+  isUserInAppointment() {
     this.appointments.forEach(app => {
-      if (app.uid === user.id && app.status === STATUS.inProgress) {
+      if (app.uid === this.user.uid && app.status === STATUS.inProgress) {
         this.hired = true;
+        this.appointment = app;
       }
     });
   }
 
-  getUserDetails(user) {
-    this.dataProvider.userData$.subscribe(data => {
-
-      if (user.type === USER_TYPE.recruiter) {
-        this.init(user.rid, data);
-        // this.user.postedJobs = data.postedJobs;
-      } else {
-        this.init(user.uid, data);
-        this.isUserInAppointment(user);
-      }
-
-    });
-  }
-
-  init(id: string, data: UserData) {
-    // this.users = data.users;
-    // this.jobs = data.jobs;
-    // this.appliedJobs = data.appliedJobs;
-    // this.viewedJobs = data.viewedJobs;
-    // this.sharedJobs = data.sharedJobs;
-    // this.appointments = data.appointments;
-
-    // this.user = new UserData(data);
-    // console.log(this.user);
-
-
-    // this.user.appliedJobs = data.appliedJobs.filter(job => job.rid === id);
-    // this.user.viewedJobs = data.viewedJobs.filter(job => job.rid === id);
-    // this.user.sharedJobs = data.sharedJobs.filter(job => job.rid === id);
-    // this.user.appointments = data.appointments.filter(job => job.rid === id);
-    // this.user.ratings = data.ratings;
-  }
-
-  isRecruiter(candidate): boolean {
-    return this.authProvider.isRecruiter(candidate);
+  isRecruiter(user): boolean {
+    return this.authProvider.isRecruiter(user);
   }
 
   profilePicture(user): string {
     return `../../assets/imgs/users/${user.gender}.svg`;
   }
 
-  makeAppointment(user) {
+  hasAppointments() {
+    return false;
+  }
+
+  updateAppointment() {
+    this.feedbackProvider.presentLoading();
+    this.appointment.status = STATUS.completed;
+    this.appointment.dateCompleted = this.dateProvider.getDate();
+    this.dataProvider.updateItem(COLLECTION.appointments, this.appointment, this.appointment.id).then(() => {
+      this.hired = false;
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentToast('Appointment completed successfully');
+    }).catch(err => {
+      console.log(err);
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentErrorAlert('Making appointment', 'An error occured while making an appointment');
+    });
+  }
+
+  createAppointment() {
     this.feedbackProvider.presentLoading();
     const appointment: Appointment = {
-      uid: user.id,
+      uid: this.user.id,
       rid: this.profile.uid,
       status: STATUS.inProgress,
       dateCreated: this.dateProvider.getDate(),
-      dateCompleted: '',
+      dateCompleted: ''
     }
     this.dataProvider.addNewItem(COLLECTION.appointments, appointment).then(() => {
-      this.ionEvent.publish(EVENTS.appointmentsUpdated);
       this.hired = true;
       this.feedbackProvider.dismissLoading();
       this.feedbackProvider.presentToast('Appointment made successfully');
@@ -141,26 +124,7 @@ export class UserDetailsPage {
   }
 
 
-  completeAppointment(user) {
-    this.feedbackProvider.presentLoading();
-    const newUpdatedAppointment: Appointment = {
-      uid: user.id,
-      rid: this.profile.uid,
-      status: STATUS.completed,
-      dateCompleted: this.dateProvider.getDate()
-    }
-    this.dataProvider.updateItem(COLLECTION.appointments, newUpdatedAppointment, user.appointment.id).then(() => {
-      this.hired = false;
-      this.feedbackProvider.dismissLoading();
-      this.feedbackProvider.presentToast('Appointment completed successfully');
-    }).catch(err => {
-      console.log(err);
-      this.feedbackProvider.dismissLoading();
-      this.feedbackProvider.presentErrorAlert('Making appointment', 'An error occured while making an appointment');
-    });
-  }
-
-  completeAppointmentActionSheep(candidate) {
+  completeAppointmentActionSheet() {
     let actionSheet = this.actionSheetCtrl.create({
       title: 'You are about to complete the appointment',
       buttons: [
@@ -168,7 +132,7 @@ export class UserDetailsPage {
           text: 'Complete appointment',
           role: 'destructive',
           handler: () => {
-            this.completeAppointment(candidate);
+            this.updateAppointment();
           }
         },
         {
