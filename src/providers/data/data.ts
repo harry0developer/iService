@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { map, distinct } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Job, ViewedJob, SharedJob, AppliedJob } from '../../models/job';
 import { User } from '../../models/user';
@@ -153,6 +153,13 @@ export class DataProvider {
     });
     return jobz;
   }
+
+  removeDuplicates(array, key: string) {
+    return array.filter((obj, pos, arr) => {
+      return arr.map(mapObj => mapObj[key]).indexOf(obj[key]) === pos;
+    });
+  }
+
   getMyPostedJobs(id: string): Observable<Job[]> {
     return this.getCollectionByKeyValuePair(COLLECTION.jobs, 'uid', id);
   }

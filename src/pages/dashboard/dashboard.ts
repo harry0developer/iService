@@ -51,20 +51,32 @@ export class DashboardPage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
+
     this.dataProvider.userData$.subscribe(data => {
+
       if (this.profile.type === USER_TYPE.recruiter) {
-        this.appliedJobs = data.appliedJobs.filter(job => job.rid === this.profile.uid);
-        this.viewedJobs = data.viewedJobs.filter(job => job.rid === this.profile.uid);
-        this.sharedJobs = data.sharedJobs.filter(job => job.rid === this.profile.uid);
+        const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid);
+        const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid);
+        const shared = data.sharedJobs.filter(job => job.rid === this.profile.uid);
+
+        this.appliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
+        this.sharedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
+        this.viewedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+
         this.appointments = data.appointments.filter(job => job.rid === this.profile.uid);
         this.postedJobs = data.jobs.filter(job => job.uid === this.profile.uid);
         this.ratings.iRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
         this.ratings.ratedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);
         this.myRating = this.dataProvider.getMyRating(this.ratings.ratedMe);
       } else {
-        this.appliedJobs = data.appliedJobs.filter(job => job.uid === this.profile.uid);
-        this.viewedJobs = data.viewedJobs.filter(job => job.uid === this.profile.uid);
-        this.sharedJobs = data.sharedJobs.filter(job => job.uid === this.profile.uid);
+        const applied = data.appliedJobs.filter(job => job.uid === this.profile.uid);
+        const viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid);
+        const shared = data.sharedJobs.filter(job => job.uid === this.profile.uid);
+
+        this.appliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
+        this.viewedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
+        this.sharedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+
         this.appointments = data.appointments.filter(job => job.uid === this.profile.uid);
         this.ratings.iRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
         this.ratings.ratedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);

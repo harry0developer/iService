@@ -41,19 +41,29 @@ export class ViewedJobsPage {
     this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
       if (this.profile.type === USER_TYPE.recruiter) {
-        const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid)
-        const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid)
-        const shared = data.sharedJobs.filter(job => job.rid === this.profile.uid)
-        this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, applied);
-        this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, viewed);
-        this.sharedJobs = this.dataProvider.getMappedJobs(data.jobs, shared);
+        const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid);
+        const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid);
+        const shared = data.sharedJobs.filter(job => job.rid === this.profile.uid);
+
+        const uniqueAppliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
+        const uniqueSharedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
+        const uniqueViewedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+
+        this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueAppliedJobs);
+        this.sharedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueSharedJobs);
+        this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueViewedJobs);
       } else {
-        const applied = data.appliedJobs.filter(job => job.uid === this.profile.uid)
-        const viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid)
-        const shared = data.sharedJobs.filter(job => job.uid === this.profile.uid)
-        this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, applied);
-        this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, viewed);
-        this.sharedJobs = this.dataProvider.getMappedJobs(data.jobs, shared);
+        const applied = data.appliedJobs.filter(job => job.uid === this.profile.uid);
+        const viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid);
+        const shared = data.sharedJobs.filter(job => job.uid === this.profile.uid);
+
+        const uniqueAppliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
+        const uniqueSharedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
+        const uniqueViewedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+
+        this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueAppliedJobs);
+        this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueViewedJobs);
+        this.sharedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueSharedJobs);
       }
     });
   }
