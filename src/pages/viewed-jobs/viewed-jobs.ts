@@ -5,10 +5,8 @@ import { DataProvider } from '../../providers/data/data';
 import { AuthProvider } from '../../providers/auth/auth';
 import { bounceIn } from '../../utils/animations';
 import { DateProvider } from '../../providers/date/date';
-import { EVENTS, USER_TYPE } from '../../utils/const';
-import { AppliedJob, ViewedJob, SharedJob, Job } from '../../models/job';
-import { Appointment } from '../../models/appointment';
-import { User } from 'firebase';
+import { USER_TYPE } from '../../utils/const';
+import { Job, AppliedJob, SharedJob, ViewedJob } from '../../models/job';
 
 @IonicPage()
 @Component({
@@ -22,6 +20,11 @@ export class ViewedJobsPage {
   appliedJobs: Job[] = [];
   viewedJobs: Job[] = [];
   sharedJobs: Job[] = [];
+
+  applied: AppliedJob[] = [];
+  shared: SharedJob[] = [];
+  viewed: ViewedJob[] = [];
+
   jobs: Job[] = [];
   category: string = 'viewed';
   pageTitle: string = '';
@@ -41,25 +44,25 @@ export class ViewedJobsPage {
     this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
       if (this.profile.type === USER_TYPE.recruiter) {
-        const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid);
-        const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid);
-        const shared = data.sharedJobs.filter(job => job.rid === this.profile.uid);
+        this.applied = data.appliedJobs.filter(job => job.rid === this.profile.uid);
+        this.viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid);
+        this.shared = data.sharedJobs.filter(job => job.rid === this.profile.uid);
 
-        const uniqueAppliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
-        const uniqueSharedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
-        const uniqueViewedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+        const uniqueAppliedJobs = this.dataProvider.removeDuplicates(this.applied, 'jid');
+        const uniqueSharedJobs = this.dataProvider.removeDuplicates(this.shared, 'jid');
+        const uniqueViewedJobs = this.dataProvider.removeDuplicates(this.viewed, 'jid');
 
         this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueAppliedJobs);
         this.sharedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueSharedJobs);
         this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueViewedJobs);
       } else {
-        const applied = data.appliedJobs.filter(job => job.uid === this.profile.uid);
-        const viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid);
-        const shared = data.sharedJobs.filter(job => job.uid === this.profile.uid);
+        this.applied = data.appliedJobs.filter(job => job.uid === this.profile.uid);
+        this.viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid);
+        this.shared = data.sharedJobs.filter(job => job.uid === this.profile.uid);
 
-        const uniqueAppliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
-        const uniqueSharedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
-        const uniqueViewedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+        const uniqueAppliedJobs = this.dataProvider.removeDuplicates(this.applied, 'jid');
+        const uniqueSharedJobs = this.dataProvider.removeDuplicates(this.shared, 'jid');
+        const uniqueViewedJobs = this.dataProvider.removeDuplicates(this.viewed, 'jid');
 
         this.appliedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueAppliedJobs);
         this.viewedJobs = this.dataProvider.getMappedJobs(data.jobs, uniqueViewedJobs);
@@ -70,8 +73,8 @@ export class ViewedJobsPage {
 
   countApplied(job) {
     let count = 0;
-    this.appliedJobs.map(aJob => {
-      if (job.id === aJob.id) {
+    this.applied.map(aJob => {
+      if (job.id === aJob.jid) {
         count++;
       }
     });
@@ -80,8 +83,8 @@ export class ViewedJobsPage {
 
   countViewed(job) {
     let count = 0;
-    this.viewedJobs.map(aJob => {
-      if (job.id === aJob.id) {
+    this.viewed.map(aJob => {
+      if (job.id === aJob.jid) {
         count++;
       }
     });
@@ -90,8 +93,8 @@ export class ViewedJobsPage {
 
   countShared(job) {
     let count = 0;
-    this.sharedJobs.map(aJob => {
-      if (job.id === aJob.id) {
+    this.shared.map(aJob => {
+      if (job.id === aJob.jid) {
         count++;
       }
     });
