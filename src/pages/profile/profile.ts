@@ -4,10 +4,11 @@ import { DataProvider } from '../../providers/data/data';
 import { slideIn, listSlideUp } from '../../utils/animations';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { AuthProvider } from '../../providers/auth/auth';
-import { COLLECTION } from '../../utils/const';
+import { COLLECTION, USER_TYPE } from '../../utils/const';
 import { Appointment } from '../../models/appointment';
 import { LoginPage } from '../login/login';
-import { AppliedJob } from '../../models/job';
+import { AppliedJob, Job, ViewedJob, SharedJob } from '../../models/job';
+import { RatingData } from '../../models/rating';
 
 declare var cordova: any;
 
@@ -19,67 +20,62 @@ declare var cordova: any;
 })
 
 export class ProfilePage {
-  profile: any;
-  job: any;
-  countViewed: number;
-  appliedViewed: number;
-  viewedJobs: any = [];
-  postedJobs: any = [];
-  appointments: Appointment[];
-  appliedJobs: AppliedJob[];
+  profile: any = {};
 
-  settings: any = {
-    hide_dob: false,
-    hide_email: false,
-    hide_phone: false,
-    hide_nationality: false,
+  postedJobs: Job[] = [];
+  appointments: Appointment[] = [];
+  ratings: RatingData = {
+    iRated: [],
+    ratedMe: []
   };
-  lastImage: string;
-  defaultImg: string = '';
-
-  profileRating: string;
+  myRating: string;
+  viewedJobs: ViewedJob[] = [];
+  sharedJobs: SharedJob[] = [];
+  appliedJobs: AppliedJob[] = [];
 
   constructor(
     private feedbackProvider: FeedbackProvider,
     private authProvider: AuthProvider,
-    private dataProvider: DataProvider,
-    private navCtrl: NavController,
+    private dataProvider: DataProvider
   ) { }
 
   ionViewDidLoad() {
-    if (!this.authProvider.isLoggedIn()) {
-      localStorage.clear();
-      this.navCtrl.setRoot(LoginPage);
-    } else {
-      this.profile = this.authProvider.profile;
-    }
-    this.initialize();
+    this.profile = this.authProvider.getStoredUser();
+    console.log(this.profile);
+
+    this.dataProvider.userData$.subscribe(data => {
+
+      if (this.profile.type === USER_TYPE.recruiter) {
+        const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid);
+        const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid);
+        const shared = data.sharedJobs.filter(job => job.rid === this.profile.uid);
+
+        this.appliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
+        this.sharedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
+        this.viewedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+
+        this.appointments = data.appointments.filter(job => job.rid === this.profile.uid);
+        this.postedJobs = data.jobs.filter(job => job.uid === this.profile.uid);
+        this.ratings.iRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
+        this.ratings.ratedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);
+        this.myRating = this.dataProvider.getMyRating(this.ratings.ratedMe);
+      } else {
+        const applied = data.appliedJobs.filter(job => job.uid === this.profile.uid);
+        const viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid);
+        const shared = data.sharedJobs.filter(job => job.uid === this.profile.uid);
+
+        this.appliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
+        this.viewedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
+        this.sharedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
+
+        this.appointments = data.appointments.filter(job => job.uid === this.profile.uid);
+        this.ratings.iRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
+        this.ratings.ratedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);
+        this.myRating = this.dataProvider.getMyRating(this.ratings.ratedMe);
+      }
+    });
   }
 
-  initialize() {
-    let type = this.isRecruiter() ? 'rid' : 'uid';
-    if (this.isRecruiter()) {
-      this.dataProvider.getMyPostedJobs(this.profile.uid).subscribe(jobs => {
-        console.log(jobs);
-      })
-    }
-    this.dataProvider.getMyAppointments(type, this.profile.uid).subscribe(appointments => {
-      console.log(appointments);
-    });
-
-    this.dataProvider.getUsersRatedMe(type, this.profile.uid).subscribe(ratedMe => {
-      console.log(ratedMe);
-    });
-    // this.dataProvider.getUsersIRated(type, this.profile.uid).subscribe(iRated => {
-    //   console.log(iRated);
-    // });
-
-    // Object.assign(this.profile, { rating: this.dataProvider.mapRatings(ratings.ratedMe) });
-
-    // this.dataProvider.getCollectionByKeyValuePair(COLLECTION.ratings, id, this.profile.uid).subscribe(rating => {
-    //   Object.assign(this.profile, { rating: this.dataProvider.mapRatings(rating) });
-    // });
-  }
 
   profilePicture(): string {
     return this.dataProvider.getProfilePicture(this.profile);
