@@ -100,13 +100,13 @@
         </ion-row>
   
         <ion-row>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_dob || !user.race">
+          <ion-col col-6 class="animated zoomIn" [hidden]="!user.race">
             <h2>
               <i class="fa fa-users" item-start></i>
             </h2>
             <p>{{user.race}}</p>
           </ion-col>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_nationality || !user.nationality">
+          <ion-col col-6 class="animated zoomIn" [hidden]="!user.nationality">
             <h2>
               <i class="fa fa-flag" item-start></i>
             </h2>
@@ -114,14 +114,14 @@
           </ion-col>
         </ion-row>
         <ion-row>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_phone || !user.phone">
+          <ion-col col-6 class="animated zoomIn" [hidden]="!user.phone">
             <h2>
               <i class="fa fa-phone enlarge" item-start></i>
             </h2>
             <p *ngIf="user.settings.hide_phone">[hidden]</p>
             <p *ngIf="!user.settings.hide_phone">{{user.phone}}</p>
           </ion-col>
-          <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_email || !user.email">
+          <ion-col col-6 class="animated zoomIn" [hidden]="!user.email">
             <h2>
               <i class="fa fa-envelope" item-start></i>
             </h2>

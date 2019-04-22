@@ -41,8 +41,6 @@ export class ProfilePage {
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
-    console.log(this.profile);
-
     this.dataProvider.userData$.subscribe(data => {
 
       if (this.profile.type === USER_TYPE.recruiter) {

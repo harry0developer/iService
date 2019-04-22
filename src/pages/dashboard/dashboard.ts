@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Events, ModalController } from 'ionic-angular';
 import { DataProvider } from '../../providers/data/data';
 import { AppointmentsPage } from '../appointments/appointments';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
@@ -15,7 +15,7 @@ import { Rating, RatingData } from '../../models/rating';
 import { RatingsPage } from '../ratings/ratings';
 import { SettingsPage } from '../settings/settings';
 import { UserData } from '../../models/data';
-import { USER_TYPE } from '../../utils/const';
+import { USER_TYPE, COLLECTION } from '../../utils/const';
 
 @IonicPage()
 @Component({
@@ -42,6 +42,7 @@ export class DashboardPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private feedbackProvider: FeedbackProvider,
+    private modalCtrl: ModalController,
     public authProvider: AuthProvider,
     public dataProvider: DataProvider,
     public afStore: AngularFirestore,
@@ -53,7 +54,7 @@ export class DashboardPage {
     this.profile = this.authProvider.getStoredUser();
 
     this.dataProvider.userData$.subscribe(data => {
-
+      this.profile = data.users.filter(user => user.uid === this.profile.uid)[0];
       if (this.profile.type === USER_TYPE.recruiter) {
         const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid);
         const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid);
@@ -118,7 +119,23 @@ export class DashboardPage {
   }
 
   editProfile() {
-    this.navCtrl.push(SettingsPage);
+    let modal = this.modalCtrl.create(SettingsPage);
+    modal.onDidDismiss(data => {
+      if (data) {
+        this.updateSettings();
+      }
+    });
+    modal.present();
   }
 
+  updateSettings() {
+    this.feedbackProvider.presentLoading();
+    this.dataProvider.updateItem(COLLECTION.users, this.profile, this.profile.id).then(() => {
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentToast('Settings updated successfully');
+    }).catch(err => {
+      console.log(err);
+      this.feedbackProvider.dismissLoading();
+    });
+  }
 }
