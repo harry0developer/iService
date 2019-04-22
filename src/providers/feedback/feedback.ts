@@ -61,41 +61,6 @@ export class FeedbackProvider {
   }
 
 
-  shareJobActionSheet() {
-    let actionSheet = this.actionSheetCtrl.create({
-      title: 'Share this job',
-      buttons: [
-        {
-          text: 'Facebook',
-          icon: 'logo-facebook',
-          handler: () => {
-            this.events.publish(EVENTS.facebookShare);
-          }
-        },
-        {
-          text: 'Twitter',
-          icon: 'logo-twitter',
-          handler: () => {
-            this.events.publish(EVENTS.twitterShare);
-          }
-        },
-        {
-          text: 'Instagram',
-          icon: 'logo-instagram',
-          handler: () => {
-            this.events.publish(EVENTS.instagramShare);
-          }
-        },
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-          }
-        }
-      ]
-    });
-    actionSheet.present();
-  }
 
 
 }

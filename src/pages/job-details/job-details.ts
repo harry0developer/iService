@@ -48,6 +48,8 @@ export class JobDetailsPage {
       this.viewedUsers = data.viewedJobs.filter(job => job.jid === this.job.id);
       this.sharedUsers = data.sharedJobs.filter(job => job.jid === this.job.id);
       this.appliedUsers = data.appliedJobs.filter(job => job.jid === this.job.id);
+      console.log(this.appliedUsers);
+
       if (!this.hasViewedJob()) {
         this.addToViewedJobs();
       }
@@ -88,8 +90,6 @@ export class JobDetailsPage {
 
   applyNow(job) {
     this.feedbackProvider.presentLoading();
-    console.log(job);
-
     const appliedJob: AppliedJob = {
       uid: this.profile.uid,
       jid: job.id,
@@ -315,82 +315,46 @@ export class JobDetailsPage {
     actionSheet.present();
   }
 
-  // private _setAppliedUsers(applied: AppliedJob[]) {
-  //   let aa = [];
-  //   if (applied && applied.length > 0) {
-  //     applied.map(a => {
-  //       if (a.jid === this.job.id) {
-  //         aa.push(a);
-  //       }
-  //     });
-  //   }
-  //   this.appliedUsers = aa;
-  // }
+  presentShareJobActionSheet(job) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: 'Share this job',
+      buttons: [
+        {
+          text: 'Facebook',
+          icon: 'logo-facebook',
+          handler: () => {
+            console.log('job shared...');
 
-  // private _setViewedUsers(viewed: ViewedJob[]) {
-  //   this.viewedJobs = [];
-  //   if (viewed && viewed.length > 0) {
-  //     viewed.map(v => {
-  //       if (v.jid === this.job.id) {
-  //         this.viewedJobs.push(v);
-  //       }
-  //     });
-  //   }
-  // }
+            //this.events.publish(EVENTS.facebookShare);
+          }
+        },
+        {
+          text: 'Twitter',
+          icon: 'logo-twitter',
+          handler: () => {
+            console.log('job shared...');
 
-  // private _setShareduserssharedUsers(shared: SharedJob[]) {
-  //   this.shared = [];
-  //   if (shared && shared.length > 0) {
-  //     shared.map(s => {
-  //       if (s.jid === this.job.id) {
-  //         this.shared.push(s);
-  //       }
-  //     });
-  //   }
-  // }
+            //this.events.publish(EVENTS.twitterShare);
+          }
+        },
+        {
+          text: 'Instagram',
+          icon: 'logo-instagram',
+          handler: () => {
+            console.log('job shared...');
 
-  // initializeJobs() {
-  //   const viewed = this.dataProvider.viewedJobs;
-  //   const applied = this.dataProvider.appliedUsers;
-  //   const shared = this.dataProvider.sharedUsers;
-  //   this._setViewedJobs(viewed);
-  //   this._setAppliedUsers(applied);
-  //   this._setShareduserssharedUsers(shared);
-  // }
+            //this.events.publish(EVENTS.instagramShare);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
 
-  // unsubscribeFromSocialEvents() {
-  //   this.ionEvent.unsubscribe(EVENTS.facebookShare);
-  //   this.ionEvent.unsubscribe(EVENTS.twitterShare);
-  //   this.ionEvent.unsubscribe(EVENTS.instagramShare);
-  // }
-
-  // presentShareJobActionSheet(job) {
-  //   this.feedbackProvider.shareJobActionSheet();
-  //   this.ionEvent.subscribe(EVENTS.facebookShare, () => {
-  //     this.unsubscribeFromSocialEvents();
-  //     if (this.shareJobWithFacebook(job)) {
-  //       this.addToShareduserssharedUsers(job, PLATFORM.facebook);
-  //     } else {
-  //       this.feedbackProvider.presentToast('Sharing job with Facebook failed, try again');
-  //     }
-  //   });
-
-  //   this.ionEvent.subscribe(EVENTS.twitterShare, () => {
-  //     this.unsubscribeFromSocialEvents();
-  //     if (this.shareJobWithTwitter(job)) {
-  //       this.addToShareduserssharedUsers(job, PLATFORM.twitter);
-  //     } else {
-  //       this.feedbackProvider.presentToast('Sharing job with Twitter failed, try again');
-  //     }
-  //   });
-
-  //   this.ionEvent.subscribe(EVENTS.instagramShare, () => {
-  //     this.unsubscribeFromSocialEvents();
-  //     if (this.shareJobWithInstagram(job)) {
-  //       this.addToShareduserssharedUsers(job, PLATFORM.instagram);
-  //     } else {
-  //       this.feedbackProvider.presentToast('Sharing job with Instagram failed, try again');
-  //     }
-  //   });
-  // }
 }

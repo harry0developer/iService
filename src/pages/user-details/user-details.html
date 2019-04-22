@@ -94,7 +94,8 @@
             <h2>
               <i class="fa fa-calendar" item-start></i>
             </h2>
-            <p>{{user.dob}}</p>
+            <p *ngIf="user.settings.hide_dob">[hidden]</p>
+            <p *ngIf="!user.settings.hide_dob">{{user.dob}}</p>
           </ion-col>
         </ion-row>
   
@@ -117,13 +118,15 @@
             <h2>
               <i class="fa fa-phone enlarge" item-start></i>
             </h2>
-            <p>{{user.phone}}</p>
+            <p *ngIf="user.settings.hide_phone">[hidden]</p>
+            <p *ngIf="!user.settings.hide_phone">{{user.phone}}</p>
           </ion-col>
           <ion-col col-6 class="animated zoomIn" [hidden]="settings?.hide_email || !user.email">
             <h2>
               <i class="fa fa-envelope" item-start></i>
             </h2>
-            <p>{{user.email}}</p>
+            <p *ngIf="user.settings.hide_email">[hidden]</p>
+            <p *ngIf="!user.settings.hide_email">{{user.email}}</p>
           </ion-col>
         </ion-row>
   

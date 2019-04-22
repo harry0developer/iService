@@ -27,7 +27,9 @@ export class ViewUsersPage {
   ionViewDidLoad() {
     const users = this.navParams.get('users');
     this.category = this.navParams.get('category');
-    // this.users = this.dataProvider.mapUsers(users);
+    this.dataProvider.userData$.subscribe(data => {
+      this.users = this.dataProvider.getMappedCandidates(data.users, users);
+    });
   }
 
   viewUserDetails() {

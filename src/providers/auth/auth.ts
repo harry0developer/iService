@@ -79,7 +79,8 @@ export class AuthProvider {
       dateCreated: this.dateProvider.getDate(),
       type: data.type,
       location: data.location,
-      phone: data.phone
+      phone: data.phone,
+      settings: { hide_dob: false, hide_email: false, hide_phone: false },
     };
     return this.afs.collection('users').doc(user.uid).set(userData);
   }

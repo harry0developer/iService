@@ -9,6 +9,8 @@ import { Appointment } from '../../models/appointment';
 import { DateProvider } from '../../providers/date/date';
 import { ViewedJob, Job, AppliedJob, SharedJob } from '../../models/job';
 import { UserData } from '../../models/data';
+import { AppointmentsPage } from '../appointments/appointments';
+import { MyJobsPage } from '../my-jobs/my-jobs';
 
 @IonicPage()
 @Component({
@@ -22,6 +24,7 @@ export class UserDetailsPage {
   viewedJobs: ViewedJob[] = [];
   appliedJobs: AppliedJob[] = [];
   sharedJobs: SharedJob[] = [];
+
   postedJobs: Job[] = [];
   appointments: Appointment[] = [];
   appointment: any;
@@ -63,6 +66,8 @@ export class UserDetailsPage {
         this.appointmentsInProgress = data.appointments.filter(app => app.uid === this.user.uid && app.status === STATUS.inProgress);
         this.isUserInAppointment();
       }
+      console.log(data);
+
       this.rating = this.dataProvider.getMyRating(data.ratings.filter(user => user.uid === this.user.uid));
     });
   }
@@ -159,6 +164,22 @@ export class UserDetailsPage {
     });
     actionSheet.present();
   }
+
+  // viewPostedJobs() {
+  //   this.navCtrl.push(MyJobsPage, { jobs: { jobs: this.postedJobs } });
+  // }
+
+  // viewAppliedJobs() {
+  //   this.navCtrl.push(MyJobsPage, { jobs: { jobs: this.appliedJobs } });
+  // }
+
+  // viewViewedJobs() {
+  //   this.navCtrl.push(MyJobsPage, { jobs: { jobs: this.viewedJobs } });
+  // }
+
+  // viewAppointments() {
+  //   this.navCtrl.push(AppointmentsPage, { appointments: { appointments: this.appointments } });
+  // }
 
 
 }

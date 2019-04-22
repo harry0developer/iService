@@ -33,14 +33,12 @@ export class SettingsPage {
     private authProvider: AuthProvider,
     private feedbackProvider: FeedbackProvider,
     private navParams: NavParams,
-    private modalCtrl: ModalController,
-    // private locationProvider: LocationProvider,
-    private events: Events
+    private modalCtrl: ModalController
   ) {
-    this.profile = this.authProvider.getStoredUser();
   }
 
   ionViewDidLoad() {
+    this.profile = this.authProvider.getStoredUser();
     const allSettings = this.dataProvider.getSettings();
     this.settings = this.getSettings(allSettings);
     this.oldSettings = {

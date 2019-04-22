@@ -43,6 +43,7 @@ export class SignupPage {
 
     const data: User = {
       ...this.data,
+      settings: { hide_dob: false, hide_email: false, hide_phone: false },
       dateCreated: this.dateProvider.getDate()
     }
     this.authProvider.signUpWithEmailAndPassword(data).then(() => {
