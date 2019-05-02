@@ -5,8 +5,6 @@ import { auth } from 'firebase';
 import { User } from '../../models/user';
 import { DateProvider } from '../date/date';
 import { USER_TYPE } from '../../utils/const';
-import { LoginPage } from '../../pages/login/login';
-import { NavController } from 'ionic-angular';
 
 @Injectable()
 export class AuthProvider {
@@ -68,6 +66,13 @@ export class AuthProvider {
     });
   }
 
+  signUpWithPhonenumber(phoneNumber, appVerifier) {
+    this.afAuth.auth.signInWithPhoneNumber(phoneNumber, appVerifier).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    });
+  }
   updateUser(data: User) {
     const user = this.getStoredUser();
     const userData: User = {

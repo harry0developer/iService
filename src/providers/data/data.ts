@@ -38,58 +38,41 @@ export class DataProvider {
     private authProvider: AuthProvider) {
     // { users, jobs, appointments, ratings, viewedJobs, appliedJobs, sharedJobs };
     this.profile = this.authProvider.getStoredUser();
-    let type = this.profile.type === USER_TYPE.recruiter ? 'rid' : 'uid';
 
-    this.getUsers().subscribe(users => {
-      this.userData.setUsers(users);
-      this.updateUserData(this.userData);
-    });
+    if (this.profile) {
 
-    this.getJobs().subscribe(jobs => {
-      this.userData.setJobs(jobs);
-      this.updateUserData(this.userData);
-    });
+      let type = this.profile.type === USER_TYPE.recruiter ? 'rid' : 'uid';
 
-    this.getMyAppointments(type, this.profile.uid).subscribe(appointments => {
-      this.userData.setAppointments(appointments);
-      this.updateUserData(this.userData);
-    });
+      this.getUsers().subscribe(users => {
+        this.userData.setUsers(users);
+        this.updateUserData(this.userData);
+      });
 
-    this.getMyViewedJobs(type, this.profile.uid).subscribe(jobs => {
-      this.userData.setViewedJobs(jobs);
-      this.updateUserData(this.userData);
-    });
+      this.getJobs().subscribe(jobs => {
+        this.userData.setJobs(jobs);
+        this.updateUserData(this.userData);
+      });
 
-    this.getMyAppliedJobs(type, this.profile.uid).subscribe(jobs => {
-      this.userData.setAppliedJob(jobs);
-      this.updateUserData(this.userData);
-    });
+      this.getMyAppointments(type, this.profile.uid).subscribe(appointments => {
+        this.userData.setAppointments(appointments);
+        this.updateUserData(this.userData);
+      });
 
-    this.getMySharedJobs(type, this.profile.uid).subscribe(jobs => {
-      this.userData.setSharedJobs(jobs);
-      this.updateUserData(this.userData);
-    });
+      this.getMyViewedJobs(type, this.profile.uid).subscribe(jobs => {
+        this.userData.setViewedJobs(jobs);
+        this.updateUserData(this.userData);
+      });
 
-    // this.getMyPostedJobs(this.profile.uid).subscribe(postedJobs => {
-    //   this.userData.setPostedJobs(postedJobs);
-    //   this.updateUserData(this.userData);
-    // });
+      this.getMyAppliedJobs(type, this.profile.uid).subscribe(jobs => {
+        this.userData.setAppliedJob(jobs);
+        this.updateUserData(this.userData);
+      });
 
-    // this.getUsersIRated('rid', this.profile.uid).subscribe(iRated => {
-    //   const rate: RatingData = {
-    //     iRated
-    //   };
-    //   this.userData.setRatings(rate);
-    //   this.updateUserData(this.userData);
-    // });
-
-    // this.getUsersRatedMe('uid', this.profile.uid).subscribe(ratedMe => {
-    //   const rate: RatingData = {
-    //     ratedMe
-    //   };
-    //   this.userData.setRatings(rate);
-    //   this.updateUserData(this.userData);
-    // });
+      this.getMySharedJobs(type, this.profile.uid).subscribe(jobs => {
+        this.userData.setSharedJobs(jobs);
+        this.updateUserData(this.userData);
+      });
+    }
   }
 
   updateUserData(userData: UserData) {

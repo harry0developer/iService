@@ -46,6 +46,7 @@ export class SignupPage {
       settings: { hide_dob: false, hide_email: false, hide_phone: false },
       dateCreated: this.dateProvider.getDate()
     }
+    console.log(data);
     this.authProvider.signUpWithEmailAndPassword(data).then(() => {
       this.navCtrl.setRoot(DashboardPage);
     }).catch(err => {

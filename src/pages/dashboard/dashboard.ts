@@ -4,10 +4,7 @@ import { DataProvider } from '../../providers/data/data';
 import { AppointmentsPage } from '../appointments/appointments';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
 import { MyJobsPage } from '../my-jobs/my-jobs';
-import { AngularFirestore } from '@angular/fire/firestore';
 import { AuthProvider } from '../../providers/auth/auth';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { LoginPage } from '../login/login';
 import { Appointment } from '../../models/appointment';
 import { AppliedJob, ViewedJob, SharedJob, Job } from '../../models/job';
 import { ViewedJobsPage } from '../viewed-jobs/viewed-jobs';
@@ -44,9 +41,7 @@ export class DashboardPage {
     private feedbackProvider: FeedbackProvider,
     private modalCtrl: ModalController,
     public authProvider: AuthProvider,
-    public dataProvider: DataProvider,
-    public afStore: AngularFirestore,
-    public afAuth: AngularFireAuth) {
+    public dataProvider: DataProvider, ) {
   }
 
 

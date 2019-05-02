@@ -17,6 +17,12 @@ page-signup {
         text-align: center;
     }
 
+    ion-select, itext-input{
+        color: $primary;
+        font-weight: bold;
+        text-align: right;
+    }
+
     p {
         color: $white;
     }

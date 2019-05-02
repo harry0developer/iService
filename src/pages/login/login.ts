@@ -13,10 +13,12 @@ import { COLLECTION, USER_TYPE, EVENTS } from '../../utils/const';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { UserData } from '../../models/data';
-
+import { PhoneNumber } from '../../models/phonenumber';
+import { WindowProvider } from '../../providers/window/window';
 @Component({
   selector: 'page-login',
   templateUrl: 'login.html',
+  providers: [WindowProvider]
 })
 export class LoginPage {
   data = {
@@ -25,6 +27,12 @@ export class LoginPage {
   }
   type = 'password';
   showPass = false;
+
+  user: any;
+
+
+  verificationId: any;
+  otpCode: string = '';
   constructor(
     public afAuth: AngularFireAuth,
     public navCtrl: NavController,
@@ -33,14 +41,42 @@ export class LoginPage {
     public dateProvider: DateProvider,
     public feedbackProvider: FeedbackProvider,
     private authProvider: AuthProvider,
-    private ionEvents: Events) {
+    private ionEvents: Events, ) {
   }
 
   ionViewDidLoad() {
+
+    // this.windowRef = this.windowProvider.windowRef;
+    // this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+    // this.windowRef.recaptchaVerifier.render();
+
     if (this.authProvider.isLoggedIn()) {
       this.navigate(this.authProvider.getStoredUser());
     }
   }
+
+  // sendLoginCode() {
+  //   const appVerifier = this.windowRef.recaptchaVerifier;
+  //   const num = this.phoneNumber.e164;
+  //   firebase.auth().signInWithPhoneNumber(num, appVerifier)
+  //     .then(result => {
+  //       console.log(result);
+  //       this.windowRef.confirmationResult = result;
+  //     })
+  //     .catch(error => console.log(error));
+  // }
+
+  // verifyLoginCode() {
+  //   this.windowRef.confirmationResult
+  //     .confirm(this.verificationCode)
+  //     .then(result => {
+  //       console.log(result);
+  //       this.user = result.user;
+  //     })
+  //     .catch(error => console.log(error, "Incorrect code entered?"));
+  // }
+
+
 
   signinWithEmailAndPassword() {
     this.feedbackProvider.presentLoading();
@@ -90,6 +126,7 @@ export class LoginPage {
     });
   }
 
+
   navigate(user) {
     this.feedbackProvider.presentLoading();
     this.authProvider.storeUser(user);
@@ -126,4 +163,26 @@ export class LoginPage {
       this.type = 'password';
     }
   }
+
+  // sendVerificationSms() {
+
+  //   this.firebaseAuth.verifyPhoneNumber('+27829390061', 60).then(res => {
+  //     console.log(res);
+  //     this.verificationId = res.verificationId;
+  //   }).catch(err => {
+  //     console.log(err);
+
+  //   }) 
+  // }
+
+  // verifySMSOtp() {
+  //   const signInCredential = firebase.auth.PhoneAuthProvider.credential(this.verificationId, this.otpCode);
+  //   firebase.auth().signInWithCredential(signInCredential).then(res => {
+  //     console.log(res);
+
+  //   }).catch(err => {
+  //     console.log(err);
+
+  //   })
+  // }
 }

@@ -3,9 +3,11 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
+// import { AngularFireModule } from '@angular/fire';
+// import { AngularFirestoreModule } from '@angular/fire/firestore';
+// import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireDatabaseModule } from '@angular/fire/database';
 
 import { RatingModule } from "ngx-rating";
 import { Network } from '@ionic-native/network';
@@ -40,6 +42,8 @@ import { SettingsPage } from '../pages/settings/settings';
 import { AppointmentsPage } from '../pages/appointments/appointments';
 import { NetworkErrorPage } from '../pages/network-error/network-error';
 import { NetworkProvider } from '../providers/network/network';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @NgModule({
   declarations: [
@@ -69,9 +73,12 @@ import { NetworkProvider } from '../providers/network/network';
     BrowserModule,
     IonicModule.forRoot(MyApp),
     BrowserAnimationsModule,
+    // AngularFireModule.initializeApp(firebaseConfig),
+    // AngularFirestoreModule,
+    RatingModule,
+
     AngularFireModule.initializeApp(firebaseConfig),
-    AngularFirestoreModule,
-    RatingModule
+    AngularFireDatabaseModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -100,7 +107,6 @@ import { NetworkProvider } from '../providers/network/network';
   providers: [
     StatusBar,
     SplashScreen,
-    AngularFireAuth,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     SocialSharing,
     Network,
@@ -108,7 +114,9 @@ import { NetworkProvider } from '../providers/network/network';
     AuthProvider,
     FeedbackProvider,
     DateProvider,
-    NetworkProvider
+    NetworkProvider,
+    AngularFirestore,
+    AngularFireAuth
   ]
 })
 export class AppModule { }

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController } from 'ionic-angular';
+import { IonicPage, NavController, ModalController } from 'ionic-angular';
 import { DataProvider } from '../../providers/data/data';
 import { slideIn, listSlideUp } from '../../utils/animations';
 import { FeedbackProvider } from '../../providers/feedback/feedback';
@@ -9,6 +9,7 @@ import { Appointment } from '../../models/appointment';
 import { LoginPage } from '../login/login';
 import { AppliedJob, Job, ViewedJob, SharedJob } from '../../models/job';
 import { RatingData } from '../../models/rating';
+import { SettingsPage } from '../settings/settings';
 
 declare var cordova: any;
 
@@ -36,37 +37,25 @@ export class ProfilePage {
   constructor(
     private feedbackProvider: FeedbackProvider,
     private authProvider: AuthProvider,
-    private dataProvider: DataProvider
+    private dataProvider: DataProvider,
+    private modalCtrl: ModalController
   ) { }
 
   ionViewDidLoad() {
     this.profile = this.authProvider.getStoredUser();
     this.dataProvider.userData$.subscribe(data => {
-
+      this.profile = data.users.filter(user => user.uid === this.profile.uid)[0];
+      this.appliedJobs = data.appliedJobs;
+      this.sharedJobs = data.sharedJobs;
+      this.viewedJobs = data.viewedJobs;
       if (this.profile.type === USER_TYPE.recruiter) {
-        const applied = data.appliedJobs.filter(job => job.rid === this.profile.uid);
-        const viewed = data.viewedJobs.filter(job => job.rid === this.profile.uid);
-        const shared = data.sharedJobs.filter(job => job.rid === this.profile.uid);
-
-        this.appliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
-        this.sharedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
-        this.viewedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
-
-        this.appointments = data.appointments.filter(job => job.rid === this.profile.uid);
+        this.appointments = data.appointments.filter(appointment => appointment.rid === this.profile.uid);
         this.postedJobs = data.jobs.filter(job => job.uid === this.profile.uid);
         this.ratings.iRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
         this.ratings.ratedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);
         this.myRating = this.dataProvider.getMyRating(this.ratings.ratedMe);
       } else {
-        const applied = data.appliedJobs.filter(job => job.uid === this.profile.uid);
-        const viewed = data.viewedJobs.filter(job => job.uid === this.profile.uid);
-        const shared = data.sharedJobs.filter(job => job.uid === this.profile.uid);
-
-        this.appliedJobs = this.dataProvider.removeDuplicates(applied, 'jid');
-        this.viewedJobs = this.dataProvider.removeDuplicates(shared, 'jid');
-        this.sharedJobs = this.dataProvider.removeDuplicates(viewed, 'jid');
-
-        this.appointments = data.appointments.filter(job => job.uid === this.profile.uid);
+        this.appointments = data.appointments.filter(appointment => appointment.uid === this.profile.uid);
         this.ratings.iRated = data.ratings.filter(rater => rater.rid === this.profile.uid);
         this.ratings.ratedMe = data.ratings.filter(rater => rater.uid === this.profile.uid);
         this.myRating = this.dataProvider.getMyRating(this.ratings.ratedMe);
@@ -105,13 +94,25 @@ export class ProfilePage {
 
 
   settingsPage() {
-
+    let modal = this.modalCtrl.create(SettingsPage);
+    modal.onDidDismiss(data => {
+      if (data) {
+        this.updateSettings();
+      }
+    });
+    modal.present();
   }
 
   updateSettings() {
-
+    this.feedbackProvider.presentLoading();
+    this.dataProvider.updateItem(COLLECTION.users, this.profile, this.profile.id).then(() => {
+      this.feedbackProvider.dismissLoading();
+      this.feedbackProvider.presentToast('Settings updated successfully');
+    }).catch(err => {
+      console.log(err);
+      this.feedbackProvider.dismissLoading();
+    });
   }
-
   public presentActionSheet() {
 
   }

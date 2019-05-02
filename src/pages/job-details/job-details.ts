@@ -6,7 +6,7 @@ import { DateProvider } from '../../providers/date/date';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AppliedJob, SharedJob, ViewedJob } from '../../models/job';
 import { ViewUsersPage } from '../view-users/view-users';
-import { COLLECTION } from '../../utils/const';
+import { COLLECTION, USER_TYPE } from '../../utils/const';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { UserData } from '../../models/data';
 import { User } from 'firebase';
@@ -26,6 +26,11 @@ export class JobDetailsPage {
   viewedUsers: ViewedJob[] = [];
   sharedUsers: SharedJob[] = [];
 
+  myRating: string;
+  viewedJobs: ViewedJob[] = [];
+  sharedJobs: SharedJob[] = [];
+  appliedJobs: AppliedJob[] = [];
+
   constructor(
     public navCtrl: NavController,
     public actionSheetCtrl: ActionSheetController,
@@ -44,20 +49,18 @@ export class JobDetailsPage {
     this.dataProvider.getItemById(COLLECTION.users, this.job.uid).subscribe(user => {
       this.job.postedBy = user;
     });
+
+
     this.dataProvider.userData$.subscribe(data => {
       this.viewedUsers = data.viewedJobs.filter(job => job.jid === this.job.id);
       this.sharedUsers = data.sharedJobs.filter(job => job.jid === this.job.id);
       this.appliedUsers = data.appliedJobs.filter(job => job.jid === this.job.id);
-      console.log(this.appliedUsers);
 
       if (!this.hasViewedJob()) {
         this.addToViewedJobs();
       }
       this.hasUserApplied();
     });
-
-
-
   }
 
 

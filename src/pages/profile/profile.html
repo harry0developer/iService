@@ -67,10 +67,15 @@
             <i class="fa fa-transgender" item-start></i>
             <p>Gender <span class="details">{{profile.gender}}</span></p>
           </ion-item>
+          <ion-item text-wrap *ngIf="profile.race">
+            <i class="fa fa-flag" item-start></i>
+            <p>Race <span class="details">{{profile.race}}</span></p>
+          </ion-item>
           <ion-item text-wrap *ngIf="profile.nationality">
             <i class="fa fa-flag" item-start></i>
             <p>Nationality <span class="details">{{profile.nationality}}</span></p>
           </ion-item>
+          
         </ion-card>
       </ion-list>
   
